@@ -1,0 +1,18 @@
+{
+  "name": "daily",
+  "version": "1.0.0",
+  "description": "Daily: protocol + lift tracker",
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "build": "node build.mjs",
+    "check": "tsc -p . && node build.mjs",
+    "test": "python3 tests/smoke.py dist/daily.html"
+  },
+  "author": "",
+  "license": "ISC",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

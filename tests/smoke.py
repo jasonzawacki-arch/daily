@@ -1,0 +1,31 @@
+from playwright.sync_api import sync_playwright
+import datetime
+errs=[]; td=datetime.date.today(); y=td-datetime.timedelta(days=1); y2=td-datetime.timedelta(days=2)
+seed=f"localStorage.setItem('tour','1');localStorage.setItem('wl:wcfg',JSON.stringify({{start:'{y2}'}}));localStorage.setItem('wl:w-{y2}',JSON.stringify({{k:0,dn:1}}));localStorage.setItem('wl:w-{y}',JSON.stringify({{k:3,dn:1}}));"
+def S(n,f):
+    try: r=f(); print('OK  ',n,'' if r is None else r)
+    except Exception as e: print('FAIL',n,str(e).split('\n')[0][:170])
+with sync_playwright() as p:
+    b=p.chromium.launch(); pg=b.new_context(viewport={'width':390,'height':844}).new_page()
+    pg.on('pageerror',lambda e:errs.append(str(e)[:200])); pg.add_init_script(seed)
+    pg.goto('file://'+__import__('os').path.abspath(__import__('sys').argv[1] if len(__import__('sys').argv)>1 else 'dist/daily.html')+''); pg.wait_for_timeout(1300)
+    P=lambda s:pg.locator('#hp '+s); L=lambda s:pg.locator('#hl '+s)
+    def tab(t): P(f'button[data-a=tab][data-v={t}]').click(); pg.wait_for_timeout(350)
+    tab('vitals')
+    S('Vitals capsule',lambda:P('.cap').count())
+    S('type -> preview pills',lambda:(P('#qc-vitals').fill('BP 118 over 72 weight 204.6 slept 6.5'),P('button[data-a=qc]').click(),pg.wait_for_timeout(300),P('.vp .pill').all_inner_texts())[-1])
+    S('nothing saved before confirm',lambda:P('input[data-k=wt]').input_value()=='')
+    S('Save writes fields',lambda:(P('button[data-a=vsave]').click(),pg.wait_for_timeout(300),(P('input[data-k=wt]').input_value(),P('input[data-k="bp.am.0"]').input_value())))
+    tab('fuel')
+    S('Fuel capsule + meal preview/save',lambda:(P('#qc-fuel').fill('ate eggs and rice 520 calories 34 protein'),P('#qc-fuel').press('Enter'),pg.wait_for_timeout(300),P('.vp .pill').all_inner_texts(),P('button[data-a=vsave]').click(),pg.wait_for_timeout(300),P('.card:has(h3:text("Logged")) .r').count()))
+    S('Cancel clears',lambda:(P('#qc-fuel').fill('16 oz water'),P('button[data-a=qc]').click(),pg.wait_for_timeout(250),P('button[data-a=vcancel]').click(),pg.wait_for_timeout(250),P('.vp').count()))
+    P('button[data-a=tab][data-v=sw]').click(); pg.wait_for_timeout(500)
+    S('Lift capsule on lift day',lambda:L('.cap').count())
+    S('set preview',lambda:(L('#qc-set').fill('bench 185 for 8'),L('button[data-a=qc]').click(),pg.wait_for_timeout(300),L('.vp .pill').all_inner_texts())[-1])
+    S('log set fills row 1',lambda:(L('button[data-a=vsave]').click(),pg.wait_for_timeout(300),(L('input[data-s$="|0|w"]').first.input_value(),L('input[data-s$="|0|r"]').first.input_value())))
+    S('second set goes to row 2',lambda:(L('#qc-set').fill('185 for 7'),L('button[data-a=qc]').click(),pg.wait_for_timeout(250),L('button[data-a=vsave]').click(),pg.wait_for_timeout(300),(L('input[data-s$="|1|w"]').first.input_value(),L('input[data-s$="|1|r"]').first.input_value())))
+    L('button[data-a=tab][data-v=sw]').click(); pg.wait_for_timeout(500); tab('today')
+    S('toggle item persists across reload',lambda:(P('label.r input[type=checkbox]').first.check(),pg.wait_for_timeout(500),pg.reload(),pg.wait_for_timeout(1400),P('label.r').first.count() and (P('.pg b').inner_text())))
+    S('all six tabs render',lambda:[ (tab(x),P('.w').count())[1] for x in ['today','vitals','fuel','hist','more']])
+    pg.screenshot(path='v.png')
+    print('ERRORS',errs); b.close()
