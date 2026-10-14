@@ -72,11 +72,11 @@ with sync_playwright() as p:
 
     check("file picker accepts any file type (Android mislabels .json downloads)", P("#rgf").get_attribute("accept") is None)
     P("details:has(#rgt) summary").click(); P("#rgt").fill(json.dumps(mine)); P("button[data-a=rgp]").click(); pg.wait_for_timeout(400)
-    check("pasted regimen is offered", P("button[data-a=rgy]").count() == 1 and "Tap Replace" in pg.locator("#hp").evaluate("h => h.shadowRoot.getElementById('ut').textContent"))
+    check("pasted regimen is offered", P("button[data-a=rgy]").count() == 1 and P("#ut button").inner_text() == "Replace")
     P("button[data-a=rgn]").click(); pg.wait_for_timeout(300)
     P("#rgf").set_input_files(write("daily-regimen (1).txt", mine)); pg.wait_for_timeout(400)
     check("asks before replacing", P("button[data-a=rgy]").count() == 1 and "Test plan" in text())
-    P("button[data-a=rgy]").click(); pg.wait_for_timeout(500)
+    P("#ut button").click(); pg.wait_for_timeout(500)  # Replace, right in the message
     check("regimen card shows the loaded file", "loaded from a file" in text() and f"{len(mine['items'])} items" in text())
     check("version notes come from the file", "First test note" in text() or P("summary:text-is('t1 (Today)')").count() == 1)
     today()

@@ -459,7 +459,8 @@ function offerReg(o: any, file = '') {
   regPend = why ? null : o;
   regMsg = why ? 'Not loaded. ' + (file ? file + ': ' : '') + why : '';
   render();
-  showNote(why ? 'Regimen not loaded. See the Regimen card.' : 'Found ' + (o.name || 'a regimen') + '. Tap Replace to use it.');
+  if (why) showNote('Regimen not loaded. See the Regimen card.');
+  else showNote('Found ' + (o.name || 'a regimen') + ' (' + o.items.length + ' items).', ['Replace', useReg]);
   try {
     const el = $(why ? '#rgf' : '#rgq');
     if (el) (why ? el.parentElement : el).scrollIntoView({ block: 'center' });
@@ -2312,15 +2313,26 @@ const undoKey = (a: string) =>
   })[a];
 let undoSt: any = null,
   uto = 0;
-function showNote(msg: string) {
+let noteAct: (() => void) | null = null;
+/** A short message at the bottom; with an action, it carries a button and stays up longer. */
+function showNote(msg: string, act?: [string, () => void]) {
   undoSt = null;
+  noteAct = act ? act[1] : null;
   const t = $('#ut') as HTMLElement;
-  t.textContent = msg;
+  t.innerHTML = esc(msg) + (act ? ` <button data-ua=1>${esc(act[0])}</button>` : '');
   t.hidden = false;
   clearTimeout(uto);
   uto = window.setTimeout(() => {
     t.hidden = true;
-  }, 5000);
+    noteAct = null;
+  }, act ? 15000 : 5000);
+}
+function useReg() {
+  if (!regPend) return;
+  put('reg', regPend);
+  regMsg = 'Loaded ' + (regPend.name || 'the regimen') + '. Today now shows it.';
+  showNote('Loaded ' + (regPend.name || 'the regimen') + '.');
+  regPend = null;
 }
 function showUndo(k: string, snap: string, msg: string) {
   undoSt = { k, snap };
@@ -2333,7 +2345,15 @@ function showUndo(k: string, snap: string, msg: string) {
   }, 7000);
 }
 SR.addEventListener('click', (e) => {
-  const b = (e.target as HTMLElement).closest('#ut button');
+  const b = (e.target as HTMLElement).closest('#ut button') as HTMLElement | null;
+  if (b && b.dataset.ua && noteAct) {
+    const f = noteAct;
+    noteAct = null;
+    ($('#ut') as HTMLElement).hidden = true;
+    f();
+    render();
+    return;
+  }
   if (b && undoSt) {
     put(undoSt.k, JSON.parse(undoSt.snap));
     undoSt = null;
@@ -2938,10 +2958,7 @@ app.addEventListener('click', async (e) => {
     offerReg(o);
     return;
   } else if (a === 'rgy' && regPend) {
-    put('reg', regPend);
-    regMsg = 'Loaded ' + (regPend.name || 'the regimen') + '. Today now shows it.';
-    showNote('Loaded ' + (regPend.name || 'the regimen') + '.');
-    regPend = null;
+    useReg();
   } else if (a === 'rgn') {
     regPend = null;
     regMsg = '';
@@ -3059,7 +3076,16 @@ async function filePicked(t: HTMLInputElement) {
       showNote(o && o.format === 'daily-regimen' ? 'That is a regimen file. Load it under Customize and settings.' : 'That file is not a Daily backup.');
     } else {
       bkPend = o;
-      showNote('Backup file read. Tap Restore to use it.');
+      showNote('Backup file read.', [
+        'Restore',
+        () => {
+          if (!bkPend) return;
+          restoreAll(bkPend);
+          bkPend = null;
+          window.L_ && L_.r && L_.r();
+          showNote('Backup restored.');
+        },
+      ]);
     }
     render();
   }
