@@ -27,6 +27,8 @@ let js = '(function(){var M={},C={};function R(n){if(C[n])return C[n].exports;va
 for (const [n, c] of Object.entries(mods)) js += 'M[' + JSON.stringify(n) + ']=function(module,exports,require){\n' + c + '\n};\n';
 js += JSON.stringify(ENTRY) + '.forEach(R);})();';
 js = js.replace(/<\/script/gi, '<\\/script');
+const BUILD = new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
+js = js.split('__DAILY_BUILD__').join(BUILD);
 const tpl = fs.readFileSync(path.join(SRC, 'index.template.html'), 'utf8');
 const html = tpl.replace('/*CSS*/', () => fs.readFileSync(path.join(SRC, 'global.css'), 'utf8')).replace('/*JS*/', () => '\n' + js + '\n');
 fs.mkdirSync('dist', { recursive: true });

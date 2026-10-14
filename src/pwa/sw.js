@@ -18,7 +18,8 @@ self.addEventListener('fetch', (e) => {
   if (e.request.mode === 'navigate') {
     const root = new URL('./', self.registration.scope).pathname;
     if (u.pathname !== root && u.pathname !== root + 'index.html') return;
-    e.respondWith(fetch(e.request).then((r) => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then((c) => c.put('./index.html', copy)); } return r; })
+    // no-cache: always ask the server (GitHub Pages lets browsers reuse a page for 10 minutes), offline falls back to the saved copy
+    e.respondWith(fetch(e.request.url, { cache: 'no-cache', credentials: 'same-origin' }).then((r) => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then((c) => c.put('./index.html', copy)); } return r; })
       .catch(() => caches.match('./index.html').then((r) => r || caches.match('./'))));
     return;
   }
