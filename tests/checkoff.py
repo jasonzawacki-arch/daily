@@ -25,6 +25,13 @@ with sync_playwright() as p:
     S('save item', lambda: (P('button[data-a=vsave]').click(), pg.wait_for_timeout(400), prog()))
     S('two windows', lambda: cmd('finished dinner and training'))
     S('nothing matched msg', lambda: (cmd('hello there'), P('p.vm').inner_text())[1])
-    S('check-all button on opened window', lambda: (P('button[data-a=o]').nth(5).click(), pg.wait_for_timeout(300), P('button[data-a=wall]').count()))
+    def open_a_window():
+        # The current time window starts open, so which window a tap opens depends on the time of day: tap until one shows check-all.
+        for i in range(P('button[data-a=o]').count()):
+            if P('button[data-a=wall]').count():
+                break
+            P('button[data-a=o]').nth(i).click(); pg.wait_for_timeout(300)
+        return P('button[data-a=wall]').count()
+    S('check-all button on opened window', lambda: open_a_window() or (_ for _ in ()).throw(AssertionError('no window showed check-all')))
     S('check-all works', lambda: (P('button[data-a=wall]').first.click(), pg.wait_for_timeout(400), prog()))
     print('ERRORS', errs); b.close()

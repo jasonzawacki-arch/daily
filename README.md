@@ -2,6 +2,10 @@
 
 A configurable daily regimen + lifting tracker. TypeScript source compiles to **one self-contained HTML file** — no server, no framework, no build dependencies beyond the TypeScript compiler.
 
+![Daily on a phone: the day's checklist, the workout log and the program editor with templates](docs/screenshots/daily.jpg)
+
+**Try it: https://jasonzawacki-arch.github.io/daily/** (sample data; installable, works offline).
+
 ## What it does
 
 - **Daily checkoffs** — regimen items organized into time windows (morning, training, meals, evening, pre-bed), with weekday / day-of-week filters and date-gated items
