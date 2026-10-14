@@ -100,6 +100,10 @@ export interface ProgramFile {
   format: 'daily-program';
   version: 1;
   name?: string;
+  /** One line about the program, shown with templates. */
+  about?: string;
+  /** 'cycle' (default): days rotate, the next day follows the last completed one. 'week': 7 days, Monday first. */
+  sched?: 'cycle' | 'week';
   /** HIT style: one working set to failure, feeder sets and short rest options. */
   hit?: boolean;
   /** Days in cycle order; a day with off: true is a rest day. */
@@ -111,15 +115,17 @@ export function checkProgram(p: any): string {
   if (!p || typeof p !== 'object' || p.format !== 'daily-program') return 'This is not a Daily program file.';
   if (p.version !== 1) return 'This program file is from a newer version of Daily.';
   if (p.name != null && !str(p.name, 80)) return 'The program name is too long or has < or >.';
+  if (p.about != null && !str(p.about, 400)) return 'The "about" text is too long or has < or >.';
   if (p.hit != null && typeof p.hit !== 'boolean') return '"hit" must be true or false.';
+  if (p.sched != null && p.sched !== 'cycle' && p.sched !== 'week') return '"sched" must be "cycle" or "week".';
   const D = p.days;
   if (!Array.isArray(D) || D.length < 1 || D.length > 14) return 'The program needs 1 to 14 days.';
-  if (!D.some((d) => d && !d.off)) return 'The program needs at least one training day.';
+  if (p.sched === 'week' && D.length !== 7) return 'A weekly program needs exactly 7 days, Monday first (use "off": true for rest days).';
+  if (!D.some((d) => d && !d.off && Array.isArray(d.ex) && d.ex.length)) return 'The program needs at least one training day with exercises.';
   for (const d of D) {
     if (!d || typeof d !== 'object' || !str(d.n, 60) || !d.n) return 'Each day needs a short name, without < or >.';
     if (d.off != null && typeof d.off !== 'boolean') return 'Day "' + d.n + '": "off" must be true or false.';
     if (!Array.isArray(d.ex) || d.ex.length > 30) return 'Day "' + d.n + '": exercises must be a list of up to 30.';
-    if (!d.off && !d.ex.length) return 'Day "' + d.n + '" has no exercises. Mark it "off": true for a rest day.';
     for (const e of d.ex) {
       if (!e || typeof e !== 'object' || !str(e.n, 80) || !e.n) return 'Day "' + d.n + '": each exercise needs a name, without < or >.';
       if (!Number.isInteger(e.s) || e.s < 1 || e.s > 10) return '"' + e.n + '": sets must be a whole number from 1 to 10.';
@@ -137,6 +143,9 @@ const EXK = ['n', 's', 'r', 't', 'g', 'rp', 'ss', 'wu'];
 const pick = (e: any) => Object.fromEntries(EXK.filter((k) => e[k] != null && e[k] !== false && !(k === 't' && e[k] === '')).map((k) => [k, e[k]]));
 /** The program as the app stores it (mem.prog), without the file fields. */
 export const programData = (p: ProgramFile) => ({
+  ...(p.name ? { name: p.name } : {}),
+  ...(p.about ? { about: p.about } : {}),
+  ...(p.sched === 'week' ? { sched: 'week' } : {}),
   ...(p.hit ? { hit: true } : {}),
   days: p.days.map((d) => ({ n: d.n, ...(d.off ? { off: true } : {}), ex: d.ex.map((e) => ({ t: '', ...pick(e), g: e.g || 'Other' })) })),
 });
@@ -145,6 +154,8 @@ export const programFile = (prog: any, name = ''): ProgramFile => ({
   format: 'daily-program',
   version: 1,
   ...(name ? { name } : {}),
+  ...(prog.about ? { about: prog.about } : {}),
+  sched: prog.sched === 'week' ? 'week' : 'cycle',
   ...(prog.hit ? { hit: true } : {}),
   days: (prog.days || []).map((d) => ({ n: d.n, ...(d.off ? { off: true } : {}), ex: (d.ex || []).map(pick) as any })),
 });

@@ -2333,7 +2333,7 @@ function useReg() {
   put('reg', regPend);
   // A regimen file can carry a lifting program; it replaces the program on the Lift side.
   if (pg && window.L_) {
-    L_.put('prog', { ...programData(pg), ...(pg.name ? { name: pg.name } : {}) });
+    L_.put('prog', programData(pg));
     L_.r && L_.r();
   }
   const what = (regPend.name || 'the regimen') + (pg ? ' and its lifting program' : '');

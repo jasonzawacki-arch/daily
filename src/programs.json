@@ -1,0 +1,1379 @@
+[
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Dorian Yates HIT",
+  "sched": "cycle",
+  "hit": true,
+  "about": "2 on, 1 off, 2 on, 1 off. One working set to failure per exercise after feeder sets, rest-pause where marked.",
+  "days": [
+   {
+    "n": "Chest, biceps and abs",
+    "ex": [
+     {
+      "n": "Smith incline press",
+      "s": 1,
+      "r": "6-8",
+      "g": "Chest",
+      "t": "Primary clavicular builder. 1 set to failure + rest-pause (15 s).",
+      "rp": true,
+      "wu": "Feeders: 50% x 8, 70% x 4, 85% x 2 (cold muscle)"
+     },
+     {
+      "n": "Smith flat press",
+      "s": 1,
+      "r": "6-8",
+      "g": "Chest",
+      "t": "Mid and lower chest. 1 set to strict failure, stop cleanly."
+     },
+     {
+      "n": "Incline dumbbell fly",
+      "s": 1,
+      "r": "8-10",
+      "g": "Chest",
+      "t": "Lengthened stretch. Strict failure, no rest-pause."
+     },
+     {
+      "n": "Cable crossover",
+      "s": 1,
+      "r": "10-12",
+      "g": "Chest",
+      "t": "Continuous tension, 2 s peak squeeze. Rest-pause 10-15 s.",
+      "rp": true
+     },
+     {
+      "n": "Incline dumbbell curl",
+      "s": 1,
+      "r": "8-10",
+      "g": "Biceps",
+      "t": "Long-head stretch, supinated grip. Strict failure."
+     },
+     {
+      "n": "Spider curl",
+      "s": 1,
+      "r": "8-10",
+      "g": "Biceps",
+      "t": "Shortened peak contraction (or preacher or cable curl). Rest-pause 10-15 s.",
+      "rp": true
+     },
+     {
+      "n": "Cable rope hammer curl",
+      "s": 1,
+      "r": "10-12",
+      "g": "Biceps",
+      "t": "Neutral grip, 1 s peak hold. Strict failure."
+     },
+     {
+      "n": "Kneeling cable crunch",
+      "s": 1,
+      "r": "12-15",
+      "g": "Core",
+      "t": "Lock hips, flex sternum to pelvis. Rest-pause 10-15 s.",
+      "rp": true
+     }
+    ]
+   },
+   {
+    "n": "Back and rear delts",
+    "ex": [
+     {
+      "n": "Straight-arm pulldown",
+      "s": 1,
+      "r": "10-12",
+      "g": "Back",
+      "t": "Lat isolation and neural primer. Strict form, strict failure.",
+      "wu": "Feeders: 50% x 8, 75% x 5"
+     },
+     {
+      "n": "Underhand lat pulldown",
+      "s": 1,
+      "r": "6-8",
+      "g": "Back",
+      "t": "Vertical pull, supinated grip. Rest-pause 15 s.",
+      "rp": true,
+      "wu": "Feeders: 70% x 4, 85% x 2"
+     },
+     {
+      "n": "Seated neutral-grip cable row",
+      "s": 1,
+      "r": "6-8",
+      "g": "Back",
+      "t": "Elbows out 45-60 degrees, pull to mid-lower sternum, no torso sway. Strict failure."
+     },
+     {
+      "n": "One-arm dumbbell row",
+      "s": 1,
+      "r": "6-8",
+      "g": "Back",
+      "t": "Elbow tucked to ribs, sweep to hip crease. Strict failure, no rest-pause."
+     },
+     {
+      "n": "Cable rear delt fly",
+      "s": 1,
+      "r": "10-12",
+      "g": "Shoulders",
+      "t": "Eye-level pulleys, horizontal arc. Rest-pause 10-15 s.",
+      "rp": true
+     },
+     {
+      "n": "Seated cable back extension",
+      "s": 1,
+      "r": "10-12",
+      "g": "Back",
+      "t": "Segmental flexion and extension, smooth 3 s eccentric. Strict failure."
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Delts, traps, triceps and abs",
+    "ex": [
+     {
+      "n": "Smith overhead press",
+      "s": 1,
+      "r": "6-8",
+      "g": "Shoulders",
+      "t": "Primary heavy delt builder. Rest-pause 15 s.",
+      "rp": true,
+      "wu": "Feeders: 50% x 8, 70% x 4, 85% x 1-2 (cold muscle)"
+     },
+     {
+      "n": "Incline dumbbell side lateral",
+      "s": 1,
+      "r": "8-10",
+      "g": "Shoulders",
+      "t": "Overloads the stretched bottom position. Strict tempo, strict failure."
+     },
+     {
+      "n": "Cable side lateral",
+      "s": 1,
+      "r": "10-12",
+      "g": "Shoulders",
+      "t": "Overloads the shortened top position. Rest-pause 10-15 s.",
+      "rp": true
+     },
+     {
+      "n": "Kelso shrug",
+      "s": 1,
+      "r": "8-10",
+      "g": "Back",
+      "t": "Chest supported, straight arms, 2 s hold at full retraction. Strict failure."
+     },
+     {
+      "n": "Close-grip Smith press",
+      "s": 1,
+      "r": "6-8",
+      "g": "Triceps",
+      "t": "Heavy triceps mass builder. Strict failure."
+     },
+     {
+      "n": "Cable rope pushdown",
+      "s": 1,
+      "r": "10-12",
+      "g": "Triceps",
+      "t": "Split the rope past the hips. Rest-pause 10-15 s.",
+      "rp": true
+     },
+     {
+      "n": "Cable rope overhead triceps",
+      "s": 1,
+      "r": "8-10",
+      "g": "Triceps",
+      "t": "Full long-head stretch behind the neck. Strict failure."
+     },
+     {
+      "n": "Kneeling cable crunch",
+      "s": 1,
+      "r": "12-15",
+      "g": "Core",
+      "t": "Direct abdominal flexion. Rest-pause 10-15 s.",
+      "rp": true
+     }
+    ]
+   },
+   {
+    "n": "Legs and calves",
+    "ex": [
+     {
+      "n": "Leg extension",
+      "s": 1,
+      "r": "10-12",
+      "g": "Quads",
+      "t": "Pre-exhaust the quads. Rest-pause 10-15 s.",
+      "rp": true,
+      "wu": "Feeders: 50% x 10, 75% x 5"
+     },
+     {
+      "n": "Pin-loaded leg press",
+      "s": 1,
+      "r": "8-10",
+      "g": "Quads",
+      "t": "Stop cleanly at concentric failure. No rest-pause.",
+      "wu": "Feeders: 60% x 6, 80% x 3"
+     },
+     {
+      "n": "Seated adductor machine",
+      "s": 1,
+      "r": "10-12",
+      "g": "Other",
+      "t": "Feet flat and neutral, 1 s squeeze, 3 s eccentric. Rest-pause 10-15 s.",
+      "rp": true,
+      "wu": "Feeler: 65% x 5"
+     },
+     {
+      "n": "Seated leg curl",
+      "s": 1,
+      "r": "8-10",
+      "g": "Hamstrings",
+      "t": "Locked hip angle. Rest-pause 15 s.",
+      "rp": true,
+      "wu": "Feeders: 50% x 8, 75% x 4"
+     },
+     {
+      "n": "Smith stiff-leg deadlift",
+      "s": 1,
+      "r": "6-8",
+      "g": "Hamstrings",
+      "t": "Never rest-pause. Keep the spine rigid, hinge at the hips.",
+      "wu": "Feeler: 70% x 4"
+     },
+     {
+      "n": "Leg press calf raise",
+      "s": 1,
+      "r": "10-12",
+      "g": "Calves",
+      "t": "Full stretch at the bottom. Rest-pause 10 s.",
+      "rp": true,
+      "wu": "Feeder: 60% x 8"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Push pull legs",
+  "sched": "cycle",
+  "about": "6 days on, 1 off, rotating: each muscle twice a week. Two versions of each day (A and B). Add weight when you hit the top of the rep range on every set.",
+  "days": [
+   {
+    "n": "Push A",
+    "ex": [
+     {
+      "n": "Bench press",
+      "s": 4,
+      "r": "5-8",
+      "g": "Chest"
+     },
+     {
+      "n": "Overhead press",
+      "s": 3,
+      "r": "8-10",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Incline dumbbell press",
+      "s": 3,
+      "r": "8-12",
+      "g": "Chest"
+     },
+     {
+      "n": "Lateral raise",
+      "s": 3,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Triceps pushdown",
+      "s": 3,
+      "r": "10-12",
+      "g": "Triceps"
+     },
+     {
+      "n": "Overhead triceps extension",
+      "s": 3,
+      "r": "10-12",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Pull A",
+    "ex": [
+     {
+      "n": "Deadlift",
+      "s": 3,
+      "r": "5",
+      "g": "Back"
+     },
+     {
+      "n": "Pull-up",
+      "s": 3,
+      "r": "6-10",
+      "g": "Back"
+     },
+     {
+      "n": "Barbell row",
+      "s": 3,
+      "r": "8-10",
+      "g": "Back"
+     },
+     {
+      "n": "Face pull",
+      "s": 3,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Hammer curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Biceps"
+     },
+     {
+      "n": "Biceps curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Biceps"
+     }
+    ]
+   },
+   {
+    "n": "Legs A",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 4,
+      "r": "5-8",
+      "g": "Quads"
+     },
+     {
+      "n": "Romanian deadlift",
+      "s": 3,
+      "r": "8-10",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Leg press",
+      "s": 3,
+      "r": "10-12",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Standing calf raise",
+      "s": 4,
+      "r": "10-15",
+      "g": "Calves"
+     }
+    ]
+   },
+   {
+    "n": "Push B",
+    "ex": [
+     {
+      "n": "Overhead press",
+      "s": 4,
+      "r": "5-8",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Incline bench press",
+      "s": 3,
+      "r": "8-10",
+      "g": "Chest"
+     },
+     {
+      "n": "Dip",
+      "s": 3,
+      "r": "8-12",
+      "g": "Triceps"
+     },
+     {
+      "n": "Cable fly",
+      "s": 3,
+      "r": "12-15",
+      "g": "Chest"
+     },
+     {
+      "n": "Lateral raise",
+      "s": 3,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Skull crusher",
+      "s": 3,
+      "r": "10-12",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Pull B",
+    "ex": [
+     {
+      "n": "Barbell row",
+      "s": 4,
+      "r": "5-8",
+      "g": "Back"
+     },
+     {
+      "n": "Lat pulldown",
+      "s": 3,
+      "r": "8-12",
+      "g": "Back"
+     },
+     {
+      "n": "Seated cable row",
+      "s": 3,
+      "r": "10-12",
+      "g": "Back"
+     },
+     {
+      "n": "Rear delt fly",
+      "s": 3,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Incline dumbbell curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Biceps"
+     },
+     {
+      "n": "Hammer curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Biceps"
+     }
+    ]
+   },
+   {
+    "n": "Legs B",
+    "ex": [
+     {
+      "n": "Front squat",
+      "s": 4,
+      "r": "6-8",
+      "g": "Quads"
+     },
+     {
+      "n": "Hip thrust",
+      "s": 3,
+      "r": "8-10",
+      "g": "Glutes"
+     },
+     {
+      "n": "Bulgarian split squat",
+      "s": 3,
+      "r": "8-12",
+      "g": "Quads"
+     },
+     {
+      "n": "Seated leg curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Seated calf raise",
+      "s": 4,
+      "r": "12-15",
+      "g": "Calves"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "PHUL",
+  "sched": "week",
+  "about": "Power Hypertrophy Upper Lower: 4 days a week (Mon, Tue, Thu, Fri). Heavy power days, then volume hypertrophy days.",
+  "days": [
+   {
+    "n": "Upper power",
+    "ex": [
+     {
+      "n": "Bench press",
+      "s": 4,
+      "r": "3-5",
+      "g": "Chest"
+     },
+     {
+      "n": "Incline dumbbell press",
+      "s": 4,
+      "r": "6-10",
+      "g": "Chest"
+     },
+     {
+      "n": "Barbell row",
+      "s": 4,
+      "r": "3-5",
+      "g": "Back"
+     },
+     {
+      "n": "Lat pulldown",
+      "s": 4,
+      "r": "6-10",
+      "g": "Back"
+     },
+     {
+      "n": "Overhead press",
+      "s": 3,
+      "r": "5-8",
+      "g": "Shoulders"
+     },
+     {
+      "n": "EZ-bar curl",
+      "s": 3,
+      "r": "6-10",
+      "g": "Biceps"
+     },
+     {
+      "n": "Skull crusher",
+      "s": 3,
+      "r": "6-10",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Lower power",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 4,
+      "r": "3-5",
+      "g": "Quads"
+     },
+     {
+      "n": "Deadlift",
+      "s": 4,
+      "r": "3-5",
+      "g": "Back"
+     },
+     {
+      "n": "Leg press",
+      "s": 4,
+      "r": "10-15",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg curl",
+      "s": 4,
+      "r": "6-10",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Standing calf raise",
+      "s": 4,
+      "r": "6-10",
+      "g": "Calves"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Upper hypertrophy",
+    "ex": [
+     {
+      "n": "Incline bench press",
+      "s": 4,
+      "r": "8-12",
+      "g": "Chest"
+     },
+     {
+      "n": "Dumbbell fly",
+      "s": 4,
+      "r": "8-12",
+      "g": "Chest"
+     },
+     {
+      "n": "Seated cable row",
+      "s": 4,
+      "r": "8-12",
+      "g": "Back"
+     },
+     {
+      "n": "Dumbbell row",
+      "s": 4,
+      "r": "8-12",
+      "g": "Back"
+     },
+     {
+      "n": "Lateral raise",
+      "s": 4,
+      "r": "8-12",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Incline dumbbell curl",
+      "s": 4,
+      "r": "8-12",
+      "g": "Biceps"
+     },
+     {
+      "n": "Triceps pushdown",
+      "s": 4,
+      "r": "8-12",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Lower hypertrophy",
+    "ex": [
+     {
+      "n": "Front squat",
+      "s": 4,
+      "r": "8-12",
+      "g": "Quads"
+     },
+     {
+      "n": "Lunge",
+      "s": 4,
+      "r": "8-12",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg extension",
+      "s": 4,
+      "r": "10-15",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg curl",
+      "s": 4,
+      "r": "10-15",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Seated calf raise",
+      "s": 4,
+      "r": "8-12",
+      "g": "Calves"
+     },
+     {
+      "n": "Standing calf raise",
+      "s": 4,
+      "r": "8-12",
+      "g": "Calves"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "PHAT",
+  "sched": "week",
+  "about": "Power Hypertrophy Adaptive Training: 5 days a week. Two power days (Mon, Tue), then three hypertrophy days (Thu to Sat). Speed sets: 6 x 3 at about 65 to 70% of your power-day weight, moved fast.",
+  "days": [
+   {
+    "n": "Upper power",
+    "ex": [
+     {
+      "n": "Pendlay row",
+      "s": 3,
+      "r": "3-5",
+      "g": "Back"
+     },
+     {
+      "n": "Weighted pull-up",
+      "s": 2,
+      "r": "6-10",
+      "g": "Back"
+     },
+     {
+      "n": "Rack chin",
+      "s": 2,
+      "r": "6-10",
+      "g": "Back"
+     },
+     {
+      "n": "Flat dumbbell press",
+      "s": 3,
+      "r": "3-5",
+      "g": "Chest"
+     },
+     {
+      "n": "Weighted dip",
+      "s": 2,
+      "r": "6-10",
+      "g": "Triceps"
+     },
+     {
+      "n": "Seated dumbbell press",
+      "s": 3,
+      "r": "6-10",
+      "g": "Shoulders"
+     },
+     {
+      "n": "EZ-bar curl",
+      "s": 3,
+      "r": "6-10",
+      "g": "Biceps"
+     },
+     {
+      "n": "Skull crusher",
+      "s": 3,
+      "r": "6-10",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Lower power",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 3,
+      "r": "3-5",
+      "g": "Quads"
+     },
+     {
+      "n": "Hack squat",
+      "s": 2,
+      "r": "6-10",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg extension",
+      "s": 2,
+      "r": "6-10",
+      "g": "Quads"
+     },
+     {
+      "n": "Stiff-leg deadlift",
+      "s": 3,
+      "r": "5-8",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Leg curl",
+      "s": 2,
+      "r": "6-10",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Standing calf raise",
+      "s": 3,
+      "r": "6-8",
+      "g": "Calves"
+     },
+     {
+      "n": "Seated calf raise",
+      "s": 2,
+      "r": "6-10",
+      "g": "Calves"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Back and shoulders hypertrophy",
+    "ex": [
+     {
+      "n": "Pendlay row",
+      "s": 6,
+      "r": "3",
+      "g": "Back",
+      "t": "Speed sets"
+     },
+     {
+      "n": "Rack chin",
+      "s": 3,
+      "r": "8-12",
+      "g": "Back"
+     },
+     {
+      "n": "Seated cable row",
+      "s": 3,
+      "r": "8-12",
+      "g": "Back"
+     },
+     {
+      "n": "Dumbbell row",
+      "s": 2,
+      "r": "12-15",
+      "g": "Back"
+     },
+     {
+      "n": "Close-grip pulldown",
+      "s": 2,
+      "r": "15-20",
+      "g": "Back"
+     },
+     {
+      "n": "Seated dumbbell press",
+      "s": 3,
+      "r": "8-12",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Upright row",
+      "s": 2,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Lateral raise",
+      "s": 3,
+      "r": "12-20",
+      "g": "Shoulders"
+     }
+    ]
+   },
+   {
+    "n": "Lower hypertrophy",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 6,
+      "r": "3",
+      "g": "Quads",
+      "t": "Speed sets"
+     },
+     {
+      "n": "Hack squat",
+      "s": 3,
+      "r": "8-12",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg press",
+      "s": 2,
+      "r": "12-15",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg extension",
+      "s": 3,
+      "r": "15-20",
+      "g": "Quads"
+     },
+     {
+      "n": "Romanian deadlift",
+      "s": 3,
+      "r": "8-12",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Leg curl",
+      "s": 2,
+      "r": "12-15",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Seated leg curl",
+      "s": 2,
+      "r": "15-20",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Donkey calf raise",
+      "s": 4,
+      "r": "10-12",
+      "g": "Calves"
+     },
+     {
+      "n": "Seated calf raise",
+      "s": 3,
+      "r": "15-20",
+      "g": "Calves"
+     }
+    ]
+   },
+   {
+    "n": "Chest and arms hypertrophy",
+    "ex": [
+     {
+      "n": "Flat dumbbell press",
+      "s": 6,
+      "r": "3",
+      "g": "Chest",
+      "t": "Speed sets"
+     },
+     {
+      "n": "Incline dumbbell press",
+      "s": 3,
+      "r": "8-12",
+      "g": "Chest"
+     },
+     {
+      "n": "Machine chest press",
+      "s": 3,
+      "r": "12-15",
+      "g": "Chest"
+     },
+     {
+      "n": "Incline cable fly",
+      "s": 2,
+      "r": "15-20",
+      "g": "Chest"
+     },
+     {
+      "n": "EZ-bar preacher curl",
+      "s": 3,
+      "r": "8-12",
+      "g": "Biceps"
+     },
+     {
+      "n": "Concentration curl",
+      "s": 2,
+      "r": "12-15",
+      "g": "Biceps"
+     },
+     {
+      "n": "Spider curl",
+      "s": 2,
+      "r": "15-20",
+      "g": "Biceps"
+     },
+     {
+      "n": "Overhead triceps extension",
+      "s": 3,
+      "r": "8-12",
+      "g": "Triceps"
+     },
+     {
+      "n": "Triceps pushdown",
+      "s": 2,
+      "r": "12-15",
+      "g": "Triceps"
+     },
+     {
+      "n": "Cable kickback",
+      "s": 2,
+      "r": "15-20",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Upper lower",
+  "sched": "week",
+  "about": "4 days a week (Mon, Tue, Thu, Fri): each muscle twice a week, a heavier and a lighter version of each day.",
+  "days": [
+   {
+    "n": "Upper A",
+    "ex": [
+     {
+      "n": "Bench press",
+      "s": 4,
+      "r": "5-8",
+      "g": "Chest"
+     },
+     {
+      "n": "Barbell row",
+      "s": 4,
+      "r": "5-8",
+      "g": "Back"
+     },
+     {
+      "n": "Overhead press",
+      "s": 3,
+      "r": "8-10",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Lat pulldown",
+      "s": 3,
+      "r": "8-10",
+      "g": "Back"
+     },
+     {
+      "n": "Biceps curl",
+      "s": 2,
+      "r": "10-12",
+      "g": "Biceps"
+     },
+     {
+      "n": "Triceps pushdown",
+      "s": 2,
+      "r": "10-12",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Lower A",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 4,
+      "r": "5-8",
+      "g": "Quads"
+     },
+     {
+      "n": "Romanian deadlift",
+      "s": 3,
+      "r": "8-10",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Leg press",
+      "s": 3,
+      "r": "10-12",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Standing calf raise",
+      "s": 3,
+      "r": "12-15",
+      "g": "Calves"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Upper B",
+    "ex": [
+     {
+      "n": "Incline dumbbell press",
+      "s": 4,
+      "r": "8-10",
+      "g": "Chest"
+     },
+     {
+      "n": "Pull-up",
+      "s": 4,
+      "r": "6-10",
+      "g": "Back"
+     },
+     {
+      "n": "Seated dumbbell press",
+      "s": 3,
+      "r": "10-12",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Seated cable row",
+      "s": 3,
+      "r": "10-12",
+      "g": "Back"
+     },
+     {
+      "n": "Hammer curl",
+      "s": 2,
+      "r": "10-12",
+      "g": "Biceps"
+     },
+     {
+      "n": "Overhead triceps extension",
+      "s": 2,
+      "r": "10-12",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Lower B",
+    "ex": [
+     {
+      "n": "Deadlift",
+      "s": 3,
+      "r": "3-5",
+      "g": "Back"
+     },
+     {
+      "n": "Front squat",
+      "s": 3,
+      "r": "8-10",
+      "g": "Quads"
+     },
+     {
+      "n": "Bulgarian split squat",
+      "s": 3,
+      "r": "10-12",
+      "g": "Quads"
+     },
+     {
+      "n": "Seated leg curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Seated calf raise",
+      "s": 3,
+      "r": "12-15",
+      "g": "Calves"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Full body 3 days",
+  "sched": "week",
+  "about": "Mon, Wed and Fri, a different full-body session each day. A good start for beginners or a busy week.",
+  "days": [
+   {
+    "n": "Full body A",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 3,
+      "r": "5-8",
+      "g": "Quads"
+     },
+     {
+      "n": "Bench press",
+      "s": 3,
+      "r": "5-8",
+      "g": "Chest"
+     },
+     {
+      "n": "Barbell row",
+      "s": 3,
+      "r": "8-10",
+      "g": "Back"
+     },
+     {
+      "n": "Lateral raise",
+      "s": 2,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Plank",
+      "s": 2,
+      "r": "30-60",
+      "g": "Core",
+      "t": "Seconds"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Full body B",
+    "ex": [
+     {
+      "n": "Deadlift",
+      "s": 3,
+      "r": "3-5",
+      "g": "Back"
+     },
+     {
+      "n": "Overhead press",
+      "s": 3,
+      "r": "6-8",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Lat pulldown",
+      "s": 3,
+      "r": "8-12",
+      "g": "Back"
+     },
+     {
+      "n": "Leg curl",
+      "s": 2,
+      "r": "10-12",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Hanging leg raise",
+      "s": 2,
+      "r": "8-12",
+      "g": "Core"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Full body C",
+    "ex": [
+     {
+      "n": "Leg press",
+      "s": 3,
+      "r": "10-12",
+      "g": "Quads"
+     },
+     {
+      "n": "Incline dumbbell press",
+      "s": 3,
+      "r": "8-12",
+      "g": "Chest"
+     },
+     {
+      "n": "Seated cable row",
+      "s": 3,
+      "r": "10-12",
+      "g": "Back"
+     },
+     {
+      "n": "Biceps curl",
+      "s": 2,
+      "r": "10-12",
+      "g": "Biceps"
+     },
+     {
+      "n": "Triceps pushdown",
+      "s": 2,
+      "r": "10-12",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "5x5 strength",
+  "sched": "cycle",
+  "about": "Workout A, rest, workout B, rest, rotating (about 3 sessions a week). 5 sets of 5 with the same weight; add 5 lb (2.5 kg) next time you complete all sets.",
+  "days": [
+   {
+    "n": "Workout A",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 5,
+      "r": "5",
+      "g": "Quads"
+     },
+     {
+      "n": "Bench press",
+      "s": 5,
+      "r": "5",
+      "g": "Chest"
+     },
+     {
+      "n": "Barbell row",
+      "s": 5,
+      "r": "5",
+      "g": "Back"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Workout B",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 5,
+      "r": "5",
+      "g": "Quads"
+     },
+     {
+      "n": "Overhead press",
+      "s": 5,
+      "r": "5",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Deadlift",
+      "s": 1,
+      "r": "5",
+      "g": "Back"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ }
+]

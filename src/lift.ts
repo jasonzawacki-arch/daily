@@ -1,5 +1,6 @@
 import liftCss from './lift.css';
 import { checkProgram, programData, programFile } from './regcheck.js';
+import TEMPLATES from './programs.json';
 const SR = document.getElementById('hl').attachShadow({ mode: 'open' });
 SR.innerHTML =
   '<style>' + liftCss + '</style><div id=app></div><div id=tm hidden></div><div id=ut hidden></div><input type=file id=pgf class=fi tabindex=-1 aria-hidden=true>';
@@ -94,253 +95,11 @@ const DEF = {
     ex: d.ex.map((e) => ({ n: e[0], s: e[1], r: e[2], t: '', g: LIB[e[0]] || 'Other' })),
   })),
 };
-const DY = {
-  hit: true,
-  days: [
-    {
-      n: 'Chest, biceps and abs',
-      ex: [
-        {
-          n: 'Smith incline press',
-          s: 1,
-          r: '6-8',
-          g: 'Chest',
-          t: 'Primary clavicular builder. 1 set to failure + rest-pause (15 s).',
-          rp: true,
-          wu: 'Feeders: 50% x 8, 70% x 4, 85% x 2 (cold muscle)',
-        },
-        {
-          n: 'Smith flat press',
-          s: 1,
-          r: '6-8',
-          g: 'Chest',
-          t: 'Mid and lower chest. 1 set to strict failure, stop cleanly.',
-        },
-        {
-          n: 'Incline dumbbell fly',
-          s: 1,
-          r: '8-10',
-          g: 'Chest',
-          t: 'Lengthened stretch. Strict failure, no rest-pause.',
-        },
-        {
-          n: 'Cable crossover',
-          s: 1,
-          r: '10-12',
-          g: 'Chest',
-          t: 'Continuous tension, 2 s peak squeeze. Rest-pause 10-15 s.',
-          rp: true,
-        },
-        {
-          n: 'Incline dumbbell curl',
-          s: 1,
-          r: '8-10',
-          g: 'Biceps',
-          t: 'Long-head stretch, supinated grip. Strict failure.',
-        },
-        {
-          n: 'Spider curl',
-          s: 1,
-          r: '8-10',
-          g: 'Biceps',
-          t: 'Shortened peak contraction (or preacher or cable curl). Rest-pause 10-15 s.',
-          rp: true,
-        },
-        {
-          n: 'Cable rope hammer curl',
-          s: 1,
-          r: '10-12',
-          g: 'Biceps',
-          t: 'Neutral grip, 1 s peak hold. Strict failure.',
-        },
-        {
-          n: 'Kneeling cable crunch',
-          s: 1,
-          r: '12-15',
-          g: 'Core',
-          t: 'Lock hips, flex sternum to pelvis. Rest-pause 10-15 s.',
-          rp: true,
-        },
-      ],
-    },
-    {
-      n: 'Back and rear delts',
-      ex: [
-        {
-          n: 'Straight-arm pulldown',
-          s: 1,
-          r: '10-12',
-          g: 'Back',
-          t: 'Lat isolation and neural primer. Strict form, strict failure.',
-          wu: 'Feeders: 50% x 8, 75% x 5',
-        },
-        {
-          n: 'Underhand lat pulldown',
-          s: 1,
-          r: '6-8',
-          g: 'Back',
-          t: 'Vertical pull, supinated grip. Rest-pause 15 s.',
-          rp: true,
-          wu: 'Feeders: 70% x 4, 85% x 2',
-        },
-        {
-          n: 'Seated neutral-grip cable row',
-          s: 1,
-          r: '6-8',
-          g: 'Back',
-          t: 'Elbows out 45-60 degrees, pull to mid-lower sternum, no torso sway. Strict failure.',
-        },
-        {
-          n: 'One-arm dumbbell row',
-          s: 1,
-          r: '6-8',
-          g: 'Back',
-          t: 'Elbow tucked to ribs, sweep to hip crease. Strict failure, no rest-pause.',
-        },
-        {
-          n: 'Cable rear delt fly',
-          s: 1,
-          r: '10-12',
-          g: 'Shoulders',
-          t: 'Eye-level pulleys, horizontal arc. Rest-pause 10-15 s.',
-          rp: true,
-        },
-        {
-          n: 'Seated cable back extension',
-          s: 1,
-          r: '10-12',
-          g: 'Back',
-          t: 'Segmental flexion and extension, smooth 3 s eccentric. Strict failure.',
-        },
-      ],
-    },
-    { n: 'Rest', off: true, ex: [] },
-    {
-      n: 'Delts, traps, triceps and abs',
-      ex: [
-        {
-          n: 'Smith overhead press',
-          s: 1,
-          r: '6-8',
-          g: 'Shoulders',
-          t: 'Primary heavy delt builder. Rest-pause 15 s.',
-          rp: true,
-          wu: 'Feeders: 50% x 8, 70% x 4, 85% x 1-2 (cold muscle)',
-        },
-        {
-          n: 'Incline dumbbell side lateral',
-          s: 1,
-          r: '8-10',
-          g: 'Shoulders',
-          t: 'Overloads the stretched bottom position. Strict tempo, strict failure.',
-        },
-        {
-          n: 'Cable side lateral',
-          s: 1,
-          r: '10-12',
-          g: 'Shoulders',
-          t: 'Overloads the shortened top position. Rest-pause 10-15 s.',
-          rp: true,
-        },
-        {
-          n: 'Kelso shrug',
-          s: 1,
-          r: '8-10',
-          g: 'Back',
-          t: 'Chest supported, straight arms, 2 s hold at full retraction. Strict failure.',
-        },
-        {
-          n: 'Close-grip Smith press',
-          s: 1,
-          r: '6-8',
-          g: 'Triceps',
-          t: 'Heavy triceps mass builder. Strict failure.',
-        },
-        {
-          n: 'Cable rope pushdown',
-          s: 1,
-          r: '10-12',
-          g: 'Triceps',
-          t: 'Split the rope past the hips. Rest-pause 10-15 s.',
-          rp: true,
-        },
-        {
-          n: 'Cable rope overhead triceps',
-          s: 1,
-          r: '8-10',
-          g: 'Triceps',
-          t: 'Full long-head stretch behind the neck. Strict failure.',
-        },
-        {
-          n: 'Kneeling cable crunch',
-          s: 1,
-          r: '12-15',
-          g: 'Core',
-          t: 'Direct abdominal flexion. Rest-pause 10-15 s.',
-          rp: true,
-        },
-      ],
-    },
-    {
-      n: 'Legs and calves',
-      ex: [
-        {
-          n: 'Leg extension',
-          s: 1,
-          r: '10-12',
-          g: 'Quads',
-          t: 'Pre-exhaust the quads. Rest-pause 10-15 s.',
-          rp: true,
-          wu: 'Feeders: 50% x 10, 75% x 5',
-        },
-        {
-          n: 'Pin-loaded leg press',
-          s: 1,
-          r: '8-10',
-          g: 'Quads',
-          t: 'Stop cleanly at concentric failure. No rest-pause.',
-          wu: 'Feeders: 60% x 6, 80% x 3',
-        },
-        {
-          n: 'Seated adductor machine',
-          s: 1,
-          r: '10-12',
-          g: 'Other',
-          t: 'Feet flat and neutral, 1 s squeeze, 3 s eccentric. Rest-pause 10-15 s.',
-          rp: true,
-          wu: 'Feeler: 65% x 5',
-        },
-        {
-          n: 'Seated leg curl',
-          s: 1,
-          r: '8-10',
-          g: 'Hamstrings',
-          t: 'Locked hip angle. Rest-pause 15 s.',
-          rp: true,
-          wu: 'Feeders: 50% x 8, 75% x 4',
-        },
-        {
-          n: 'Smith stiff-leg deadlift',
-          s: 1,
-          r: '6-8',
-          g: 'Hamstrings',
-          t: 'Never rest-pause. Keep the spine rigid, hinge at the hips.',
-          wu: 'Feeler: 70% x 4',
-        },
-        {
-          n: 'Leg press calf raise',
-          s: 1,
-          r: '10-12',
-          g: 'Calves',
-          t: 'Full stretch at the bottom. Rest-pause 10 s.',
-          rp: true,
-          wu: 'Feeder: 60% x 8',
-        },
-      ],
-    },
-    { n: 'Rest', off: true, ex: [] },
-  ],
-};
+// Program templates are data (src/programs.json); the first is the Dorian Yates HIT routine.
+const TPL: any[] = TEMPLATES as any,
+  DY = programData(TPL[0]);
+let tplSel = 0,
+  schMsg = '';
 const U = () => cfg().u || 'lb';
 const plates = (w) => {
   const kg = U() === 'kg',
@@ -405,7 +164,7 @@ SR.addEventListener('click', (e) => {
   if ((e.target as HTMLElement).closest('#ut button[data-pa]')) {
     if (!pgPend) return;
     un(cl(prog()), 'Program replaced');
-    put('prog', { ...programData(pgPend), ...(pgPend.name ? { name: pgPend.name } : {}) });
+    put('prog', programData(pgPend));
     pgPend = null;
     render();
     return;
@@ -485,17 +244,22 @@ const prog = () => mem.prog || DEF,
 function dayIdx(s) {
   const d = wd(s);
   if (d.k != null) return d.k;
+  if (WEEK()) return (new Date(s + 'T12:00:00').getDay() + 6) % 7; // Monday = 0
   const ks = logs().filter((k) => k.slice(2) < s && mem[k].dn);
   if (ks.length) return ((mem[ks[ks.length - 1]].k ?? 0) + 1) % CY();
   return ((days(cfg().start, s) % CY()) + CY()) % CY();
 }
-const ON = () => prog().days.length,
+const WEEK = () => prog().sched === 'week' && prog().days.length === 7,
+  WDS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+  ON = () => prog().days.length,
   // A program may list its own rest days (off: true); otherwise one OFF day follows the last day.
   hasOff = () => prog().days.some((d) => d.off),
-  CY = () => ON() + (hasOff() ? 0 : 1),
+  CY = () => (WEEK() ? 7 : ON() + (hasOff() ? 0 : 1)),
   isOff = (k) => k >= ON() || !!(prog().days[k] || {}).off,
   nm = (k) =>
-    isOff(k)
+    WEEK()
+      ? WDS[k].slice(0, 3)
+      : isOff(k)
       ? 'OFF'
       : 'ON ' +
         (prog()
@@ -646,9 +410,11 @@ function progV() {
     Object.keys(LIB)
       .map((n) => '<option>' + esc(n) + '</option>')
       .join('') +
-    '</datalist><div class=hint>Your program: edit days and exercises here. Rep ranges drive the "add weight" hints. Swipe a row left to delete it. RP marks a rest-pause set after the working set; log it as weight and the extra reps.</div>';
+    '</datalist><div class=hint>Your program: edit days and exercises here. Rep ranges drive the "add weight" hints. Swipe a row left to delete it. RP marks a rest-pause set after the working set; log it as weight and the extra reps.</div>' +
+    `<div class=card><h3>Start from a template</h3><select id=tpl aria-label="Template">${TPL.map((t, i) => `<option value=${i} ${i === tplSel ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select><p class=sm>${esc(TPL[tplSel].about || '')} ${TPL[tplSel].sched === 'week' ? 'Fixed weekdays.' : 'Rotating cycle.'}</p><button class=btn data-a=tpu>Use this template</button> <button class=btn data-a=tps>Save as file</button><p class=sm>Using a template replaces the current program, with Undo; then change anything below. Save as file to edit it on a computer and load it back, or to put it in a regimen file.</p></div>`;
   P.days.forEach((D, i) => {
-    h += `<div class=card><input type=text data-p="${i}|n" value="${esc(D.n)}" aria-label="Day name"><p class=sm>${nm(i)}</p>`;
+    const mv = `<button class=mv data-a=dmu data-v=${i} aria-label="Move day up" ${i ? '' : 'disabled'}>&#9650;</button><button class=mv data-a=dmd data-v=${i} aria-label="Move day down" ${i < P.days.length - 1 ? '' : 'disabled'}>&#9660;</button>`;
+    h += `<div class=card><input type=text data-p="${i}|n" value="${esc(D.n)}" aria-label="Day name"><div class=exh><span class=sm>${WEEK() ? WDS[i] : nm(i)}${D.off ? ' · rest day' : ''}</span><i style="flex:1"></i><button class=lnk data-a=doff data-v=${i}>${D.off ? 'Make it a training day' : 'Make it a rest day'}</button>${mv}</div>`;
     if (D.off) {
       h += '<p class=sm>Rest day. Nothing to log except recovery.</p></div>';
       return;
@@ -662,7 +428,11 @@ function progV() {
   const c = cfg();
   return (
     h +
-    `<div class=card><h3>Program file</h3><p class=sm>${P.name ? esc(P.name) + '. ' : ''}Save this program as a file to keep, edit or share, or load another one. Loading replaces the current program, with Undo.</p><button class=btn data-a=pgs>Save program file</button> <label class=btn for=pgf role=button style="display:inline-block;cursor:pointer">Load program file</label></div><div class=card><h3>Dorian Yates HIT</h3><p class=sm>2 on, 1 off, 2 on, 1 off. One working set to failure per exercise, rest-pause where marked. Reloads the full routine and replaces the current program.</p><button class=btn data-a=dy>Reload this routine</button></div><div class=card><h3>Import a program</h3><p class=sm>Paste one day per line ending in a colon, then exercises like Bench press 4x6-8.</p><textarea id=imp rows=6 placeholder="Push:&#10;Bench press 4x6-8&#10;Lateral raise 3x12-15"></textarea><button class=btn data-a=imp style="margin-top:8px">Import (replaces program)</button></div><div class=card><h3>Cycle</h3><p class=sm>${ON()} ON days, then 1 OFF, repeating. <button class=lnk data-a=ad>Add day</button> <button class=lnk data-a=rmd>Remove last day</button> Last deload: ${c.dl || 'none logged'}. The next day follows your last completed day, so skipping a day doesn't shift the cycle.</p><label class=f>Training weeks before a deload</label><select data-cf=bl>${[3, 4, 5, 6, 8].map((n) => `<option ${(cfg().bl || 5) === n ? 'selected' : ''}>${n}</option>`).join('')}</select><label class=f>Readiness strictness</label><select data-cf=rg>${[
+    `<div class=card><h3>Program file</h3><p class=sm>${P.name ? '<b>' + esc(P.name) + '</b>. ' : ''}${P.about ? esc(P.about) + ' ' : ''}Save this program as a file to keep, edit or share, or load another one. Loading replaces the current program, with Undo.</p><button class=btn data-a=pgs>Save program file</button> <label class=btn for=pgf role=button style="display:inline-block;cursor:pointer">Load program file</label></div><div class=card><h3>Import a program</h3><p class=sm>Paste one day per line ending in a colon, then exercises like Bench press 4x6-8.</p><textarea id=imp rows=6 placeholder="Push:&#10;Bench press 4x6-8&#10;Lateral raise 3x12-15"></textarea><button class=btn data-a=imp style="margin-top:8px">Import (replaces program)</button></div><div class=card><h3>Schedule</h3><select id=sch aria-label="Schedule"><option value=cycle ${WEEK() ? '' : 'selected'}>Rotating cycle</option><option value=week ${WEEK() ? 'selected' : ''}>Fixed weekdays (Mon to Sun)</option></select><p class=sm>${
+      WEEK()
+        ? 'Each day above is a weekday, Monday first. Make days rest days to set your week, and use the arrows to move a workout to another day. Training on a different day? Pick the day at the top of Today.'
+        : `${P.days.filter((d) => !d.off).length} training days${hasOff() ? ' and ' + P.days.filter((d) => d.off).length + ' rest days' : ', then 1 rest day'}, repeating. The next day follows your last completed day, so skipping a day doesn't shift the cycle. <button class=lnk data-a=ad>Add day</button> <button class=lnk data-a=ad data-v=off>Add rest day</button> <button class=lnk data-a=rmd>Remove last day</button>`
+    }${schMsg ? ' <b>' + esc(schMsg) + '</b>' : ''}</p><p class=sm>Last deload: ${c.dl || 'none logged'}.</p><label class=f>Training weeks before a deload</label><select data-cf=bl>${[3, 4, 5, 6, 8].map((n) => `<option ${(cfg().bl || 5) === n ? 'selected' : ''}>${n}</option>`).join('')}</select><label class=f>Readiness strictness</label><select data-cf=rg>${[
       [0.7, 'Lenient'],
       [1, 'Normal'],
       [1.3, 'Strict'],
@@ -1324,9 +1094,6 @@ app.addEventListener('click', async (e) => {
       if (dl) await dl.save({ filename: 'daily-program.json', data: JSON.stringify(programFile(prog(), prog().name || 'My program'), null, 1) });
     } catch (x) {}
     return;
-  } else if (a === 'dy') {
-    un(cl(prog()), 'Program replaced');
-    put('prog', cl(DY));
   } else if (a === 'imp') {
     const D = [];
     $('#imp')
@@ -1417,10 +1184,38 @@ app.addEventListener('click', async (e) => {
     if (d.k == null) d.k = dayIdx(date);
     put('w-' + date, d);
     swp = null;
+  } else if (a === 'tpu') {
+    un(cl(prog()), 'Program replaced');
+    put('prog', programData(TPL[tplSel]));
+  } else if (a === 'tps') {
+    const t = TPL[tplSel];
+    try {
+      const dl = await claude.use('downloads');
+      if (dl) await dl.save({ filename: 'daily-program-' + t.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.json', data: JSON.stringify(t, null, 1) });
+    } catch (x) {}
+    return;
+  } else if (a === 'doff') {
+    const P = cl(prog()),
+      D = P.days[+v];
+    if (!D) return;
+    if (D.off) {
+      delete D.off;
+      if (D.n === 'Rest') D.n = 'Day ' + (+v + 1);
+    } else if (P.days.filter((x) => !x.off).length > 1) {
+      D.off = true;
+    } else return;
+    put('prog', P);
+  } else if (a === 'dmu' || a === 'dmd') {
+    const P = cl(prog()),
+      i = +v,
+      j = a === 'dmu' ? i - 1 : i + 1;
+    if (j < 0 || j >= P.days.length) return;
+    [P.days[i], P.days[j]] = [P.days[j], P.days[i]];
+    put('prog', P);
   } else if (a === 'ad') {
     const N = ON(),
       P = cl(prog());
-    P.days.push({ n: 'Day ' + (N + 1), ex: [] });
+    P.days.push(v === 'off' ? { n: 'Rest', off: true, ex: [] } : { n: 'Day ' + (N + 1), ex: [] });
     if (!hasOff())
       logs().forEach((k) => {
         if (mem[k].k === N) {
@@ -1568,6 +1363,27 @@ app.addEventListener('click', async (e) => {
 });
 app.addEventListener('change', (e) => {
   const t = e.target;
+  if (t.id === 'tpl') {
+    tplSel = +t.value || 0;
+    render();
+    return;
+  }
+  if (t.id === 'sch') {
+    const P = cl(prog());
+    schMsg = '';
+    if (t.value === 'week') {
+      if (P.days.length > 7) {
+        schMsg = 'A week has 7 days. Remove days until there are 7 or fewer, then switch.';
+        render();
+        return;
+      }
+      while (P.days.length < 7) P.days.push({ n: 'Rest', off: true, ex: [] });
+      P.sched = 'week';
+    } else delete P.sched;
+    put('prog', P);
+    render();
+    return;
+  }
   if (t.dataset.s) {
     const [n0, i, f] = t.dataset.s.split('|'),
       n = n0.replace(/&amp;/g, '&');
