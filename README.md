@@ -24,6 +24,27 @@ A configurable daily regimen + lifting tracker. TypeScript source compiles to **
 
 *Publishing (once, for the repository owner):* **Settings > Pages > Source: GitHub Actions**. The `phone app` workflow then publishes `dist/site` on every push to `main`.
 
+## Sync across devices (optional)
+
+The installed app can keep the same data on a phone and a computer through the user's own Google Drive: **More > Reports and backup > Sync with Google Drive**. Nothing changes for anyone who skips it, and no sign-in is ever needed to use or try the app.
+
+- Daily keeps one file in the hidden app folder of the user's Drive (`daily-sync.json`); no server of ours is involved. Each storage key (a day, a workout, settings, the regimen, the program) carries its last change time, and the newer change wins key by key. Photos stay on the device.
+- The first sync on a device that already has data asks whether to combine both, use the Drive copy, or replace it.
+- A browser app without a server gets Google access for about an hour at a time. While it lasts, changes sync on their own; after that a **Sync** button appears and one tap syncs again.
+- Inside Claude, Daily uses Claude's own cloud backup instead.
+
+### Setting up Google sign-in (once, for the person who publishes the app)
+
+Sync stays hidden until the app has a Google OAuth client ID. One ID works for both Daily and JobLedger, because both are published from the same address.
+
+1. Open https://console.cloud.google.com, sign in, and create a project (for example "Daily and JobLedger").
+2. **APIs & Services > Library**: find **Google Drive API** and click **Enable**.
+3. **Google Auth Platform > Get started**: app name, support email, audience **External**, contact email, then **Create**.
+4. **Data Access > Add or remove scopes**: add `https://www.googleapis.com/auth/drive.appdata`, then **Save**. Only this Drive scope is used; it reaches a hidden folder for this app and nothing else in the user's Drive.
+5. **Audience > Test users**: add your own Google account. While the app is in testing, only test users can sign in. To let anyone sign in, click **Publish app**; drive.appdata is a non-sensitive scope, so Google asks only for basic app verification.
+6. **Clients > Create client**: type **Web application**, and under **Authorized JavaScript origins** add `https://jasonzawacki-arch.github.io`. Click **Create** and copy the client ID (it ends in `.apps.googleusercontent.com`).
+7. Put the ID in `GOOGLE_CLIENT_ID` in `src/gsync-config.ts` here and in JobLedger (`src/engine/gsync-config.ts`), then push. The client ID is not a secret: it names the app to Google.
+
 ## Regimen files
 
 The checklist (time windows, items, version notes and a few labels) is data, not code. The built-in one is [`src/regimen.json`](src/regimen.json); a file loaded in the app replaces it on that device. So one public app can run a private regimen: the regimen lives only on the phone and in its backups, and a private copy of this repository only needs its own `src/regimen.json`.
