@@ -451,7 +451,19 @@ let regMsg = '',
   bkPend: any = null;
 function regCard() {
   const own = !!mem.reg;
-  return `<div class=card><h3>Regimen</h3><p class=sm>${esc(REG.name || 'Regimen')}: ${I.length} items in ${Wn.length} windows${own ? ', loaded from a file on this device' : ', built into the app'}.</p><button class=btn data-a=rgs>Save regimen file</button> <button class=btn data-a=rgl>Load regimen file</button>${own ? ` <button class=btn data-a=rgb>${regBack ? 'Tap again to switch' : 'Use built-in regimen'}</button>` : ''}<input type=file id=rgf accept=".json,application/json" hidden><p class=sm>A regimen file holds your windows, items and version notes. Loading one replaces the list on this device and goes into backups. Past check marks follow item positions, so keep the order when you edit it.</p>${regPend ? `<div class=al>Replace the regimen on this device with ${esc(regPend.name || 'this file')} (${regPend.items.length} items)? Your logs stay.</div><button class=btn data-a=rgy>Replace</button> <button class=btn data-a=rgn>Cancel</button>` : ''}${regMsg ? `<p class=sm role=status>${esc(regMsg)}</p>` : ''}</div>`;
+  return `<div class=card><h3>Regimen</h3><p class=sm>${esc(REG.name || 'Regimen')}: ${I.length} items in ${Wn.length} windows${own ? ', loaded from a file on this device' : ', built into the app'}.</p><button class=btn data-a=rgs>Save regimen file</button> <button class=btn data-a=rgl>Load regimen file</button>${own ? ` <button class=btn data-a=rgb>${regBack ? 'Tap again to switch' : 'Use built-in regimen'}</button>` : ''}<input type=file id=rgf hidden><p class=sm>A regimen file holds your windows, items and version notes. Loading one replaces the list on this device and goes into backups. Past check marks follow item positions, so keep the order when you edit it.</p><details style="margin-top:8px"><summary class=sm>Or paste a regimen</summary><textarea id=rgt rows=3 placeholder="Paste the contents of a regimen file" style="margin-top:6px"></textarea><button class=lk data-a=rgp>Check pasted regimen</button></details>${regPend ? `<div class=al id=rgq>Replace the regimen on this device with ${esc(regPend.name || 'this file')} (${regPend.items.length} items)? Your logs stay.</div><button class=btn data-a=rgy>Replace</button> <button class=btn data-a=rgn>Cancel</button>` : ''}${regMsg ? `<p class=sm role=status>${esc(regMsg)}</p>` : ''}</div>`;
+}
+/** Checks a regimen from a file or paste and shows Replace / Cancel, or why it cannot be used. */
+function offerReg(o: any, file = '') {
+  const why = o ? checkRegimen(o) : 'This file is not valid JSON.';
+  regPend = why ? null : o;
+  regMsg = why ? 'Not loaded. ' + (file ? file + ': ' : '') + why : '';
+  render();
+  showNote(why ? 'Regimen not loaded. See the Regimen card.' : 'Found ' + (o.name || 'a regimen') + '. Tap Replace to use it.');
+  try {
+    const el = $(why ? '#rgf' : '#rgq');
+    if (el) (why ? el.parentElement : el).scrollIntoView({ block: 'center' });
+  } catch (x) {}
 }
 async function saveFile(name: string, text: string) {
   try {
@@ -473,7 +485,7 @@ function sumCard() {
   return `<div class=card><h3>Summary for your prescriber</h3><p class=sm>Last 14 logged days: adherence, BP, sleep, symptoms, and labs.</p><button class=btn data-a=sum>Generate summary</button> <button class=btn data-a=pdf>Save 1-page PDF</button>${sumT ? `<textarea rows=12 readonly style="margin-top:10px">${esc(sumT)}</textarea><button class=lk data-a=sdl>Save as text file</button>` : ''}</div>`;
 }
 function dataCard() {
-  return `<div class=card><h3>Data</h3><button class=btn data-a=csv>Export CSV</button> <button class=btn data-a=bk>Backup</button> <button class=btn data-a=tc>Transfer code</button>${tcode ? `<textarea id=tcv rows=3 readonly style="margin-top:10px">${esc(tcode)}</textarea>` : ''}<textarea id=rs rows=2 placeholder="Paste a backup to restore" style="margin-top:10px"></textarea><button class=lk data-a=rs>Restore from pasted backup</button> <button class=lk data-a=rsf>Restore from backup file</button><input type=file id=rsfi accept=".json,application/json" hidden>${bkPend ? `<div class=al>Restore this backup file? It overwrites matching data on this device.</div><button class=btn data-a=rsy>Restore</button> <button class=btn data-a=rsn>Cancel</button>` : ''}<p class=sm>${mode === 'local' ? 'Saved in the local database on this device. Use Backup to move it.' : mode === 'unsaved' ? 'Last save failed. Reload and try again.' : 'Saved on this device only.'}</p>${persisted === true ? '<p class=sm>Browser storage protection: on.</p>' : persisted === false ? '<p class=sm>Browser storage protection: off. The browser may clear data when space is low, so ' + ((window as any).DAILY_STANDALONE ? 'download a backup now and then.' : 'keep cloud backups on.') + '</p>' : ''}<p class=sm>A tracking log, not medical advice. Bring changes to your prescriber.</p></div>`;
+  return `<div class=card><h3>Data</h3><button class=btn data-a=csv>Export CSV</button> <button class=btn data-a=bk>Backup</button> <button class=btn data-a=tc>Transfer code</button>${tcode ? `<textarea id=tcv rows=3 readonly style="margin-top:10px">${esc(tcode)}</textarea>` : ''}<textarea id=rs rows=2 placeholder="Paste a backup to restore" style="margin-top:10px"></textarea><button class=lk data-a=rs>Restore from pasted backup</button> <button class=lk data-a=rsf>Restore from backup file</button><input type=file id=rsfi hidden>${bkPend ? `<div class=al>Restore this backup file? It overwrites matching data on this device.</div><button class=btn data-a=rsy>Restore</button> <button class=btn data-a=rsn>Cancel</button>` : ''}<p class=sm>${mode === 'local' ? 'Saved in the local database on this device. Use Backup to move it.' : mode === 'unsaved' ? 'Last save failed. Reload and try again.' : 'Saved on this device only.'}</p>${persisted === true ? '<p class=sm>Browser storage protection: on.</p>' : persisted === false ? '<p class=sm>Browser storage protection: off. The browser may clear data when space is low, so ' + ((window as any).DAILY_STANDALONE ? 'download a backup now and then.' : 'keep cloud backups on.') + '</p>' : ''}<p class=sm>A tracking log, not medical advice. Bring changes to your prescriber.</p></div>`;
 }
 let secs = new Set<string>();
 function sec(id: string, title: string, sum: string, body: () => string) {
@@ -2924,9 +2936,17 @@ app.addEventListener('click', async (e) => {
       put('reg', null);
       regMsg = 'Using the built-in regimen.';
     }
+  } else if (a === 'rgp') {
+    let o: any = null;
+    try {
+      o = JSON.parse(($('#rgt') as HTMLTextAreaElement).value);
+    } catch (x) {}
+    offerReg(o);
+    return;
   } else if (a === 'rgy' && regPend) {
     put('reg', regPend);
-    regMsg = 'Loaded ' + (regPend.name || 'the regimen') + '.';
+    regMsg = 'Loaded ' + (regPend.name || 'the regimen') + '. Today now shows it.';
+    showNote('Loaded ' + (regPend.name || 'the regimen') + '.');
     regPend = null;
   } else if (a === 'rgn') {
     regPend = null;
@@ -3038,9 +3058,8 @@ app.addEventListener('change', async (e) => {
       o = JSON.parse(await f.text());
     } catch (x) {}
     if (t.id === 'rgf') {
-      const why = o ? checkRegimen(o) : 'This file is not valid JSON.';
-      regPend = why ? null : o;
-      regMsg = why ? 'Not loaded. ' + why : '';
+      offerReg(o, f.name);
+      return;
     } else if (!o || typeof o !== 'object' || Array.isArray(o) || o.format === 'daily-regimen') {
       bkPend = null;
       showNote(o && o.format === 'daily-regimen' ? 'That is a regimen file. Load it under Customize and settings.' : 'That file is not a Daily backup.');

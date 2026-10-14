@@ -39,7 +39,7 @@ bad["items"][0][1] = "<img src=x onerror=alert(1)>"
 
 with sync_playwright() as p:
     b = p.chromium.launch()
-    ctx = b.new_context(viewport={"width": 390, "height": 844}, accept_downloads=True)
+    ctx = b.new_context(viewport={"width": 390, "height": 844}, accept_downloads=True, is_mobile=True, has_touch=True)
     ctx.add_init_script("localStorage.setItem('tour','1');localStorage.setItem('side','p')")
     pg = ctx.new_page()
     pg.on("pageerror", lambda e: errs.append(str(e)[:200]))
@@ -70,7 +70,11 @@ with sync_playwright() as p:
     P("#rgf").set_input_files(write("junk.json", "{not json")); pg.wait_for_timeout(400)
     check("non-JSON file is refused", "not valid JSON" in text())
 
-    P("#rgf").set_input_files(write("mine.json", mine)); pg.wait_for_timeout(400)
+    check("file picker accepts any file type (Android mislabels .json downloads)", P("#rgf").get_attribute("accept") is None)
+    P("details:has(#rgt) summary").click(); P("#rgt").fill(json.dumps(mine)); P("button[data-a=rgp]").click(); pg.wait_for_timeout(400)
+    check("pasted regimen is offered", P("button[data-a=rgy]").count() == 1 and "Tap Replace" in pg.locator("#hp").evaluate("h => h.shadowRoot.getElementById('ut').textContent"))
+    P("button[data-a=rgn]").click(); pg.wait_for_timeout(300)
+    P("#rgf").set_input_files(write("daily-regimen (1).txt", mine)); pg.wait_for_timeout(400)
     check("asks before replacing", P("button[data-a=rgy]").count() == 1 and "Test plan" in text())
     P("button[data-a=rgy]").click(); pg.wait_for_timeout(500)
     check("regimen card shows the loaded file", "loaded from a file" in text() and f"{len(mine['items'])} items" in text())
