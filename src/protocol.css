@@ -1580,3 +1580,30 @@ td:last-child{min-width:64px}
 .rt0{stroke:color-mix(in srgb,var(--tx) 22%,transparent)}
 @media(prefers-color-scheme:light){.lk,.lnk{color:#173fb0}}
 :host([data-theme="light"]) .lk,:host([data-theme="light"]) .lnk{color:#173fb0}
+/* Gut: Bristol scale picker */
+.bri {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 6px;
+}
+.bri button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--ln);
+  background: transparent;
+  color: var(--tx);
+  min-height: 56px;
+}
+.bri b {
+  font-size: 16px;
+}
+.bri span {
+  font-size: 12px;
+  line-height: 1.25;
+  color: var(--mu);
+}

@@ -12,6 +12,7 @@ A configurable daily regimen + lifting tracker. TypeScript source compiles to **
 - **Dose planner** — "up next" scheduling, missed-dose flags, and a dose-change log with chart markers
 - **Titration view** — weight, blood pressure, and sleep trends around dose changes, with lab values overlaid
 - **Injection-site rotation** — site maps with rotation rules per injectable type
+- **Gut tracking** — quick-tap symptoms with severity and time, the Bristol scale, food tags (with FODMAP groups) and fiber on meals; a Gut patterns screen compares symptoms after each food against other meals, with counts and a minimum sample before anything is flagged, plus fiber and water on symptom days, an elimination plan with reintroduction results, and prompts to contact a clinician for red flags
 - **Lift tracking** — workout templates, set logging with validation warnings, progressive-overload analytics, weekly volume by muscle
 - **Reports** — one-page PDF summaries and weekly reviews
 - **Local-first** — all data stays in IndexedDB on the device; optional cloud backup to the user's own store

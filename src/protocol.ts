@@ -1,6 +1,7 @@
 import protocolCss from './protocol.css';
 import REG0 from './regimen.json';
 import { checkRegimen, programData, reTest, type Regimen } from './regcheck.js';
+import { BRISTOL, FOOD_TAGS, GUT_SY, RED_FLAG, compareDays, elimResults, fodmapOf, gutAlerts, summarize, tagPatterns, tracked, type Elim, type GutDay } from './gut.js';
 const SR = document.getElementById('hp').attachShadow({ mode: 'open' });
 SR.innerHTML =
   '<style>' +
@@ -402,7 +403,7 @@ function histV() {
     .slice(0, 14);
   if (!ks.length)
     return '<div class=card>No days logged yet. Check off items on the Today tab to start your history.</div>';
-  return `${weekly()}${stats(ks)}${trendCard()}${titrCard()}${calCard()}${awakeCard()}${findCard()}<div class=card><h3>Last ${ks.length} logged days</h3><table><tr><th>Day</th><th>Type</th><th>Done</th><th>Avg sys</th><th>Sleep</th></tr>${ks
+  return `${weekly()}${stats(ks)}${trendCard()}${titrCard()}${calCard()}${awakeCard()}${gutLinkCard()}${findCard()}<div class=card><h3>Last ${ks.length} logged days</h3><table><tr><th>Day</th><th>Type</th><th>Done</th><th>Avg sys</th><th>Sleep</th></tr>${ks
     .map((k) => {
       const s = k.slice(2),
         d = mem[k],
@@ -897,6 +898,23 @@ function reportModel() {
     labs,
   };
 }
+function gutLine(dates: string[]): string {
+  const set = new Set(dates),
+    sm = summarize(gutDays().filter((g) => set.has(g.date)));
+  if (!sm.symptoms.length && !sm.bms) return 'Gut: none logged';
+  const f1 = (x) => (x == null ? '-' : String(Math.round(x * 10) / 10));
+  return (
+    'Gut: ' +
+    (sm.symptoms.length ? sm.symptoms.map(([n, c, v]) => n + ' x' + c + (n === RED_FLAG ? '' : ' (avg severity ' + f1(v) + '/5)')).join(', ') : 'no symptoms') +
+    '; ' +
+    sm.bms +
+    ' bowel movements' +
+    (sm.bristolAvg != null ? ', Bristol average ' + f1(sm.bristolAvg) : '') +
+    '; fiber ' +
+    f1(sm.fiberAvg) +
+    ' g/day'
+  );
+}
 function sumText() {
   const ks = Object.keys(mem)
       .filter((k) => k.startsWith('d-'))
@@ -951,6 +969,7 @@ function sumText() {
             .map(([s, n]) => s + ' x' + n)
             .join(', ')
         : 'none logged'),
+    gutLine(ks.map((k) => k.slice(2))),
     'Latest labs: ' +
       (Object.values(lb)
         .map((x) => x.m + ' ' + x.v + ' (' + x.d + ')')
@@ -1409,6 +1428,139 @@ const MEALS = [
   ['Bedtime peanut butter', 95, 4, 3, 8, 'A'],
 ];
 const sumN = (d, k) => ((d && d.nu) || []).reduce((t, x) => t + (+x[k] || 0), 0);
+// ---------- gut: outputs (timed symptoms, Bristol) against inputs (tagged meals, fiber, water)
+let gutTime: { d: string; t: string } | null = null,
+  gutSel: string | null = null,
+  mealEd: number | null = null,
+  elimSel: string[] = [],
+  gutSym = '',
+  gutWin = '2-4';
+const mealKey = (n) => String(n || '').trim().toLowerCase();
+/** Tags and fiber are remembered per meal name, so tagging a meal once covers its past and future entries. */
+const mealTags = (x): string[] => x.tg || (mealKey(x.n) !== 'meal' && (cfg().mtag || {})[mealKey(x.n)]) || [];
+const mealFiber = (x): number => (x.fb != null ? +x.fb : +((cfg().mfb || {})[mealKey(x.n)] || 0));
+const allTags = (): string[] => [...new Set([...FOOD_TAGS.map((t) => t[0]), ...(cfg().ftags || [])])];
+/** Fiber from checked checklist items such as "Psyllium 5 g". */
+function checklistFiber(d): number {
+  const c = (d && d.c) || {};
+  return all()
+    .filter((x) => c[x.id] && /psyllium|fiber/i.test(x.l))
+    .reduce((t, x) => {
+      const m = x.l.match(/(\d+(?:\.\d+)?)\s?g\b/);
+      return t + (m ? +m[1] : 0);
+    }, 0);
+}
+function gutDays(): GutDay[] {
+  return Object.keys(mem)
+    .filter((k) => k.startsWith('d-'))
+    .sort()
+    .map((k) => {
+      const d = mem[k] || {},
+        nu = d.nu || [];
+      return {
+        date: k.slice(2),
+        meals: nu.map((x) => ({ t: x.t || '', n: x.n, tags: mealTags(x) })),
+        gut: d.g || [],
+        water: +d.w || 0,
+        fiber: nu.reduce((t, x) => t + mealFiber(x), 0) + checklistFiber(d),
+      };
+    });
+}
+const nowHM = () => new Date().toTimeString().slice(0, 5);
+function gutCard(d): string {
+  const g = (d.g || []).map((e, i) => ({ e, i })).sort((a, b) => (a.e.t < b.e.t ? -1 : 1)),
+    isToday = date === iso(new Date());
+  const al = date === iso(new Date()) ? gutAlerts(gutDays(), date) : [];
+  return `<div class=card id=gutc><h3>Gut</h3>${al.map((t) => `<div class=al>${esc(t)}</div>`).join('')}<p class=sm>Tap a symptom, then how bad it is (1 mild, 5 severe). Bowel movements use the Bristol scale.</p><label class=f>Time</label><input type=time id=gtm data-gtm value="${gutTime && gutTime.d === date ? gutTime.t : isToday ? nowHM() : '12:00'}" style="max-width:160px"><label class=f>Symptom</label><div class=chips>${GUT_SY.map((s) => `<button data-a=gs data-v="${s}" class="${gutSel === s ? 'on' : ''}"${s === RED_FLAG ? ' style="color:var(--nw)"' : ''}>${s}</button>`).join('')}</div>${
+    gutSel
+      ? gutSel === RED_FLAG
+        ? `<div class=chips><button data-a=gv data-v=3>Log it</button><button data-a=gs data-v="">Cancel</button></div>`
+        : `<div class=sm style="margin-top:6px">${esc(gutSel)}: how bad?</div><div class=en>${[1, 2, 3, 4, 5].map((n) => `<button data-a=gv data-v=${n}>${n}</button>`).join('')}</div>`
+      : ''
+  }<label class=f>Bowel movement (Bristol)</label><div class=bri>${BRISTOL.map(([n, l]) => `<button data-a=gb data-v=${n}><b>${n}</b><span>${l}</span></button>`).join('')}</div>${
+    g.length
+      ? `<div style="margin-top:10px">${g
+          .map(
+            ({ e, i }) =>
+              `<div class=r><span>${esc(e.t)} ${e.k === 'b' ? 'Bowel movement, Bristol ' + e.b : esc(e.s || '') + (e.s === RED_FLAG ? '' : ', ' + e.v + ' of 5')}</span><button data-a=gx data-v=${i}>Remove</button></div>`,
+          )
+          .join('')}</div>`
+      : '<p class=sm>Nothing logged for this day.</p>'
+  }${(() => {
+    const el = cfg().elim as Elim | undefined;
+    return el && elimActive(el) ? `<p class=sm>Elimination plan: day ${days2(el.start, iso(new Date())) + 1} of ${el.days}, avoiding ${el.tags.map(esc).join(', ')}.</p>` : '';
+  })()}<button class=btn data-a=qg data-v=gut style="margin-top:8px">See patterns</button><p class=sm>A log, not medical advice.</p></div>`;
+}
+function mealRow(x, i): string {
+  const tags = mealTags(x),
+    el = cfg().elim as Elim | undefined,
+    av = el && elimActive(el) ? tags.filter((t) => el.tags.includes(t)) : [],
+    fb = mealFiber(x);
+  return `<div class=r><span>${x.t || ''} ${esc(x.n)}<br><small class=sm>${x.k} kcal, P ${x.p}, C ${x.c}, F ${x.f}${fb ? ', fiber ' + fb + ' g' : ''}${tags.length ? ' · ' + tags.map(esc).join(', ') : ''}</small>${av.length ? `<br><small class=sm style="color:var(--nw)">Contains ${av.map(esc).join(', ')}, which your elimination plan avoids.</small>` : ''}</span><button data-a=mt data-v=${i}>${mealEd === i ? 'Done' : 'Tags'}</button><button data-a=nx2 data-v=${i}>Remove</button></div>${
+    mealEd === i
+      ? `<div class=chips style="margin:4px 0 10px">${allTags()
+          .map((t) => `<button data-a=mtg data-v="${i}|${esc(t)}" class="${tags.includes(t) ? 'on' : ''}" title="${esc(fodmapOf(t) ? 'FODMAP: ' + fodmapOf(t) : '')}">${esc(t)}${fodmapOf(t) ? ' <small>' + esc(fodmapOf(t)) + '</small>' : ''}</button>`)
+          .join('')}</div><div class=g style="grid-template-columns:1fr 1fr;margin-bottom:10px"><input type=number inputmode=decimal data-mfb=${i} placeholder="Fiber g" value="${x.fb != null ? x.fb : (cfg().mfb || {})[mealKey(x.n)] || ''}" aria-label="Fiber in grams"><input type=text id=ntag placeholder="New tag" aria-label="New food tag"></div><button class=lk data-a=ntg data-v=${i}>Add tag</button><p class=sm>Tags and fiber are remembered for "${esc(x.n)}" next time.</p>`
+      : ''
+  }`;
+}
+/** Gut patterns: its own screen (from Fuel or History), so the analysis has room and logging stays quick. */
+function gutV(): string {
+  return `<div class=card><button class=lk data-a=qg data-v=fuel>&#8249; Back to Fuel</button><h3 style="margin-top:6px">Gut patterns</h3><p class=sm>Your logged meals, fiber and water against the symptoms and bowel movements you log in Fuel. Everything stays on this device.</p></div>${gutPatternsCard()}${elimCard()}`;
+}
+function gutLinkCard(): string {
+  const n = tracked(gutDays()).length;
+  return n ? `<div class=card><h3>Gut patterns</h3><p class=sm>${n} day${n > 1 ? 's' : ''} of gut tracking. Food tags against symptoms, fiber and water, and your elimination plan.</p><button class=btn data-a=qg data-v=gut>Open gut patterns</button></div>` : '';
+}
+function gutPatternsCard(): string {
+  const days = gutDays(),
+    tr = tracked(days);
+  if (!tr.length) return '<div class=card><p class=sm>Log symptoms and bowel movements in Fuel for a few days, and tag your meals there, to see patterns here.</p></div>';
+  const [w0, w1] = gutWin.split('-').map(Number),
+    now = new Date(),
+    pat = tagPatterns(days, gutSym, [w0, w1], iso(now), now.getHours() * 60 + now.getMinutes()),
+    cmp = compareDays(days),
+    sm = summarize(tr.slice(-14)),
+    symName = gutSym ? gutSym.toLowerCase() : 'a symptom (2 or worse)',
+    pct = (a, b) => (b ? Math.round((100 * a) / b) + '%' : '-'),
+    f1 = (x, u) => (x == null ? '-' : (Math.round(x * 10) / 10).toString() + (u ? ' ' + u : ''));
+  const rows = pat.rows.filter((r) => r.n > 0).slice(0, 8);
+  return `<div class=card><h3>Overview</h3><p class=sm>Last ${sm.days} tracked days: ${sm.symptoms.length ? sm.symptoms.map(([n, c, v]) => esc(n) + ' x' + c + (n === RED_FLAG ? '' : ' (avg ' + f1(v, '') + ')')).join(', ') : 'no symptoms'}; ${sm.bms} bowel movements${sm.bristolAvg != null ? ', Bristol average ' + f1(sm.bristolAvg, '') : ''}; fiber ${f1(sm.fiberAvg, 'g')} and water ${f1(sm.waterAvg, 'oz')} a day.</p>
+<label class=f>After meals with each food tag</label><div class=g style="grid-template-columns:1fr 1fr"><select data-gsym aria-label="Symptom"><option value="">Any symptom</option>${GUT_SY.filter((x) => x !== RED_FLAG).map((x) => `<option ${gutSym === x ? 'selected' : ''}>${x}</option>`).join('')}</select><select data-gwin aria-label="Time after the meal">${['0-2', '2-4', '4-8'].map((x) => `<option value=${x} ${gutWin === x ? 'selected' : ''}>${x.replace('-', ' to ')} h after</option>`).join('')}</select></div>${
+    rows.length
+      ? `<table><tr><th>Food tag</th><th>Followed by ${esc(symName)}</th><th>Other meals</th></tr>${rows
+          .map((r) => `<tr${r.flag ? ' style="font-weight:600"' : ''}><td>${esc(r.tag)}${r.flag ? ' <small style="color:var(--nw)">worth testing</small>' : ''}</td><td>${r.hit} of ${r.n} (${pct(r.hit, r.n)})</td><td>${r.ohit} of ${r.on} (${pct(r.ohit, r.on)})</td></tr>`)
+          .join('')}</table>`
+      : `<p class=sm>Tag your meals (Fuel, Logged, Tags) to see which foods come before symptoms. ${pat.meals} meals counted so far.</p>`
+  }<p class=sm>A tag is marked worth testing only after 5 or more meals with it, 3 or more followed by symptoms, and a rate at least 25 points above other meals. Coincidences are common with a few weeks of data, so treat it as a lead and test it with an elimination plan (below).</p>
+<label class=f>Days with symptoms against days without</label>${
+    cmp.symDays >= 3 && cmp.calmDays >= 3
+      ? `<table><tr><th></th><th>Symptom days (${cmp.symDays})</th><th>Other days (${cmp.calmDays})</th></tr>${cmp.rows.map((r) => `<tr><td>${r.label}</td><td>${f1(r.sym, r.unit)}</td><td>${f1(r.calm, r.unit)}</td></tr>`).join('')}</table>`
+      : `<p class=sm>Needs at least 3 days with symptoms and 3 without since you started logging. You have ${cmp.symDays} and ${cmp.calmDays}.</p>`
+  }</div>`;
+}
+function elimActive(e: Elim): boolean {
+  return !!e && days2(e.start, iso(new Date())) >= 0 && days2(e.start, iso(new Date())) < e.days;
+}
+function elimCard(): string {
+  const e = cfg().elim as Elim | undefined,
+    t = iso(new Date());
+  if (!e)
+    return `<div class=card><h3>Elimination plan</h3><p class=sm>To test a pattern: avoid a few foods for a set time, then add them back one at a time and compare. Plan it with your clinician or dietitian, especially for a low-FODMAP diet.</p><div class=chips>${allTags()
+      .map((x) => `<button data-a=et data-v="${esc(x)}" class="${elimSel.includes(x) ? 'on' : ''}">${esc(x)}</button>`)
+      .join('')}</div><label class=f>Length</label><select id=eld>${[14, 21, 28, 42].map((n) => `<option value=${n} ${n === 28 ? 'selected' : ''}>${n / 7} weeks</option>`).join('')}</select><button class=btn data-a=es style="margin-top:8px" ${elimSel.length ? '' : 'disabled'}>Start avoiding ${elimSel.length ? elimSel.length + ' food' + (elimSel.length > 1 ? 's' : '') : '...'}</button></div>`;
+  const day = days2(e.start, t) + 1,
+    over = day > e.days,
+    res = elimResults(e, gutDays(), t),
+    left = e.tags.filter((x) => !(e.re || []).some((r) => r.tag === x));
+  return `<div class=card><h3>Elimination plan</h3><p class=sm>${over ? 'Avoiding phase finished.' : `Day ${Math.max(1, day)} of ${e.days}.`} Avoiding ${e.tags.map(esc).join(', ')}.</p>${
+    over && left.length
+      ? `<p class=sm>Add foods back one at a time, a few days apart, and log symptoms.</p><div class=g style="grid-template-columns:1fr auto"><select id=ert>${left.map((x) => `<option>${esc(x)}</option>`).join('')}</select><button class=btn data-a=er>Add back today</button></div>`
+      : ''
+  }<table><tr><th>Period</th><th>Days logged</th><th>Days with symptoms</th></tr>${res
+    .map((r) => `<tr><td>${esc(r.label)}</td><td>${r.days}</td><td>${r.days ? r.symDays + ' (' + Math.round((100 * r.symDays) / r.days) + '%)' : '-'}</td></tr>`)
+    .join('')}</table><p class=sm>Only days with gut entries count. A few days is a small sample; repeat a reintroduction before drawing conclusions.</p><button class=lk data-a=ee>End plan</button></div>`;
+}
 function fuelV() {
   const d = mem['d-' + date] || {},
     nu = d.nu || [],
@@ -1430,7 +1582,8 @@ function fuelV() {
     .join(
       '',
     )}<div><button class=lk data-a=cy2>Copy yesterday's meals</button></div><div class=chips>${MEALS.map((m, i) => (m[5] === 'A' || m[5] === t ? `<button data-a=nm data-v=${i}>${m[0]}</button>` : '')).join('')}</div><input type=text id=nn placeholder="Custom meal" style="margin-top:10px"><div class=g style="grid-template-columns:1fr 1fr 1fr 1fr"><input type=number id=nk placeholder="kcal"><input type=number id=np placeholder="P g"><input type=number id=nc placeholder="C g"><input type=number id=nf placeholder="F g"></div><button class=btn data-a=nc2>Add entry</button> <button class=lk data-a=nfv>Save as favorite</button></div>
-${favCard()}<div class=card><h3>Logged</h3>${nu.map((x, i) => `<div class=r><span>${x.t || ''} ${esc(x.n)}<br><small class=sm>${x.k} kcal, P ${x.p}, C ${x.c}, F ${x.f}</small></span><button data-a=nx2 data-v=${i}>Remove</button></div>`).join('') || '<p class=sm>Nothing logged yet.</p>'}</div>
+${favCard()}<div class=card><h3>Logged</h3>${nu.map((x, i) => mealRow(x, i)).join('') || '<p class=sm>Nothing logged yet.</p>'}<p class=sm>Fiber today ${Math.round(gutDays().find((g) => g.date === date)?.fiber || 0)} g, counting checked fiber items.</p></div>
+${gutCard(d)}
 <div class=card><h3>Water</h3><p class=sm>${d.w || 0} oz today</p><div class=chips>${[8, 16, 24].map((n) => `<button data-a=wt data-v=${n}>+${n} oz</button>`).join('')}<button data-a=wt data-v=-8>-8 oz</button></div></div>${groceryCard()}`;
 }
 function nextTxt() {
@@ -1462,7 +1615,10 @@ const rvals = (d, k) =>
   ).filter((x) => x !== '' && x != null && !isNaN(x));
 function alertHTML() {
   const d = mem['d-' + date] || {};
-  let h = (cfg().al || [])
+  let h = gutAlerts(gutDays(), iso(new Date()))
+    .map((t) => `<div class=al>${esc(t)}</div>`)
+    .join('');
+  h += (cfg().al || [])
     .filter((r) => rvals(d, r.m).some((x) => (r.o === '<' ? x < r.v : x > r.v)))
     .map((r) => `<div class=al>${esc(r.t)}</div>`)
     .join('');
@@ -1613,7 +1769,7 @@ const ICM =
 function quickRow() {
   return date !== iso(new Date())
     ? ''
-    : `${vbar('today', REG.voice ? 'Say: took ' + REG.voice + ', meds done' : 'Say: took morning meds, done')}<div class=chips style="margin:6px 0 10px"><button data-a=qw>+8 oz water</button><button data-a=qg data-v=fuel>Add meal</button><button data-a=qg data-v=vitals>Log vitals</button></div>`;
+    : `${vbar('today', REG.voice ? 'Say: took ' + REG.voice + ', meds done' : 'Say: took morning meds, done')}<div class=chips style="margin:6px 0 10px"><button data-a=qw>+8 oz water</button><button data-a=qg data-v=fuel>Add meal</button><button data-a=qg data-v=vitals>Log vitals</button><button data-a=qgut>Log gut</button></div>`;
 }
 function recents() {
   const seen = {},
@@ -2242,7 +2398,9 @@ function render() {
           ? fuelV()
           : tab === 'hist'
             ? histV()
-            : moreV();
+            : tab === 'gut'
+              ? gutV()
+              : moreV();
   $('#app').innerHTML =
     `<div class=w data-t="${tab}"><header><div class=dr><button data-a=p aria-label="Previous day">&#8249;</button><div class=dt><b>${fmt(date)}</b>${d.dn ? '<i style="color:var(--dn)">Day complete</i>' : ''}${isT ? '<i>Today</i>' : '<button class=lk data-a=td>Jump to today</button>'}</div><button data-a=n aria-label="Next day">&#8250;</button></div>
 <div class=sg><button data-a=t data-v=L class="${t === 'L' ? 'on' : ''}">Lifting day</button><button data-a=t data-v=R class="${t === 'R' ? 'on' : ''}">Recovery day</button></div>${d.t ? '' : '<p class=ht>Suggested from your last days. Tap to confirm.</p>'}<div class=pg><svg viewBox="0 0 44 44" width=44 height=44><defs><linearGradient id=rg x1=0 y1=0 x2=1 y2=1><stop offset=0 style="stop-color:var(--nw)"/><stop offset=1 style="stop-color:var(--dn)"/></linearGradient></defs><circle cx=22 cy=22 r=18 class=rt0></circle><circle cx=22 cy=22 r=18 class=rt1 stroke-dasharray="${(b ? a / b : 0) * 113.1} 113.1"></circle></svg><div><b>${a} of ${b} done</b><span>${nextTxt()}</span></div></div></header>${warnHTML()}${body}${tab === 'today' || tab === 'vitals' ? fin(d, a, b) : ''}</div>
@@ -2256,7 +2414,7 @@ function render() {
     ]
       .map(
         ([k, l]) =>
-          `<button data-a=tab data-v=${k} class="${tab === k ? 'on' : ''}">${IC[k]}<span>${l}</span></button>`,
+          `<button data-a=tab data-v=${k} class="${tab === k || (k === 'fuel' && tab === 'gut') ? 'on' : ''}">${IC[k]}<span>${l}</span></button>`,
       )
       .join('')}</nav>`;
   afterRender();
@@ -2508,7 +2666,56 @@ app.addEventListener('click', async (e) => {
     put('d-' + date, d);
   } else if (a === 'nx2') {
     d.nu.splice(+v, 1);
+    if (mealEd === +v) mealEd = null;
     put('d-' + date, d);
+  } else if (a === 'gs') {
+    gutSel = v || null;
+  } else if (a === 'gv' || a === 'gb') {
+    const tm = (($('#gtm') as HTMLInputElement) || ({} as any)).value || nowHM();
+    if (a === 'gv' && !gutSel) return;
+    d.g = (d.g || []).concat(a === 'gv' ? { t: tm, k: 's', s: gutSel, v: +v } : { t: tm, k: 'b', b: +v });
+    d.t = d.t || typeOf(date);
+    gutSel = null;
+    gutTime = null;
+    put('d-' + date, d);
+    showNote(a === 'gb' ? 'Logged Bristol ' + v + ' at ' + tm + '.' : 'Logged at ' + tm + '.');
+  } else if (a === 'gx') {
+    (d.g || []).splice(+v, 1);
+    put('d-' + date, d);
+  } else if (a === 'mt') {
+    mealEd = mealEd === +v ? null : +v;
+  } else if (a === 'mtg' || a === 'ntg') {
+    const [si, tg0] = a === 'mtg' ? String(v).split('|') : [v, ''],
+      i = +si,
+      x = (d.nu || [])[i],
+      tg = a === 'ntg' ? ((($('#ntag') as HTMLInputElement) || ({} as any)).value || '').trim().replace(/[<>|]/g, '').slice(0, 40) : tg0;
+    if (!x || !tg) return;
+    const cur = mealTags(x),
+      next = a === 'ntg' ? [...new Set([...cur, tg])] : cur.includes(tg) ? cur.filter((t) => t !== tg) : [...cur, tg];
+    x.tg = next;
+    put('d-' + date, d);
+    const c = JSON.parse(JSON.stringify(cfg()));
+    if (mealKey(x.n) !== 'meal') (c.mtag = c.mtag || {})[mealKey(x.n)] = next;
+    if (a === 'ntg' && !allTags().includes(tg)) c.ftags = (c.ftags || []).concat(tg);
+    put('cfg', c);
+  } else if (a === 'et') {
+    elimSel = elimSel.includes(v) ? elimSel.filter((x) => x !== v) : elimSel.concat(v);
+  } else if (a === 'es') {
+    if (!elimSel.length) return;
+    const c = JSON.parse(JSON.stringify(cfg()));
+    c.elim = { start: iso(new Date()), days: +(($('#eld') as HTMLSelectElement) || ({ value: 28 } as any)).value || 28, tags: elimSel, re: [] };
+    elimSel = [];
+    put('cfg', c);
+  } else if (a === 'er') {
+    const c = JSON.parse(JSON.stringify(cfg())),
+      tg = (($('#ert') as HTMLSelectElement) || ({} as any)).value;
+    if (!c.elim || !tg) return;
+    c.elim.re = (c.elim.re || []).concat({ tag: tg, d: iso(new Date()) });
+    put('cfg', c);
+  } else if (a === 'ee') {
+    const c = JSON.parse(JSON.stringify(cfg()));
+    delete c.elim;
+    put('cfg', c);
   } else if (a === 'wt') {
     d.w = Math.max(0, (d.w || 0) + +v);
     d.t = d.t || typeOf(date);
@@ -2719,6 +2926,15 @@ app.addEventListener('click', async (e) => {
     put('d-' + date, d);
   } else if (a === 'qg') {
     tab = v;
+    if (v === 'gut' || v === 'fuel') setTimeout(() => scrollTo(0, 0), 30);
+  } else if (a === 'qgut') {
+    tab = 'fuel';
+    setTimeout(() => {
+      // land just below the sticky date header
+      const el = $('#gutc'),
+        hd = $('header');
+      if (el) scrollTo(0, el.getBoundingClientRect().top + scrollY - (hd ? hd.getBoundingClientRect().height : 0) - 8);
+    }, 60);
   } else if (a === 'cy2') {
     const y = mem['d-' + addD(date, -1)];
     if (!y || !y.nu) return;
@@ -3043,9 +3259,16 @@ app.addEventListener('click', async (e) => {
         'sleep_h',
         'wakes',
         'energy',
+        'gut_symptoms',
+        'gut_max_severity',
+        'bowel_movements',
+        'bristol_avg',
+        'fiber_g',
         'notes',
       ],
     ];
+    const gd: Record<string, GutDay> = {};
+    gutDays().forEach((x) => (gd[x.date] = x));
     Object.keys(mem)
       .filter((k) => k.startsWith('d-'))
       .sort()
@@ -3066,6 +3289,14 @@ app.addEventListener('click', async (e) => {
           g('sl'),
           g('aw'),
           g('en'),
+          ((gd[s] || {}).gut || []).filter((q) => q.k === 's').length,
+          Math.max(0, ...((gd[s] || {}).gut || []).filter((q) => q.k === 's').map((q) => q.v || 0)) || '',
+          ((gd[s] || {}).gut || []).filter((q) => q.k === 'b').length,
+          (() => {
+            const b = ((gd[s] || {}).gut || []).filter((q) => q.k === 'b').map((q) => q.b || 0);
+            return b.length ? Math.round((b.reduce((a2, c2) => a2 + c2, 0) / b.length) * 10) / 10 : '';
+          })(),
+          gd[s] ? Math.round(gd[s].fiber) : '',
           '"' + (x.nt || '').replace(/"/g, '""') + '"',
         ]);
       });
@@ -3138,6 +3369,31 @@ document.addEventListener('visibilitychange', () => {
 });
 app.addEventListener('change', async (e) => {
   const t = e.target;
+  if (t.dataset.mfb != null) {
+    const d = JSON.parse(JSON.stringify(mem['d-' + date] || {})),
+      x = (d.nu || [])[+t.dataset.mfb];
+    if (!x) return;
+    const fb = t.value === '' ? null : Math.max(0, Math.min(200, Number(t.value) || 0));
+    fb == null ? delete x.fb : (x.fb = fb);
+    put('d-' + date, d);
+    if (mealKey(x.n) !== 'meal') {
+      const c = JSON.parse(JSON.stringify(cfg()));
+      c.mfb = c.mfb || {};
+      fb == null ? delete c.mfb[mealKey(x.n)] : (c.mfb[mealKey(x.n)] = fb);
+      put('cfg', c);
+    }
+    render();
+    return;
+  }
+  if (t.dataset.gtm != null) {
+    gutTime = t.value ? { d: date, t: t.value } : null;
+    return;
+  }
+  if (t.dataset.gsym != null || t.dataset.gwin != null) {
+    t.dataset.gsym != null ? (gutSym = t.value) : (gutWin = t.value);
+    render();
+    return;
+  }
   if (t.dataset.k === 'bt' || t.dataset.k === 'wk') {
     setK(t.dataset.k, t.value);
     const dd = mem['d-' + date] || {};
@@ -3202,6 +3458,9 @@ app.addEventListener('change', async (e) => {
     d.c = d.c || {};
     d.t = d.t || typeOf(date);
     t.checked ? (d.c[t.dataset.c] = 1) : delete d.c[t.dataset.c];
+    // when it was checked, for timing analysis (only for today; past days were checked later than taken)
+    d.ct = d.ct || {};
+    t.checked && date === iso(new Date()) ? (d.ct[t.dataset.c] = nowHM()) : delete d.ct[t.dataset.c];
     supAdj(t.dataset.c, t.checked);
     vialAdj(t.dataset.c, t.checked);
     put('d-' + date, d);
