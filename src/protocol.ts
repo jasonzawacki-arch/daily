@@ -5,7 +5,7 @@ const SR = document.getElementById('hp').attachShadow({ mode: 'open' });
 SR.innerHTML =
   '<style>' +
   protocolCss +
-  '</style><div id=app></div><div id=ut hidden role=status aria-live=polite></div><button id=jn class=jn hidden>Jump to now</button>';
+  '</style><div id=app></div><div id=ut hidden role=status aria-live=polite></div><button id=jn class=jn hidden>Jump to now</button><input type=file id=rgf class=fi tabindex=-1 aria-hidden=true><input type=file id=rsfi class=fi tabindex=-1 aria-hidden=true>';
 
 const $ = (s) => SR.querySelector(s),
   esc = (s) =>
@@ -451,7 +451,7 @@ let regMsg = '',
   bkPend: any = null;
 function regCard() {
   const own = !!mem.reg;
-  return `<div class=card><h3>Regimen</h3><p class=sm>${esc(REG.name || 'Regimen')}: ${I.length} items in ${Wn.length} windows${own ? ', loaded from a file on this device' : ', built into the app'}.</p><button class=btn data-a=rgs>Save regimen file</button> <button class=btn data-a=rgl>Load regimen file</button>${own ? ` <button class=btn data-a=rgb>${regBack ? 'Tap again to switch' : 'Use built-in regimen'}</button>` : ''}<input type=file id=rgf hidden><p class=sm>A regimen file holds your windows, items and version notes. Loading one replaces the list on this device and goes into backups. Past check marks follow item positions, so keep the order when you edit it.</p><details style="margin-top:8px"><summary class=sm>Or paste a regimen</summary><textarea id=rgt rows=3 placeholder="Paste the contents of a regimen file" style="margin-top:6px"></textarea><button class=lk data-a=rgp>Check pasted regimen</button></details>${regPend ? `<div class=al id=rgq>Replace the regimen on this device with ${esc(regPend.name || 'this file')} (${regPend.items.length} items)? Your logs stay.</div><button class=btn data-a=rgy>Replace</button> <button class=btn data-a=rgn>Cancel</button>` : ''}${regMsg ? `<p class=sm role=status>${esc(regMsg)}</p>` : ''}</div>`;
+  return `<div class=card><h3>Regimen</h3><p class=sm>${esc(REG.name || 'Regimen')}: ${I.length} items in ${Wn.length} windows${own ? ', loaded from a file on this device' : ', built into the app'}.</p><button class=btn data-a=rgs>Save regimen file</button> <label class=btn for=rgf role=button style="display:inline-block;cursor:pointer">Load regimen file</label>${own ? ` <button class=btn data-a=rgb>${regBack ? 'Tap again to switch' : 'Use built-in regimen'}</button>` : ''}<p class=sm>A regimen file holds your windows, items and version notes. Loading one replaces the list on this device and goes into backups. Past check marks follow item positions, so keep the order when you edit it.</p><details style="margin-top:8px"><summary class=sm>Or paste a regimen</summary><textarea id=rgt rows=3 placeholder="Paste the contents of a regimen file" style="margin-top:6px"></textarea><button class=lk data-a=rgp>Check pasted regimen</button></details>${regPend ? `<div class=al id=rgq>Replace the regimen on this device with ${esc(regPend.name || 'this file')} (${regPend.items.length} items)? Your logs stay.</div><button class=btn data-a=rgy>Replace</button> <button class=btn data-a=rgn>Cancel</button>` : ''}${regMsg ? `<p class=sm role=status>${esc(regMsg)}</p>` : ''}</div>`;
 }
 /** Checks a regimen from a file or paste and shows Replace / Cancel, or why it cannot be used. */
 function offerReg(o: any, file = '') {
@@ -485,7 +485,7 @@ function sumCard() {
   return `<div class=card><h3>Summary for your prescriber</h3><p class=sm>Last 14 logged days: adherence, BP, sleep, symptoms, and labs.</p><button class=btn data-a=sum>Generate summary</button> <button class=btn data-a=pdf>Save 1-page PDF</button>${sumT ? `<textarea rows=12 readonly style="margin-top:10px">${esc(sumT)}</textarea><button class=lk data-a=sdl>Save as text file</button>` : ''}</div>`;
 }
 function dataCard() {
-  return `<div class=card><h3>Data</h3><button class=btn data-a=csv>Export CSV</button> <button class=btn data-a=bk>Backup</button> <button class=btn data-a=tc>Transfer code</button>${tcode ? `<textarea id=tcv rows=3 readonly style="margin-top:10px">${esc(tcode)}</textarea>` : ''}<textarea id=rs rows=2 placeholder="Paste a backup to restore" style="margin-top:10px"></textarea><button class=lk data-a=rs>Restore from pasted backup</button> <button class=lk data-a=rsf>Restore from backup file</button><input type=file id=rsfi hidden>${bkPend ? `<div class=al>Restore this backup file? It overwrites matching data on this device.</div><button class=btn data-a=rsy>Restore</button> <button class=btn data-a=rsn>Cancel</button>` : ''}<p class=sm>${mode === 'local' ? 'Saved in the local database on this device. Use Backup to move it.' : mode === 'unsaved' ? 'Last save failed. Reload and try again.' : 'Saved on this device only.'}</p>${persisted === true ? '<p class=sm>Browser storage protection: on.</p>' : persisted === false ? '<p class=sm>Browser storage protection: off. The browser may clear data when space is low, so ' + ((window as any).DAILY_STANDALONE ? 'download a backup now and then.' : 'keep cloud backups on.') + '</p>' : ''}<p class=sm>A tracking log, not medical advice. Bring changes to your prescriber.</p></div>`;
+  return `<div class=card><h3>Data</h3><button class=btn data-a=csv>Export CSV</button> <button class=btn data-a=bk>Backup</button> <button class=btn data-a=tc>Transfer code</button>${tcode ? `<textarea id=tcv rows=3 readonly style="margin-top:10px">${esc(tcode)}</textarea>` : ''}<textarea id=rs rows=2 placeholder="Paste a backup to restore" style="margin-top:10px"></textarea><button class=lk data-a=rs>Restore from pasted backup</button> <label class=lk for=rsfi role=button style="cursor:pointer">Restore from backup file</label>${bkPend ? `<div class=al>Restore this backup file? It overwrites matching data on this device.</div><button class=btn data-a=rsy>Restore</button> <button class=btn data-a=rsn>Cancel</button>` : ''}<p class=sm>${mode === 'local' ? 'Saved in the local database on this device. Use Backup to move it.' : mode === 'unsaved' ? 'Last save failed. Reload and try again.' : 'Saved on this device only.'}</p>${persisted === true ? '<p class=sm>Browser storage protection: on.</p>' : persisted === false ? '<p class=sm>Browser storage protection: off. The browser may clear data when space is low, so ' + ((window as any).DAILY_STANDALONE ? 'download a backup now and then.' : 'keep cloud backups on.') + '</p>' : ''}<p class=sm>A tracking log, not medical advice. Bring changes to your prescriber.</p></div>`;
 }
 let secs = new Set<string>();
 function sec(id: string, title: string, sum: string, body: () => string) {
@@ -2921,12 +2921,6 @@ app.addEventListener('click', async (e) => {
     put('sup', S);
   } else if (a === 'rgs') {
     await saveFile('daily-regimen.json', JSON.stringify(REG, null, 1));
-  } else if (a === 'rgl') {
-    ($('#rgf') as HTMLInputElement).click();
-    return;
-  } else if (a === 'rsf') {
-    ($('#rsfi') as HTMLInputElement).click();
-    return;
   } else if (a === 'rgb') {
     if (!regBack) {
       regBack = true;
@@ -3047,12 +3041,12 @@ app.addEventListener('keydown', (e) => {
     render();
   }
 });
-app.addEventListener('change', async (e) => {
-  const t = e.target;
-  if (t.id === 'rgf' || t.id === 'rsfi') {
+// The file inputs live outside #app, so a re-render while the phone's file picker is open cannot drop the pick.
+async function filePicked(t: HTMLInputElement) {
+  {
     const f = t.files && t.files[0];
-    t.value = '';
     if (!f) return;
+    t.value = '';
     let o: any = null;
     try {
       o = JSON.parse(await f.text());
@@ -3063,10 +3057,26 @@ app.addEventListener('change', async (e) => {
     } else if (!o || typeof o !== 'object' || Array.isArray(o) || o.format === 'daily-regimen') {
       bkPend = null;
       showNote(o && o.format === 'daily-regimen' ? 'That is a regimen file. Load it under Customize and settings.' : 'That file is not a Daily backup.');
-    } else bkPend = o;
+    } else {
+      bkPend = o;
+      showNote('Backup file read. Tap Restore to use it.');
+    }
     render();
-    return;
   }
+}
+['rgf', 'rsfi'].forEach((id) => {
+  const el = $('#' + id) as HTMLInputElement;
+  el.addEventListener('change', () => filePicked(el));
+  el.addEventListener('input', () => filePicked(el));
+});
+// Some phones return from the picker without a change event; check for a picked file when the page is back.
+const pickCheck = () => setTimeout(() => ['rgf', 'rsfi'].forEach((id) => filePicked($('#' + id) as HTMLInputElement)), 400);
+window.addEventListener('focus', pickCheck);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) pickCheck();
+});
+app.addEventListener('change', async (e) => {
+  const t = e.target;
   if (t.dataset.k === 'bt' || t.dataset.k === 'wk') {
     setK(t.dataset.k, t.value);
     const dd = mem['d-' + date] || {};

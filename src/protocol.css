@@ -261,6 +261,14 @@ th {
   border-bottom: 1px solid var(--ln);
   text-align: left;
 }
+.fi {
+  position: fixed;
+  left: -100px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
 .btn {
   background: var(--ac);
   color: var(--bg);
