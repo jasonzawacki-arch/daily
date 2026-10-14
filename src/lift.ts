@@ -1,7 +1,8 @@
 import liftCss from './lift.css';
+import { checkProgram, programData, programFile } from './regcheck.js';
 const SR = document.getElementById('hl').attachShadow({ mode: 'open' });
 SR.innerHTML =
-  '<style>' + liftCss + '</style><div id=app></div><div id=tm hidden></div><div id=ut hidden></div>';
+  '<style>' + liftCss + '</style><div id=app></div><div id=tm hidden></div><div id=ut hidden></div><input type=file id=pgf class=fi tabindex=-1 aria-hidden=true>';
 
 const $ = (s) => SR.querySelector(s),
   esc = (s) =>
@@ -373,7 +374,42 @@ function un(P, m?) {
     t.hidden = true;
   }, 6000);
 }
+let pgPend: any = null;
+// Load program file: the input sits outside #app so a re-render while the picker is open cannot drop the pick.
+async function pgPicked() {
+  const el = $('#pgf') as HTMLInputElement,
+    f = el.files && el.files[0];
+  if (!f) return;
+  el.value = '';
+  let o: any = null;
+  try {
+    o = JSON.parse(await f.text());
+  } catch (x) {}
+  if (o && o.format === 'daily-regimen' && o.program) o = o.program; // a regimen file that carries a program
+  const why = o ? checkProgram(o) : 'This file is not valid JSON.',
+    t = $('#ut');
+  pgPend = why ? null : o;
+  t.innerHTML = why
+    ? esc('Program not loaded. ' + why)
+    : esc(`Found ${o.name || 'a program'} (${o.days.filter((d) => !d.off).length} training days).`) + ' <button data-pa=1>Replace</button>';
+  t.hidden = false;
+  clearTimeout(uto);
+  uto = setTimeout(() => {
+    t.hidden = true;
+    pgPend = null;
+  }, 15000);
+}
+($('#pgf') as HTMLInputElement).addEventListener('change', pgPicked);
+window.addEventListener('focus', () => setTimeout(pgPicked, 400));
 SR.addEventListener('click', (e) => {
+  if ((e.target as HTMLElement).closest('#ut button[data-pa]')) {
+    if (!pgPend) return;
+    un(cl(prog()), 'Program replaced');
+    put('prog', { ...programData(pgPend), ...(pgPend.name ? { name: pgPend.name } : {}) });
+    pgPend = null;
+    render();
+    return;
+  }
   if ((e.target as HTMLElement).closest('#ut button') && lastP) {
     put('prog', lastP);
     lastP = null;
@@ -626,7 +662,7 @@ function progV() {
   const c = cfg();
   return (
     h +
-    `<div class=card><h3>Dorian Yates HIT</h3><p class=sm>2 on, 1 off, 2 on, 1 off. One working set to failure per exercise, rest-pause where marked. Reloads the full routine and replaces the current program.</p><button class=btn data-a=dy>Reload this routine</button></div><div class=card><h3>Import a program</h3><p class=sm>Paste one day per line ending in a colon, then exercises like Bench press 4x6-8.</p><textarea id=imp rows=6 placeholder="Push:&#10;Bench press 4x6-8&#10;Lateral raise 3x12-15"></textarea><button class=btn data-a=imp style="margin-top:8px">Import (replaces program)</button></div><div class=card><h3>Cycle</h3><p class=sm>${ON()} ON days, then 1 OFF, repeating. <button class=lnk data-a=ad>Add day</button> <button class=lnk data-a=rmd>Remove last day</button> Last deload: ${c.dl || 'none logged'}. The next day follows your last completed day, so skipping a day doesn't shift the cycle.</p><label class=f>Training weeks before a deload</label><select data-cf=bl>${[3, 4, 5, 6, 8].map((n) => `<option ${(cfg().bl || 5) === n ? 'selected' : ''}>${n}</option>`).join('')}</select><label class=f>Readiness strictness</label><select data-cf=rg>${[
+    `<div class=card><h3>Program file</h3><p class=sm>${P.name ? esc(P.name) + '. ' : ''}Save this program as a file to keep, edit or share, or load another one. Loading replaces the current program, with Undo.</p><button class=btn data-a=pgs>Save program file</button> <label class=btn for=pgf role=button style="display:inline-block;cursor:pointer">Load program file</label></div><div class=card><h3>Dorian Yates HIT</h3><p class=sm>2 on, 1 off, 2 on, 1 off. One working set to failure per exercise, rest-pause where marked. Reloads the full routine and replaces the current program.</p><button class=btn data-a=dy>Reload this routine</button></div><div class=card><h3>Import a program</h3><p class=sm>Paste one day per line ending in a colon, then exercises like Bench press 4x6-8.</p><textarea id=imp rows=6 placeholder="Push:&#10;Bench press 4x6-8&#10;Lateral raise 3x12-15"></textarea><button class=btn data-a=imp style="margin-top:8px">Import (replaces program)</button></div><div class=card><h3>Cycle</h3><p class=sm>${ON()} ON days, then 1 OFF, repeating. <button class=lnk data-a=ad>Add day</button> <button class=lnk data-a=rmd>Remove last day</button> Last deload: ${c.dl || 'none logged'}. The next day follows your last completed day, so skipping a day doesn't shift the cycle.</p><label class=f>Training weeks before a deload</label><select data-cf=bl>${[3, 4, 5, 6, 8].map((n) => `<option ${(cfg().bl || 5) === n ? 'selected' : ''}>${n}</option>`).join('')}</select><label class=f>Readiness strictness</label><select data-cf=rg>${[
       [0.7, 'Lenient'],
       [1, 'Normal'],
       [1.3, 'Strict'],
@@ -1282,6 +1318,12 @@ app.addEventListener('click', async (e) => {
       ch = true;
     });
     if (ch) put('w-' + date, d);
+  } else if (a === 'pgs') {
+    try {
+      const dl = await claude.use('downloads');
+      if (dl) await dl.save({ filename: 'daily-program.json', data: JSON.stringify(programFile(prog(), prog().name || 'My program'), null, 1) });
+    } catch (x) {}
+    return;
   } else if (a === 'dy') {
     un(cl(prog()), 'Program replaced');
     put('prog', cl(DY));

@@ -1,6 +1,6 @@
 import protocolCss from './protocol.css';
 import REG0 from './regimen.json';
-import { checkRegimen, reTest, type Regimen } from './regcheck.js';
+import { checkRegimen, programData, reTest, type Regimen } from './regcheck.js';
 const SR = document.getElementById('hp').attachShadow({ mode: 'open' });
 SR.innerHTML =
   '<style>' +
@@ -451,7 +451,7 @@ let regMsg = '',
   bkPend: any = null;
 function regCard() {
   const own = !!mem.reg;
-  return `<div class=card><h3>Regimen</h3><p class=sm>${esc(REG.name || 'Regimen')}: ${I.length} items in ${Wn.length} windows${own ? ', loaded from a file on this device' : ', built into the app'}.</p><button class=btn data-a=rgs>Save regimen file</button> <label class=btn for=rgf role=button style="display:inline-block;cursor:pointer">Load regimen file</label>${own ? ` <button class=btn data-a=rgb>${regBack ? 'Tap again to switch' : 'Use built-in regimen'}</button>` : ''}<p class=sm>A regimen file holds your windows, items and version notes. Loading one replaces the list on this device and goes into backups. Past check marks follow item positions, so keep the order when you edit it.</p><p class=sm>App build __DAILY_BUILD__</p><details style="margin-top:8px"><summary class=sm>Or paste a regimen</summary><textarea id=rgt rows=3 placeholder="Paste the contents of a regimen file" style="margin-top:6px"></textarea><button class=lk data-a=rgp>Check pasted regimen</button></details>${regPend ? `<div class=al id=rgq>Replace the regimen on this device with ${esc(regPend.name || 'this file')} (${regPend.items.length} items)? Your logs stay.</div><button class=btn data-a=rgy>Replace</button> <button class=btn data-a=rgn>Cancel</button>` : ''}${regMsg ? `<p class=sm role=status>${esc(regMsg)}</p>` : ''}</div>`;
+  return `<div class=card><h3>Regimen</h3><p class=sm>${esc(REG.name || 'Regimen')}: ${I.length} items in ${Wn.length} windows${own ? ', loaded from a file on this device' : ', built into the app'}.</p><button class=btn data-a=rgs>Save regimen file</button> <label class=btn for=rgf role=button style="display:inline-block;cursor:pointer">Load regimen file</label>${own ? ` <button class=btn data-a=rgb>${regBack ? 'Tap again to switch' : 'Use built-in regimen'}</button>` : ''}<p class=sm>A regimen file holds your windows, items and version notes. Loading one replaces the list on this device and goes into backups. Past check marks follow item positions, so keep the order when you edit it.</p><p class=sm>App build __DAILY_BUILD__</p><details style="margin-top:8px"><summary class=sm>Or paste a regimen</summary><textarea id=rgt rows=3 placeholder="Paste the contents of a regimen file" style="margin-top:6px"></textarea><button class=lk data-a=rgp>Check pasted regimen</button></details>${regPend ? `<div class=al id=rgq>Replace the regimen on this device with ${esc(regPend.name || 'this file')} (${regPend.items.length} items${regPend.program ? ', plus its lifting program' : ''})? Your logs stay.</div><button class=btn data-a=rgy>Replace</button> <button class=btn data-a=rgn>Cancel</button>` : ''}${regMsg ? `<p class=sm role=status>${esc(regMsg)}</p>` : ''}</div>`;
 }
 /** Checks a regimen from a file or paste and shows Replace / Cancel, or why it cannot be used. */
 function offerReg(o: any, file = '') {
@@ -460,7 +460,7 @@ function offerReg(o: any, file = '') {
   regMsg = why ? 'Not loaded. ' + (file ? file + ': ' : '') + why : '';
   render();
   if (why) showNote('Regimen not loaded. See the Regimen card.');
-  else showNote('Found ' + (o.name || 'a regimen') + ' (' + o.items.length + ' items).', ['Replace', useReg]);
+  else showNote('Found ' + (o.name || 'a regimen') + ' (' + o.items.length + ' items' + (o.program ? ' and a lifting program' : '') + ').', ['Replace', useReg]);
   try {
     const el = $(why ? '#rgf' : '#rgq');
     if (el) (why ? el.parentElement : el).scrollIntoView({ block: 'center' });
@@ -2329,9 +2329,16 @@ function showNote(msg: string, act?: [string, () => void]) {
 }
 function useReg() {
   if (!regPend) return;
+  const pg = regPend.program;
   put('reg', regPend);
-  regMsg = 'Loaded ' + (regPend.name || 'the regimen') + '. Today now shows it.';
-  showNote('Loaded ' + (regPend.name || 'the regimen') + '.');
+  // A regimen file can carry a lifting program; it replaces the program on the Lift side.
+  if (pg && window.L_) {
+    L_.put('prog', { ...programData(pg), ...(pg.name ? { name: pg.name } : {}) });
+    L_.r && L_.r();
+  }
+  const what = (regPend.name || 'the regimen') + (pg ? ' and its lifting program' : '');
+  regMsg = 'Loaded ' + what + '. Today now shows it.';
+  showNote('Loaded ' + what + '.');
   regPend = null;
 }
 function showUndo(k: string, snap: string, msg: string) {

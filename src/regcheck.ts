@@ -24,6 +24,8 @@ export interface Regimen {
   retire?: { item: string; vial: string; window: string; after: string };
   /** Extra [label, item pattern] factors for the awakening analysis. */
   sleep?: [string, string][];
+  /** Optional lifting program, applied with the regimen (same shape as a program file). */
+  program?: ProgramFile;
 }
 
 const cache: Record<string, RegExp | null> = {};
@@ -84,7 +86,65 @@ export function checkRegimen(r: any): string {
     if (!t || !okRe(t.item) || !str(t.vial, 60) || !str(t.window, 60) || !str(t.after, 100))
       return 'The "retire" section needs item, vial, window and after.';
   }
+  if (r.program != null) {
+    const why = checkProgram(r.program);
+    if (why) return 'Lifting program: ' + why;
+  }
   if (r.sleep != null && (!Array.isArray(r.sleep) || r.sleep.length > 10 || !r.sleep.every((p) => Array.isArray(p) && str(p[0], 40) && okRe(p[1]))))
     return 'The "sleep" section must be a list of [label, pattern].';
   return '';
 }
+
+/** A lifting program file: the cycle of days and their exercises (the Program tab). */
+export interface ProgramFile {
+  format: 'daily-program';
+  version: 1;
+  name?: string;
+  /** HIT style: one working set to failure, feeder sets and short rest options. */
+  hit?: boolean;
+  /** Days in cycle order; a day with off: true is a rest day. */
+  days: { n: string; off?: boolean; ex: { n: string; s: number; r: string; t?: string; g?: string; rp?: boolean; ss?: boolean; wu?: string }[] }[];
+}
+
+/** Returns a reason the program cannot be used, or '' when it is valid. */
+export function checkProgram(p: any): string {
+  if (!p || typeof p !== 'object' || p.format !== 'daily-program') return 'This is not a Daily program file.';
+  if (p.version !== 1) return 'This program file is from a newer version of Daily.';
+  if (p.name != null && !str(p.name, 80)) return 'The program name is too long or has < or >.';
+  if (p.hit != null && typeof p.hit !== 'boolean') return '"hit" must be true or false.';
+  const D = p.days;
+  if (!Array.isArray(D) || D.length < 1 || D.length > 14) return 'The program needs 1 to 14 days.';
+  if (!D.some((d) => d && !d.off)) return 'The program needs at least one training day.';
+  for (const d of D) {
+    if (!d || typeof d !== 'object' || !str(d.n, 60) || !d.n) return 'Each day needs a short name, without < or >.';
+    if (d.off != null && typeof d.off !== 'boolean') return 'Day "' + d.n + '": "off" must be true or false.';
+    if (!Array.isArray(d.ex) || d.ex.length > 30) return 'Day "' + d.n + '": exercises must be a list of up to 30.';
+    if (!d.off && !d.ex.length) return 'Day "' + d.n + '" has no exercises. Mark it "off": true for a rest day.';
+    for (const e of d.ex) {
+      if (!e || typeof e !== 'object' || !str(e.n, 80) || !e.n) return 'Day "' + d.n + '": each exercise needs a name, without < or >.';
+      if (!Number.isInteger(e.s) || e.s < 1 || e.s > 10) return '"' + e.n + '": sets must be a whole number from 1 to 10.';
+      if (typeof e.r !== 'string' || !/^\d{1,3}(-\d{1,3})?$/.test(e.r)) return '"' + e.n + '": reps must look like 8 or 6-8.';
+      if ((e.t != null && !str(e.t, 300)) || (e.wu != null && !str(e.wu, 200)) || (e.g != null && !str(e.g, 20)))
+        return '"' + e.n + '": a note is too long or has < or >.';
+      if ((e.rp != null && typeof e.rp !== 'boolean') || (e.ss != null && typeof e.ss !== 'boolean'))
+        return '"' + e.n + '": rp and ss must be true or false.';
+    }
+  }
+  return '';
+}
+
+const EXK = ['n', 's', 'r', 't', 'g', 'rp', 'ss', 'wu'];
+const pick = (e: any) => Object.fromEntries(EXK.filter((k) => e[k] != null && e[k] !== false && !(k === 't' && e[k] === '')).map((k) => [k, e[k]]));
+/** The program as the app stores it (mem.prog), without the file fields. */
+export const programData = (p: ProgramFile) => ({
+  ...(p.hit ? { hit: true } : {}),
+  days: p.days.map((d) => ({ n: d.n, ...(d.off ? { off: true } : {}), ex: d.ex.map((e) => ({ t: '', ...pick(e), g: e.g || 'Other' })) })),
+});
+/** A program file for the app's current program. */
+export const programFile = (prog: any, name = ''): ProgramFile => ({
+  format: 'daily-program',
+  version: 1,
+  ...(name ? { name } : {}),
+  ...(prog.hit ? { hit: true } : {}),
+  days: (prog.days || []).map((d) => ({ n: d.n, ...(d.off ? { off: true } : {}), ex: (d.ex || []).map(pick) as any })),
+});

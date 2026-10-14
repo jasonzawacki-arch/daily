@@ -41,6 +41,24 @@ The checklist (time windows, items, version notes and a few labels) is data, not
 - `items`: `[window number from 0, label, "A" every day | "L" lifting days | "R" recovery days, days "" | "wd" weekdays | "mt" Mon/Thu | "mo" Mondays, start date]`. Check marks are stored by position, so add new items at the end when you edit a regimen you already use.
 - Optional: `peptides` (pattern for injectables that go in the abdominal fat pad), `bpLow`, `voice`, `procedure`, `retire` and `sleep`. See `src/regcheck.ts` for each one. Labels cannot contain `<` or `>`.
 
+## Program files
+
+The lifting program (Lift > Program) can be a file too: **Save program file** writes `daily-program.json`, and **Load program file** replaces the current program (with Undo). A regimen file can carry a program under `"program"`, so one file can set up both sides; loading that regimen replaces the program as well.
+
+```json
+{
+ "format": "daily-program", "version": 1, "name": "Upper lower",
+ "days": [
+  {"n": "Upper", "ex": [{"n": "Bench press", "s": 3, "r": "6-8"}, {"n": "Barbell row", "s": 3, "r": "8-10", "t": "Pause at chest"}]},
+  {"n": "Lower", "ex": [{"n": "Back squat", "s": 3, "r": "5"}]},
+  {"n": "Rest", "off": true, "ex": []}
+ ]
+}
+```
+
+- Each exercise: `n` name, `s` sets (1 to 10), `r` reps like `8` or `6-8`; optional `t` note, `g` muscle group, `rp` rest-pause, `ss` superset with the next one, `wu` warm-up text.
+- `"hit": true` switches to one working set to failure, with feeder sets and short rest options.
+
 ## Tech
 
 TypeScript (Shadow DOM, IndexedDB), a dependency-free custom bundler (`build.mjs`), and Python/Playwright end-to-end tests.
@@ -54,6 +72,7 @@ tsc -p .                                # type-check
 python3 tests/smoke.py dist/daily.html  # Playwright smoke test
 python3 tests/standalone.py             # the installed app: no Claude, offline, backup files
 python3 tests/regimen.py                # regimen files: save, load, refuse bad files, backups
+python3 tests/program.py                # program files: save, load with Undo, refuse bad files
 ```
 
 ## Data
