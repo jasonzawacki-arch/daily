@@ -1,7 +1,7 @@
 from playwright.sync_api import sync_playwright
 import datetime
 errs=[]; td=datetime.date.today(); y=td-datetime.timedelta(days=1); y2=td-datetime.timedelta(days=2)
-seed=f"localStorage.setItem('tour','1');localStorage.setItem('wl:wcfg',JSON.stringify({{start:'{y2}'}}));localStorage.setItem('wl:w-{y2}',JSON.stringify({{k:0,dn:1}}));localStorage.setItem('wl:w-{y}',JSON.stringify({{k:3,dn:1}}));"
+seed=f"localStorage.setItem('tour','1');localStorage.setItem('side','p');localStorage.setItem('wl:wcfg',JSON.stringify({{start:'{y2}'}}));localStorage.setItem('wl:w-{y2}',JSON.stringify({{k:0,dn:1}}));localStorage.setItem('wl:w-{y}',JSON.stringify({{k:3,dn:1}}));"
 def S(n,f):
     try: r=f(); print('OK  ',n,'' if r is None else r)
     except Exception as e: print('FAIL',n,str(e).split('\n')[0][:170])

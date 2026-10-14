@@ -10,7 +10,7 @@ for i in range(30, 0, -1):
         'wt': round(206 - i * 0.06 + random.random(), 1), 'sl': round(6 + random.random() * 2, 1), 'aw': random.randint(0, 3),
         'sy': random.sample(['Dizziness', 'GI upset', 'Headache'], k=1) if i % 6 == 0 else []}
 mem['labs'] = {'r': [{'d': '2026-08-01', 'm': 'AST', 'v': 52}, {'d': '2026-10-01', 'm': 'AST', 'v': 44}, {'d': '2026-10-01', 'm': 'ALT', 'v': 61}, {'d': '2026-10-01', 'm': 'ApoB', 'v': 72}, {'d': '2026-10-01', 'm': 'Hematocrit', 'v': 51.2}, {'d': '2026-10-01', 'm': 'PSA', 'v': 0.8}, {'d': '2026-10-01', 'm': 'LDL', 'v': 88}]}
-MOCK = """localStorage.setItem('tour','1');window.claude={use:async n=>n==='downloads'?{save:async o=>{window.__pdf=Array.from(o.data);window.__fn=o.filename}}:null};"""
+MOCK = """localStorage.setItem('tour','1');localStorage.setItem('side','p');window.claude={use:async n=>n==='downloads'?{save:async o=>{window.__pdf=Array.from(o.data);window.__fn=o.filename}}:null};"""
 seed = "".join("" for _ in [])
 errs = []
 with sync_playwright() as p:

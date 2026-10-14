@@ -9,16 +9,16 @@ const $ = (s) => SR.querySelector(s),
   esc = (s) =>
     String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const Wn = [
-  ['03:20', 'Fasted launch'],
+  ['03:20', 'Wake and hydrate'],
   ['04:00', 'Training'],
   ['05:00', 'Post-workout and Meal 1'],
-  ['08:00', 'Medications and injections'],
-  ['10:00', 'Motility sweep 1'],
+  ['08:00', 'Morning supplements'],
+  ['10:00', 'Fiber and water 1'],
   ['11:15', 'Meal 2 and organ stack'],
-  ['13:30', 'Midday pulse and BP check'],
-  ['16:15', 'Motility sweep 2'],
+  ['13:30', 'Midday walk and BP check'],
+  ['16:15', 'Fiber and water 2'],
   ['17:15', 'Dinner and evening stack'],
-  ['20:30', 'Pre-bed pulse'],
+  ['20:30', 'Evening wind-down'],
   ['21:15', 'Sleep stack and lights out'],
 ];
 const I = [
@@ -28,7 +28,7 @@ const I = [
   [0, 'Multivitamin', 'A'],
   [0, 'Pre-workout: coffee or green tea', 'L'],
   [0, 'Morning walk 20 min', 'R'],
-  [0, 'Sample peptide 250 mcg SubQ (Mon/Thu)', 'A', 'mt'],
+  [0, 'Stretch 10 min (Mon/Thu)', 'A', 'mt'],
   [0, 'Creatine 5 g', 'A'],
   [1, 'Training session done', 'L'],
   [1, 'Intra-workout: 20 g carbs + electrolytes in 24 oz water', 'L'],
@@ -38,10 +38,10 @@ const I = [
   [2, 'Protein shake 30 g', 'A'],
   [2, 'Collagen 10 g', 'A'],
   [2, 'Vitamin C 500 mg', 'A'],
-  [3, 'Sample capsule 10 mg', 'A'],
-  [3, 'Sample tablet 5 mg (dose 1)', 'A'],
-  [3, 'Sample peptide 5 mg (50 units) SubQ, Mondays', 'A', 'mo'],
-  [3, 'Sample injection IM (Mon/Thu)', 'A', 'mt'],
+  [3, 'B-complex 1 capsule', 'A'],
+  [3, 'Electrolyte tablet in 16 oz water', 'A'],
+  [3, 'Weekly weigh-in and photo (Mondays)', 'A', 'mo'],
+  [3, 'Foam rolling 10 min (Mon/Thu)', 'A', 'mt'],
   [3, '24 oz water + pinch of salt', 'A'],
   [3, 'Zinc 15 mg', 'A'],
   [4, 'Psyllium 5 g + 20 oz water', 'A'],
@@ -54,12 +54,12 @@ const I = [
   [5, 'Probiotic 1 capsule', 'A'],
   [5, 'Green tea 2 cups', 'A'],
   [5, 'Vitamin K2 100 mcg (Mon/Thu)', 'A', 'mt'],
-  [6, 'Sample peptide 300 mcg SubQ (weekdays)', 'A', 'wd'],
+  [6, 'Afternoon walk 15 min (weekdays)', 'A', 'wd'],
   [6, 'Seated BP check at 2:00 PM (target 115-125 / 75-82)', 'A'],
   [7, 'Psyllium 5 g + 20 oz water', 'A'],
   [8, 'Dinner: 8 oz protein, rice or potato, vegetables', 'L'],
   [8, 'Dinner (light): 8 oz chicken, vegetables', 'R'],
-  [8, 'Sample capsule 10 mg (dose 2)', 'A'],
+  [8, 'Evening stretch 5 min', 'A'],
   [8, 'Magnesium 400 mg', 'A'],
   [8, 'Zinc 15 mg', 'R'],
   [8, 'Multivitamin (evening)', 'A'],
@@ -68,7 +68,7 @@ const I = [
   [8, 'Vitamin C 500 mg', 'A', '', '2026-10-12'],
   [8, 'Turmeric 500 mg', 'A'],
   [8, 'Probiotic 1 capsule', 'A', '', '2026-11-11'],
-  [9, 'Sample peptide 5 units SubQ (weekdays)', 'A', 'wd'],
+  [9, 'Plan tomorrow\'s meals (weekdays)', 'A', 'wd'],
   [9, 'Casein shake 25 g (empty stomach optional)', 'A'],
   [10, 'Peanut butter 1 tbsp', 'A'],
   [10, 'Glycine 3 g', 'A'],
@@ -143,7 +143,7 @@ const cfg = () => mem.cfg || {},
       tag: x[2],
       d: x[3] || '',
       f: x[4] || '',
-    })).concat((cfg().custom || []).map((x, i) => ({ id: 'c' + i, w: x.w, l: x.l, tag: x.tag, d: '' })));
+    })).concat((cfg().custom || []).map((x, i) => ({ id: 'c' + i, w: x.w, l: x.l, tag: x.tag, d: x.d || '' })));
 function typeOf(s) {
   const d = mem['d-' + s];
   if (d && d.t) return d.t;
@@ -485,8 +485,8 @@ const fxAuto = () => {
 function customCard() {
   const cu = cfg().custom || [];
   return `<div class=card><h3>Customize</h3><button class=btn data-a=ed>${edit ? 'Finish editing' : 'Hide or show items'}</button>
-<label class=f>Add your own item</label><select id=cw>${Wn.map((w, i) => `<option value=${i}>${w[0]} ${w[1]}</option>`).join('')}</select><input type=text id=cl placeholder="Item and dose" style="margin-top:8px"><select id=ct style="margin-top:8px"><option value=A>Every day</option><option value=L>Lifting days only</option><option value=R>Recovery days only</option></select><button class=btn data-a=add style="margin-top:8px">Add item</button>
-${cu.map((x, i) => `<div class=r><span>${esc(x.l)} <small class=sm>(${Wn[x.w][0]})</small></span><button data-a=del data-v=${i}>Remove</button></div>`).join('')}</div>`;
+<label class=f>Add your own item</label><select id=cw>${Wn.map((w, i) => `<option value=${i}>${w[0]} ${w[1]}</option>`).join('')}</select><input type=text id=cl placeholder="Item and dose" style="margin-top:8px"><select id=ct style="margin-top:8px"><option value=A>Every day</option><option value=L>Lifting days only</option><option value=R>Recovery days only</option></select><select id=cdy style="margin-top:8px" aria-label="Which days"><option value="">Every day of the week</option><option value=wd>Weekdays (Mon to Fri)</option><option value=mt>Mondays and Thursdays</option><option value=mo>Mondays only</option></select><button class=btn data-a=add style="margin-top:8px">Add item</button>
+${cu.map((x, i) => `<div class=r><span>${esc(x.l)} <small class=sm>(${Wn[x.w][0]}${x.d ? ', ' + ({ wd: 'weekdays', mt: 'Mon and Thu', mo: 'Mondays' } as any)[x.d] : ''})</small></span><button data-a=del data-v=${i}>Remove</button></div>`).join('')}</div>`;
 }
 function sumCard() {
   return `<div class=card><h3>Summary for your prescriber</h3><p class=sm>Last 14 logged days: adherence, BP, sleep, symptoms, and labs.</p><button class=btn data-a=sum>Generate summary</button> <button class=btn data-a=pdf>Save 1-page PDF</button>${sumT ? `<textarea rows=12 readonly style="margin-top:10px">${esc(sumT)}</textarea><button class=lk data-a=sdl>Save as text file</button>` : ''}</div>`;
@@ -524,9 +524,9 @@ function moreV() {
     ) +
     sec(
       'supply',
-      'Supplies and peptides',
-      `${ns} suppl${ns === 1 ? 'y' : 'ies'} - ${nv} vial${nv === 1 ? '' : 's'}${na ? ' - ' + na + ' arriving' : ''}`,
-      () => suppCard2() + vialCard() + arrCard() + cycCard(),
+      medsOn() ? 'Supplies and peptides' : 'Supplies',
+      `${ns} suppl${ns === 1 ? 'y' : 'ies'}${medsOn() ? ' - ' + nv + ' vial' + (nv === 1 ? '' : 's') : ''}${na ? ' - ' + na + ' arriving' : ''}`,
+      () => suppCard2() + (medsOn() ? vialCard() : '') + arrCard() + (medsOn() ? cycCard() : ''),
     ) +
     sec(
       'reports',
@@ -681,6 +681,8 @@ function suppCard() {
 const SQ = ['Abdomen L', 'Abdomen R', 'Thigh L', 'Thigh R', 'Deltoid L', 'Deltoid R'],
   IMS = ['Glute L', 'Glute R', 'Deltoid L', 'Deltoid R'];
 let sumT = '';
+/** Peptide and injection panels (vials, cycle) appear once the regimen has an injectable item or vials are logged. */
+const medsOn = () => all().some((x) => isInj(x) && !(cfg().hide || {})[x.id]) || ((mem.vials || {}).r || []).length > 0;
 const isInj = (x) => /SubQ|\bIM\b/.test(x.l),
   PEP = /peptide/i,
   ABD = ['Abdomen L', 'Abdomen R'],
@@ -755,7 +757,7 @@ function dueCard() {
   const today = iso(new Date());
   if (date !== today) return '';
   const h = cfg().hide || {},
-    rows = all()
+    rows0 = all()
       .filter((x) => isPlanned(x) && !h[x.id])
       .map((x) => ({ x, nd: nextDue(x, today), md: isInj(x) && sparse(x) ? missedDue(x, today) : null }))
       .filter((r) => r.nd)
@@ -763,8 +765,10 @@ function dueCard() {
         (a, b) =>
           a.nd!.n - b.nd!.n || Number(isInj(b.x)) - Number(isInj(a.x)) || Number(a.x.w) - Number(b.x.w),
       )
-      .filter((r) => isInj(r.x) || r.nd!.n <= 2)
-      .slice(0, 4);
+      .filter((r) => isInj(r.x) || r.nd!.n <= 2);
+  // Injections always make the list; everyday scheduled items fill the rest, up to four rows.
+  const inj = rows0.filter((r) => isInj(r.x)),
+    rows = rows0.filter((r) => inj.includes(r) || rows0.filter((q) => !isInj(q.x)).indexOf(r) < Math.max(0, 4 - inj.length));
   if (!rows.length) return '';
   return `<div class=card><h3>Up next</h3>${rows
     .map(({ x, nd, md }) => {
@@ -792,7 +796,7 @@ function doseCard() {
           .map((x) => medName(x.l)),
       ),
     );
-  return `<div class=card><h3>Dose changes</h3><p class=sm>Log titration changes so they show on your trend charts.</p><datalist id=dlm>${names.map((n) => `<option>${esc(n)}</option>`).join('')}</datalist>${R.slice(
+  return `<div class=card><h3>Dose changes</h3><p class=sm>Log dose changes, for supplements or medications, so they show on your trend charts.</p><datalist id=dlm>${names.map((n) => `<option>${esc(n)}</option>`).join('')}</datalist>${R.slice(
     0,
     8,
   )
@@ -1304,7 +1308,7 @@ function titrCard() {
       .filter((e) => e.d <= today)
       .sort((a, b) => (a.d < b.d ? 1 : -1));
   if (!ev.length)
-    return '<div class=card><h3>Titration view</h3><p class=sm>Log a dose change (More, Health and labs) to see weight, BP and sleep before and after it.</p></div>';
+    return '<div class=card><h3>Before and after a change</h3><p class=sm>Log a dose change (More, Health and labs) to see weight, BP and sleep before and after it.</p></div>';
   const e = ev[Math.min(tiSel, ev.length - 1)],
     x0 = -28,
     x1 = Math.max(7, Math.min(56, days2(e.d, today))),
@@ -1350,7 +1354,7 @@ function titrCard() {
       return `<tr><td>${esc(m)}</td><td>${b.v}</td><td${fl ? ' style="color:var(--nw);font-weight:600"' : ''}>${a.v}</td><td>${a.v - b.v > 0 ? '+' : ''}${+(a.v - b.v).toFixed(2)}</td></tr>`;
     })
     .join('');
-  return `<div class=card><h3>Titration view</h3><div class=chips>${ev
+  return `<div class=card><h3>Before and after a change</h3><div class=chips>${ev
     .slice(0, 6)
     .map(
       (x, i) =>
@@ -1671,30 +1675,18 @@ let voiceMsg = '',
 const actF = (x) => (cfg().act || {})[x.id] || x.f;
 const DOCLOG = [
   [
-    'v15.4',
-    'Oct 11, 2026',
+    'v2',
+    'Sample',
     [
-      'Sample peptide: 5 mg once weekly on Mondays (was 2.5 mg twice weekly).',
-      'Rest days: zero oats, cyclic dextrin, and fruit in Meals 1 and 2; carbs only at dinner.',
-      '3-pulse burn-down is temporary; Window 7A retires when the last 2 sample peptide vials are empty.',
-      'No mandatory washout (optional 10 to 14 days).',
-      'Turmeric starts Oct 12; Probiotic starts Nov 11.',
+      'Weekly weigh-in moved to Monday mornings, before breakfast.',
+      'Rest days: lighter Meal 1 and Meal 2; most carbs at dinner.',
+      'Afternoon walk added on weekdays.',
     ],
   ],
   [
-    'v15.3',
-    'Oct 11, 2026',
-    ['TrainedbyJP 3-on / 1-off floating cadence.', 'Zero-carb daytime rest-day rule.'],
-  ],
-  [
-    'v15.2',
-    'Oct 11, 2026',
-    [
-      'Sample capsule 10 mg twice daily.',
-      'Fish oil dose 1 moved to Window 3; psyllium sweeps isolated.',
-      'Creatine powder on rest days only.',
-      'Green tea extract removed from fasted states.',
-    ],
+    'v1',
+    'Sample',
+    ['Sample regimen: rename, hide or add items under Customize and settings.', 'Version notes are where you record what changed and why.'],
   ],
 ];
 function vialAdj(id, on) {
@@ -2433,7 +2425,7 @@ app.addEventListener('click', async (e) => {
     const l = $('#cl').value.trim();
     if (!l) return;
     const c = JSON.parse(JSON.stringify(cfg()));
-    c.custom = (c.custom || []).concat({ w: +$('#cw').value, l, tag: $('#ct').value });
+    c.custom = (c.custom || []).concat({ w: +$('#cw').value, l, tag: $('#ct').value, d: ($('#cdy') && $('#cdy').value) || '' });
     put('cfg', c);
   } else if (a === 'del') {
     const c = JSON.parse(JSON.stringify(cfg()));
@@ -3150,7 +3142,7 @@ window.tour = () => {
     ],
     [
       'Vitals and labs',
-      'Log BP, sleep, symptoms, injections with doses, and lab results. Ranges and draw dates are in More.',
+      'Log BP, sleep, symptoms, doses and lab results. Ranges and draw dates are in More.',
     ],
     ['Lift', 'Switch with the bottom bar. Log sets, RIR, cardio and joints, and see weekly sets per muscle.'],
     [
@@ -3158,6 +3150,15 @@ window.tour = () => {
       'Trends, the calendar, the weekly review, backups, and the prescriber summary are in History and More.',
     ],
   ];
+  // The installed app opens on Lift, so the tour starts there too.
+  let onLift = false;
+  try {
+    onLift = !!(window as any).DAILY_STANDALONE && (localStorage.getItem('side') || 'l') === 'l';
+  } catch (x) {}
+  if (onLift) {
+    S.splice(2, 1);
+    S.unshift(['Lift', 'This is your workout log. Log sets, RIR, cardio and joints, and see weekly sets per muscle. The bottom bar switches to your daily checklist.']);
+  }
   let i = 0;
   const o = document.createElement('div');
   o.style.cssText =

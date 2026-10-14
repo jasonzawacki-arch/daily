@@ -55,7 +55,23 @@ window.gomod = (m) => {
   T.p.style.display = m === 'l' ? 'none' : '';
   T.l.style.display = m === 'l' ? '' : 'none';
   scrollTo(0, 0);
+  try {
+    localStorage.setItem('side', m === 'l' ? 'l' : 'p');
+  } catch (e) {}
 };
+// The installed app opens on Lift the first time, then on whichever side you used last.
+if ((window as any).DAILY_STANDALONE) {
+  let side = 'l';
+  try {
+    side = localStorage.getItem('side') || 'l';
+  } catch (e) {}
+  if (side === 'l') {
+    (window.DBREADY || Promise.resolve()).then(() => {
+      const go = (n) => (window.P_ && window.L_ ? window.gomod('l') : n > 0 && setTimeout(() => go(n - 1), 50));
+      setTimeout(() => go(100), 0);
+    });
+  }
+}
 window.setTheme = (x) => {
   try {
     localStorage.setItem('theme', x);

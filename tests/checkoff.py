@@ -9,7 +9,7 @@ def S(n, f):
 errs = []
 with sync_playwright() as p:
     b = p.chromium.launch(); pg = b.new_context(viewport={'width': 390, 'height': 844}).new_page()
-    pg.on('pageerror', lambda e: errs.append(str(e)[:200])); pg.add_init_script("localStorage.setItem('tour','1')")
+    pg.on('pageerror', lambda e: errs.append(str(e)[:200])); pg.add_init_script("localStorage.setItem('tour','1');localStorage.setItem('side','p')")
     pg.goto('file://' + path); pg.wait_for_timeout(1500)
     P = lambda s: pg.locator('#hp ' + s)
     prog = lambda: P('.pg b').inner_text()

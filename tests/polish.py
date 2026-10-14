@@ -8,7 +8,7 @@ def S(n, f):
     except Exception as e:
         print('FAIL', n, str(e).split('\n')[0][:170])
 errs = []
-seed = "localStorage.setItem('tour','1');"
+seed = "localStorage.setItem('tour','1');localStorage.setItem('side','p');"
 with sync_playwright() as p:
     b = p.chromium.launch(); pg = b.new_context(viewport={'width': 390, 'height': 844}).new_page()
     pg.on('pageerror', lambda e: errs.append(str(e)[:200])); pg.add_init_script(seed)

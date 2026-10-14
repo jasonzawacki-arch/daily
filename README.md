@@ -17,7 +17,7 @@ A configurable daily regimen + lifting tracker. TypeScript source compiles to **
 
 **https://jasonzawacki-arch.github.io/daily/** is the same app, published from this repository. Open it in Chrome on Android, then tap the menu (three dots) and **Install app**. It gets its own icon and works offline.
 
-- It starts with the sample regimen. Make it yours under **More > Customize and settings**: rename or hide sample items and add your own. To bring over data you already have, use **Backup** (or **Transfer code**) where you have it now, then **Restore from pasted backup** in the app.
+- It opens on Lift the first time, then on whichever side you used last. The checklist starts with an everyday sample regimen (supplements, meals, water, walks). Make it yours under **More > Customize and settings**: hide sample items and add your own, each with its time window and days (every day, weekdays, Mon/Thu or Mondays). Peptide vials and the peptide cycle appear once you add an injectable item. To bring over data you already have, use **Backup** (or **Transfer code**) where you have it now, then **Restore from pasted backup** in the app.
 - Everything stays in the phone's browser storage. Download a backup now and then (**More > Reports and backup**); clearing Chrome's site data deletes the app's data.
 - Cloud backup needs Daily to be opened inside Claude, so in the installed app it explains that instead.
 

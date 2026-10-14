@@ -5,18 +5,20 @@ src = open(os.path.join(os.path.dirname(path), '..', 'src', 'protocol.ts')).read
 block = src[src.index('const I = ['):]
 block = block[:block.index('\n];')]
 rows = [l for l in block.split('\n')[1:] if l.strip().startswith('[')]
-PEP_ITEM = 'i%d' % next(i for i, l in enumerate(rows) if 'Sample peptide' in l)
-random.seed(7); td = datetime.date.today(); mem = {}
+# The default sample regimen has no injectables, so add one the way a user would (a custom item, Mondays only).
+PEP_ITEM = 'c0'
+random.seed(7); td = datetime.date.today(); mem = {'cfg': {'custom': [{'w': 3, 'l': 'Sample peptide 5 mg (50 units) SubQ, Mondays', 'tag': 'A', 'd': 'mo'}]}}
 last_mon = next(td - datetime.timedelta(days=n) for n in range(1, 8) if (td - datetime.timedelta(days=n)).weekday() == 0)
 for i in range(16, 0, -1):
     d = td - datetime.timedelta(days=i)
     c = {('i%d' % k): 1 for k in range(0, random.randint(35, 60))}
+    c[PEP_ITEM] = 1
     c.pop(PEP_ITEM, None) if d == last_mon else None
     mem['d-' + str(d)] = {'t': 'L', 'c': c, 'bp': {'am': [random.randint(112, 126), random.randint(68, 78)]},
         'wt': round(206 - i * 0.05, 1), 'sl': round(5.5 + random.random() * 2.5, 1)}
 mem['w-' + str(td - datetime.timedelta(days=9))] = {'k': 0, 'sets': {'Bench press': [{'w': 185, 'r': 8}, {'w': 185, 'r': 7}]}}
 mem['w-' + str(td - datetime.timedelta(days=2))] = {'k': 0, 'sets': {'Bench press': [{'w': 195, 'r': 8}, {'w': 195, 'r': 8}]}}
-MOCK = """localStorage.setItem('tour','1');window.claude={use:async n=>n==='downloads'?{save:async o=>{window.__pdf=Array.from(o.data);window.__fn=o.filename}}:null};"""
+MOCK = """localStorage.setItem('tour','1');localStorage.setItem('side','p');window.claude={use:async n=>n==='downloads'?{save:async o=>{window.__pdf=Array.from(o.data);window.__fn=o.filename}}:null};"""
 def S(n, f):
     try:
         r = f(); print('OK  ', n, '' if r is None else r)

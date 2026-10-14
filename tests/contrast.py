@@ -39,7 +39,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     for theme in themes:
         pg = b.new_context(viewport={'width': 390, 'height': 844}, color_scheme=theme).new_page()
-        pg.add_init_script("localStorage.setItem('tour','1');localStorage.setItem('fx','full')")
+        pg.add_init_script("localStorage.setItem('tour','1');localStorage.setItem('side','p');localStorage.setItem('fx','full')")
         pg.goto('file://' + path); pg.wait_for_timeout(800)
         pg.evaluate("async(m)=>{for(const k in m){await IDB.set(k,m[k])}}", mem); pg.reload(); pg.wait_for_timeout(1500)
         pg.evaluate(f"window.setTheme('{theme}')"); pg.wait_for_timeout(300)

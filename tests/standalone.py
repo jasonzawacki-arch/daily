@@ -29,6 +29,10 @@ with sync_playwright() as p:
     pg.goto(BASE); pg.wait_for_timeout(1500)
     P = lambda s: pg.locator("#hp " + s)
     check("runs without Claude", pg.evaluate("window.DAILY_STANDALONE === true"))
+    check("opens on Lift the first time", pg.evaluate("document.getElementById('hl').style.display !== 'none' && document.getElementById('hp').style.display === 'none'"))
+    seen = pg.evaluate("document.getElementById('hp').shadowRoot.textContent + document.getElementById('hl').shadowRoot.textContent").lower()
+    check("sample regimen has no medication items", not any(w in seen for w in ("peptide", "subq", "injection")))
+    pg.evaluate("window.gomod('p')"); pg.wait_for_timeout(300)
     m = pg.evaluate("fetch('manifest.webmanifest').then(r => r.json())")
     check("installable manifest", m["display"] == "standalone" and m["start_url"] == "./" and len(m["icons"]) == 3)
     # check an item, reload, still checked

@@ -6,7 +6,7 @@ MOCK = """
 const doc=p=>({get:async()=>{const v=L()[p];return{exists:v!==undefined,data:()=>v}},set:async d=>{const o=L();o[p]=JSON.parse(JSON.stringify(d));W(o)},delete:async()=>{const o=L();delete o[p];W(o)}});
 const col=p=>({doc:id=>doc(p+'/'+id),get:async()=>({docs:[]})});
 window.claude={use:async n=>n==='user'?{id:async()=>'u1'}:n==='db'?{collection:col}:null};})();
-localStorage.setItem('tour','1');
+localStorage.setItem('tour','1');localStorage.setItem('side','p');
 """
 def S(n, f):
     try:

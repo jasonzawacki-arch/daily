@@ -7,7 +7,7 @@ mem = {'w-' + prev: {'k': 0, 'dn': True, 'sets': {
     'Smith incline press': [{'w': 200, 'r': 8}, {'w': 200, 'r': 2, 't': 'R'}],
     'Cable crossover': [{'w': 50, 'r': 12}, {'w': 50, 'r': 3, 't': 'R'}]}}}
 mem['w-' + str(td)] = {'k': 0}
-MOCK = "localStorage.setItem('tour','1');window.claude={use:async()=>null};"
+MOCK = "localStorage.setItem('tour','1');localStorage.setItem('side','p');window.claude={use:async()=>null};"
 def S(n, f):
     try:
         r = f(); print('OK  ', n, '' if r is None else r)
