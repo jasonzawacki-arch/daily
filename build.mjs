@@ -10,7 +10,7 @@ try {
   console.error('The "typescript" package is required. Run `npm install` first.');
   process.exit(1);
 }
-const SRC = 'src', ENTRY = ['standalone.ts', 'db.ts', 'cloud.ts', 'pdf.ts', 'voice.ts', 'shell.ts', 'protocol.ts', 'lift.ts'];
+const SRC = 'src', ENTRY = ['standalone.ts', 'db.ts', 'cloud.ts', 'pdf.ts', 'voice.ts', 'shell.ts', 'protocol.ts', 'lift.ts', 'sync-daily.ts'];
 const mods = {};
 const add = (name) => {
   if (mods[name]) return;

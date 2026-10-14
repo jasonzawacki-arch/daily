@@ -412,9 +412,25 @@ function histV() {
     })
     .join('')}</table></div>`;
 }
+/** Optional Google Drive sync (installed app). */
+function syncCard(G) {
+  const s = G.state,
+    when = s.last ? agoTxt(s.last) : 'not yet';
+  let body: string;
+  if (!s.on)
+    body = `<p class=sm>Optional. Keep Daily the same on your phone and computer: sign in with a Google account and Daily keeps a copy in a private app folder in your Google Drive. The app works fully without it.</p><button class=btn data-a=gson ${s.busy ? 'disabled' : ''}>Turn on sync</button>`;
+  else if (s.choose)
+    body = `<p class=sm>This device and your Google Drive both have Daily data. What should sync do?</p><button class=btn data-a=gsch data-v=combine>Combine both</button> <button class=btn data-a=gsch data-v=drive>Use the Drive copy</button> <button class=btn data-a=gsch data-v=device>Replace the Drive copy</button><p class=sm>Combine keeps everything; where both changed the same day or setting, the newer change wins.</p>`;
+  else
+    body = `<p class=sm>Syncing${s.email ? ' as ' + esc(s.email) : ''}. Last synced ${esc(when)}.${s.tap ? ' Tap Sync now to sync again (Google access lasts about an hour).' : ' Changes sync on their own.'}</p><button class=btn data-a=gsnow ${s.busy ? 'disabled' : ''}>${s.busy ? 'Syncing...' : 'Sync now'}</button> <button class=lk data-a=gsoff>Turn off on this device</button>`;
+  return `<div class=card><h3>Sync with Google Drive</h3>${body}${s.msg ? `<p class=sm role=status>${esc(s.msg)}</p>` : ''}<p class=sm>Photos stay on this device.</p></div>`;
+}
 function cloudCard() {
-  if ((window as any).DAILY_STANDALONE)
+  if ((window as any).DAILY_STANDALONE) {
+    const G = (window as any).GSync;
+    if (G) return syncCard(G);
     return `<div class=card><h3>Cloud backup</h3><p class=sm>Cloud backup works when Daily is opened inside Claude. In this app, use Backup below now and then, and keep the file somewhere safe: it restores everything except photos.</p></div>`;
+  }
   const C = window.Cloud;
   if (!C) return '';
   const s = C.st,
@@ -525,7 +541,7 @@ function moreV() {
     sec(
       'reports',
       'Reports and backup',
-      (window as any).DAILY_STANDALONE ? 'Summary, CSV and backup file' : ca ? 'Cloud copy ' + ca : 'No cloud copy yet',
+      (window as any).DAILY_STANDALONE ? ((window as any).GSync && (window as any).GSync.state.on ? 'Google Drive sync on' : 'Summary, CSV and backup file') : ca ? 'Cloud copy ' + ca : 'No cloud copy yet',
       () => sumCard() + cloudCard() + dataCard(),
     ) +
     sec(
@@ -2964,6 +2980,18 @@ app.addEventListener('click', async (e) => {
     } catch (x) {}
     offerReg(o);
     return;
+  } else if (a === 'gson') {
+    (window as any).GSync && (window as any).GSync.link();
+    return;
+  } else if (a === 'gsnow') {
+    (window as any).GSync && (window as any).GSync.now(true);
+    return;
+  } else if (a === 'gsoff') {
+    (window as any).GSync && (window as any).GSync.off();
+    return;
+  } else if (a === 'gsch') {
+    (window as any).GSync && (window as any).GSync.choose(v);
+    return;
   } else if (a === 'rgy' && regPend) {
     useReg();
   } else if (a === 'rgn') {
@@ -3195,6 +3223,13 @@ app.addEventListener('change', async (e) => {
 });
 window.P_ = {
   mem: () => mem,
+  del: (k) => {
+    if (k === 'reg') return put('reg', null); // also switches back to the built-in regimen
+    delete mem[k];
+    try {
+      IDB.del(k).catch(() => {});
+    } catch (e) {}
+  },
   reg: () => REG,
   put: (k, v) => put(k, v),
   g: () => date,

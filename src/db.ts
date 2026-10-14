@@ -47,10 +47,45 @@ window.IDB = (() => {
         t.onerror = () => rej(t.error);
       });
     };
+  // Change time per key, for Google Drive sync. Kept under '_mt' and never returned as app data.
+  let mt: Record<string, number> | null = null,
+    mtT = 0;
+  const MT = '_mt',
+    saveMt = () => {
+      clearTimeout(mtT);
+      mtT = setTimeout(() => set('kv', MT, mt).catch(() => {}), 300) as any;
+    },
+    stamp = (k, t = Date.now()) => {
+      if (k[0] === '_') return;
+      (mt = mt || {})[k] = t;
+      saveMt();
+      try {
+        (window as any).IDB.onChange && (window as any).IDB.onChange(k);
+      } catch (e) {}
+    };
   return {
-    all: () => all('kv'),
-    set: (k, v) => set('kv', k, v),
-    del: (k) => del('kv', k),
+    all: async () => {
+      const o = await all('kv');
+      mt = { ...(o[MT] || {}), ...(mt || {}) };
+      delete o[MT];
+      return o;
+    },
+    set: (k, v) => (stamp(k), set('kv', k, v)),
+    del: (k) => (stamp(k), del('kv', k)),
+    /** Change times by key (0 or missing: not known). */
+    mtAll: async () => {
+      if (!mt) {
+        const o = await all('kv');
+        mt = o[MT] || {};
+      }
+      return { ...mt };
+    },
+    /** Sets a key's change time without a change (after sync applied a value from another device). */
+    mark: (k, t) => {
+      (mt = mt || {})[k] = t;
+      saveMt();
+    },
+    onChange: null as null | ((k: string) => void),
     phAll: async () => Object.values(await all('ph')),
     phSet: (k, v) => set('ph', k, v),
     phDel: (k) => del('ph', k),

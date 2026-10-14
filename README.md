@@ -87,6 +87,7 @@ python3 tests/smoke.py dist/daily.html  # Playwright smoke test
 python3 tests/standalone.py             # the installed app: no Claude, offline, backup files
 python3 tests/regimen.py                # regimen files: save, load, refuse bad files, backups
 python3 tests/program.py                # programs: files, templates, weekly schedule, day controls
+python3 tests/gsync.py                  # Google Drive sync, against a stand-in for Google
 ```
 
 ## Data

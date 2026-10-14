@@ -221,9 +221,15 @@ async function boot() {
   } catch (e) {
     mode = 'device';
   }
-  if (!mem.wcfg) put('wcfg', { start: date });
-  if (!mem.prog || JSON.stringify(mem.prog) === JSON.stringify(DEF))
+  // Defaults count as never changed (time 0), so syncing a new device never overwrites real data with them.
+  if (!mem.wcfg) {
+    put('wcfg', { start: date });
+    IDB.mark && IDB.mark('wcfg', 0);
+  }
+  if (!mem.prog || JSON.stringify(mem.prog) === JSON.stringify(DEF)) {
     put('prog', JSON.parse(JSON.stringify(DY)));
+    IDB.mark && IDB.mark('prog', 0);
+  }
 }
 function put(k, v) {
   mem[k] = v;
@@ -1557,6 +1563,12 @@ window.L_ = {
   has: (s) => all(wd(s)).length > 0,
   put: put,
   mem: () => mem,
+  del: (k) => {
+    delete mem[k];
+    try {
+      IDB.del(k).catch(() => {});
+    } catch (e) {}
+  },
   rev: (from: string, to: string) => {
     const ks = logs().filter((k) => k.slice(2) >= from && k.slice(2) <= to),
       w = ks.filter((k) => all(mem[k]).length),

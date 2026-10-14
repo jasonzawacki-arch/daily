@@ -167,3 +167,21 @@ body[data-fx='lite'] #bg i {
   color: #14213d;
   border-color: rgba(255, 255, 255, 0.9);
 }
+
+/* Google Drive sync: shown when a tap is needed to sync again */
+#gsc {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 92px);
+  right: 14px;
+  z-index: 50;
+  font: 600 13px/1 system-ui, sans-serif;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 0;
+  background: #1d4ed8;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+#gsc[hidden] {
+  display: none;
+}
