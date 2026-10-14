@@ -450,6 +450,8 @@ function histV() {
     .join('')}</table></div>`;
 }
 function cloudCard() {
+  if ((window as any).DAILY_STANDALONE)
+    return `<div class=card><h3>Cloud backup</h3><p class=sm>Cloud backup works when Daily is opened inside Claude. In this app, use Backup below now and then, and keep the file somewhere safe: it restores everything except photos.</p></div>`;
   const C = window.Cloud;
   if (!C) return '';
   const s = C.st,
@@ -490,7 +492,7 @@ function sumCard() {
   return `<div class=card><h3>Summary for your prescriber</h3><p class=sm>Last 14 logged days: adherence, BP, sleep, symptoms, and labs.</p><button class=btn data-a=sum>Generate summary</button> <button class=btn data-a=pdf>Save 1-page PDF</button>${sumT ? `<textarea rows=12 readonly style="margin-top:10px">${esc(sumT)}</textarea><button class=lk data-a=sdl>Save as text file</button>` : ''}</div>`;
 }
 function dataCard() {
-  return `<div class=card><h3>Data</h3><button class=btn data-a=csv>Export CSV</button> <button class=btn data-a=bk>Backup</button> <button class=btn data-a=tc>Transfer code</button>${tcode ? `<textarea id=tcv rows=3 readonly style="margin-top:10px">${esc(tcode)}</textarea>` : ''}<textarea id=rs rows=2 placeholder="Paste a backup to restore" style="margin-top:10px"></textarea><button class=lk data-a=rs>Restore from pasted backup</button><p class=sm>${mode === 'local' ? 'Saved in the local database on this device. Use Backup to move it.' : mode === 'unsaved' ? 'Last save failed. Reload and try again.' : 'Saved on this device only.'}</p>${persisted === true ? '<p class=sm>Browser storage protection: on.</p>' : persisted === false ? '<p class=sm>Browser storage protection: off. The browser may clear data when space is low, so keep cloud backups on.</p>' : ''}<p class=sm>A tracking log, not medical advice. Bring changes to your prescriber.</p></div>`;
+  return `<div class=card><h3>Data</h3><button class=btn data-a=csv>Export CSV</button> <button class=btn data-a=bk>Backup</button> <button class=btn data-a=tc>Transfer code</button>${tcode ? `<textarea id=tcv rows=3 readonly style="margin-top:10px">${esc(tcode)}</textarea>` : ''}<textarea id=rs rows=2 placeholder="Paste a backup to restore" style="margin-top:10px"></textarea><button class=lk data-a=rs>Restore from pasted backup</button><p class=sm>${mode === 'local' ? 'Saved in the local database on this device. Use Backup to move it.' : mode === 'unsaved' ? 'Last save failed. Reload and try again.' : 'Saved on this device only.'}</p>${persisted === true ? '<p class=sm>Browser storage protection: on.</p>' : persisted === false ? '<p class=sm>Browser storage protection: off. The browser may clear data when space is low, so ' + ((window as any).DAILY_STANDALONE ? 'download a backup now and then.' : 'keep cloud backups on.') + '</p>' : ''}<p class=sm>A tracking log, not medical advice. Bring changes to your prescriber.</p></div>`;
 }
 let secs = new Set<string>();
 function sec(id: string, title: string, sum: string, body: () => string) {
@@ -529,7 +531,7 @@ function moreV() {
     sec(
       'reports',
       'Reports and backup',
-      ca ? 'Cloud copy ' + ca : 'No cloud copy yet',
+      (window as any).DAILY_STANDALONE ? 'Summary, CSV and backup file' : ca ? 'Cloud copy ' + ca : 'No cloud copy yet',
       () => sumCard() + cloudCard() + dataCard(),
     ) +
     sec(
