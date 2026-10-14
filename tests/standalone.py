@@ -45,7 +45,8 @@ with sync_playwright() as p:
     # backup downloads as a file
     P("button[data-a=tab][data-v=more]").click(); pg.wait_for_timeout(500)
     P("button[data-a=sec][data-v=reports]").click(); pg.wait_for_timeout(400)
-    check("cloud backup explains itself", "inside Claude" in pg.content())
+    shown = pg.evaluate("document.getElementById('hp').shadowRoot.textContent")
+    check("optional Google Drive sync offered, no sign-in needed to use the app", "Sync with Google Drive" in shown and "Optional" in shown)
     try:
         with pg.expect_download(timeout=5000) as dl:
             P("button[data-a=bk]").click()

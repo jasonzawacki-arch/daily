@@ -75,8 +75,7 @@ def drive_items():
 def device(b, client=True, exp=3600):
     ctx = b.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True)
     init = "localStorage.setItem('tour','1');localStorage.setItem('side','p');"
-    if client:
-        init += f"window.GSYNC_CLIENT_ID='test-client';window.__expIn={exp};"
+    init += f"window.GSYNC_CLIENT_ID='test-client';window.__expIn={exp};" if client else "window.GSYNC_CLIENT_ID='';"
     ctx.add_init_script(init)
     ctx.route("https://accounts.google.com/gsi/client", lambda r: r.fulfill(status=200, content_type="text/javascript", body=FAKE_GSI))
     ctx.route(re.compile(r"^https://www\.googleapis\.com/.*"), google_api)
