@@ -1,4 +1,6 @@
 import protocolCss from './protocol.css';
+import REG0 from './regimen.json';
+import { checkRegimen, reTest, type Regimen } from './regcheck.js';
 const SR = document.getElementById('hp').attachShadow({ mode: 'open' });
 SR.innerHTML =
   '<style>' +
@@ -8,75 +10,12 @@ SR.innerHTML =
 const $ = (s) => SR.querySelector(s),
   esc = (s) =>
     String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-const Wn = [
-  ['03:20', 'Wake and hydrate'],
-  ['04:00', 'Training'],
-  ['05:00', 'Post-workout and Meal 1'],
-  ['08:00', 'Morning supplements'],
-  ['10:00', 'Fiber and water 1'],
-  ['11:15', 'Meal 2 and organ stack'],
-  ['13:30', 'Midday walk and BP check'],
-  ['16:15', 'Fiber and water 2'],
-  ['17:15', 'Dinner and evening stack'],
-  ['20:30', 'Evening wind-down'],
-  ['21:15', 'Sleep stack and lights out'],
-];
-const I = [
-  [0, 'Wake up: water + pinch of salt', 'A'],
-  [0, 'Vitamin D3 2,000 IU', 'A'],
-  [0, 'Omega-3 fish oil 1,000 mg', 'A'],
-  [0, 'Multivitamin', 'A'],
-  [0, 'Pre-workout: coffee or green tea', 'L'],
-  [0, 'Morning walk 20 min', 'R'],
-  [0, 'Stretch 10 min (Mon/Thu)', 'A', 'mt'],
-  [0, 'Creatine 5 g', 'A'],
-  [1, 'Training session done', 'L'],
-  [1, 'Intra-workout: 20 g carbs + electrolytes in 24 oz water', 'L'],
-  [1, 'Walk / mobility done', 'R'],
-  [2, 'Meal 1: 40 g protein, 60 g carbs', 'L'],
-  [2, 'Meal 1 (light): 40 g protein, no carbs', 'R'],
-  [2, 'Protein shake 30 g', 'A'],
-  [2, 'Collagen 10 g', 'A'],
-  [2, 'Vitamin C 500 mg', 'A'],
-  [3, 'B-complex 1 capsule', 'A'],
-  [3, 'Electrolyte tablet in 16 oz water', 'A'],
-  [3, 'Weekly weigh-in and photo (Mondays)', 'A', 'mo'],
-  [3, 'Foam rolling 10 min (Mon/Thu)', 'A', 'mt'],
-  [3, '24 oz water + pinch of salt', 'A'],
-  [3, 'Zinc 15 mg', 'A'],
-  [4, 'Psyllium 5 g + 20 oz water', 'A'],
-  [5, 'Magnesium 400 mg', 'L'],
-  [5, 'Meal 2: 40 g protein, 50 g carbs, vegetables', 'L'],
-  [5, 'Meal 2 (light): 40 g protein + water', 'R'],
-  [5, 'Creatine 5 g', 'A'],
-  [5, 'Fish oil 1,000 mg (with food)', 'A'],
-  [5, 'Turmeric 500 mg', 'A'],
-  [5, 'Probiotic 1 capsule', 'A'],
-  [5, 'Green tea 2 cups', 'A'],
-  [5, 'Vitamin K2 100 mcg (Mon/Thu)', 'A', 'mt'],
-  [6, 'Afternoon walk 15 min (weekdays)', 'A', 'wd'],
-  [6, 'Seated BP check at 2:00 PM (target 115-125 / 75-82)', 'A'],
-  [7, 'Psyllium 5 g + 20 oz water', 'A'],
-  [8, 'Dinner: 8 oz protein, rice or potato, vegetables', 'L'],
-  [8, 'Dinner (light): 8 oz chicken, vegetables', 'R'],
-  [8, 'Evening stretch 5 min', 'A'],
-  [8, 'Magnesium 400 mg', 'A'],
-  [8, 'Zinc 15 mg', 'R'],
-  [8, 'Multivitamin (evening)', 'A'],
-  [8, 'Digestive enzymes', 'A'],
-  [8, 'Fish oil 1,000 mg', 'R'],
-  [8, 'Vitamin C 500 mg', 'A', '', '2026-10-12'],
-  [8, 'Turmeric 500 mg', 'A'],
-  [8, 'Probiotic 1 capsule', 'A', '', '2026-11-11'],
-  [9, 'Plan tomorrow\'s meals (weekdays)', 'A', 'wd'],
-  [9, 'Casein shake 25 g (empty stomach optional)', 'A'],
-  [10, 'Peanut butter 1 tbsp', 'A'],
-  [10, 'Glycine 3 g', 'A'],
-  [10, 'Taurine 1 g', 'A'],
-  [10, 'Chamomile tea', 'A'],
-  [10, 'Magnesium 200 mg', 'A'],
-  [10, 'Lights out: cool dark room, fluids 4-6 oz max', 'A'],
-];
+// The regimen (windows, items, version notes and a few labels) is data: src/regimen.json is the built-in one,
+// and a regimen file loaded under More > Customize replaces it on this device (stored as mem.reg).
+let Wn: [string, string][] = REG0.windows as any,
+  I: any[][] = REG0.items as any,
+  REG: Regimen = REG0 as any;
+const lastWin = () => Wn.length - 1;
 const IC = {
   today: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
   vitals: '<svg viewBox="0 0 24 24"><path d="M3 12h4l2.5-6 4 12 2.5-6H21"/></svg>',
@@ -120,9 +59,33 @@ async function boot() {
   } catch (e) {
     mode = 'device';
   }
+  applyReg();
 }
+/** Uses the regimen loaded on this device (mem.reg) when it is valid, otherwise the built-in one. */
+function applyReg() {
+  const r = mem.reg && !checkRegimen(mem.reg) ? mem.reg : REG0;
+  REG = r;
+  Wn = r.windows;
+  I = r.items;
+}
+const sameAsBuiltIn = (r) => JSON.stringify(r) === JSON.stringify(REG0);
 function put(k, v) {
+  if (k === 'reg') {
+    // The built-in regimen is never stored, so a restored backup keeps following app updates.
+    if (v == null || sameAsBuiltIn(v) || checkRegimen(v)) {
+      delete mem.reg;
+      try {
+        IDB.del('reg').catch(() => {});
+      } catch (e) {}
+      try {
+        window.Cloud && window.Cloud.touch();
+      } catch (e) {}
+      applyReg();
+      return;
+    }
+  }
   mem[k] = v;
+  if (k === 'reg') applyReg();
   try {
     window.Cloud && window.Cloud.touch();
   } catch (e) {}
@@ -138,12 +101,12 @@ const cfg = () => mem.cfg || {},
   all = () =>
     I.map((x, i) => ({
       id: 'i' + i,
-      w: x[0],
+      w: Math.min(x[0], lastWin()),
       l: (cfg().lab || {})['i' + i] || x[1],
       tag: x[2],
       d: x[3] || '',
       f: x[4] || '',
-    })).concat((cfg().custom || []).map((x, i) => ({ id: 'c' + i, w: x.w, l: x.l, tag: x.tag, d: x.d || '' })));
+    })).concat((cfg().custom || []).map((x, i) => ({ id: 'c' + i, w: Math.min(+x.w || 0, lastWin()), l: x.l, tag: x.tag, d: x.d || '' })));
 function typeOf(s) {
   const d = mem['d-' + s];
   if (d && d.t) return d.t;
@@ -321,7 +284,7 @@ function todayV() {
       ? '<div class=al>Sick-day mode is on. Check your hold list in Vitals and contact your prescriber about what to pause.</div>'
       : '') +
     (cfg().draw && days2(iso(new Date()), cfg().draw) <= 3 && days2(iso(new Date()), cfg().draw) >= 0
-      ? '<div class=al>Blood draw within 3 days: hold supplements starting 72 hours before.</div>'
+      ? '<div class=al>Blood draw within 3 days: hold ' + holdWhat() + ' starting 72 hours before.</div>'
       : '') +
     '<button class=lk data-a=xa style="margin:8px 0">Expand or collapse all</button>' +
     (edit
@@ -341,13 +304,13 @@ const EVE = [9, 10],
     return +a * 60 + +b;
   };
 function loTxt() {
-  const r = winMin(10) - nowMin();
+  const r = winMin(lastWin()) - nowMin();
   return r > 0
     ? 'Lights out in ' + (r >= 60 ? Math.floor(r / 60) + ' h ' : '') + (r % 60) + ' min'
-    : 'Past lights-out time (' + Wn[10][0] + ')';
+    : 'Past lights-out time (' + Wn[lastWin()][0] + ')';
 }
 function eveCard() {
-  if (date !== iso(new Date()) || nowMin() < winMin(9) - 60) return '';
+  if (date !== iso(new Date()) || nowMin() < winMin(Math.max(0, lastWin() - 1)) - 60) return '';
   const d = mem['d-' + date] || {},
     c = d.c || {},
     it = items(date, false).filter((x) => EVE.includes(x.w as number)),
@@ -373,7 +336,7 @@ function bpFlag(d) {
   return m < 100
     ? '<div class=al>Systolic under 100. If you feel lightheaded, sit down, drink fluids, and contact your prescriber.</div>'
     : m < 110
-      ? '<div class=al>Systolic under 110. Check your protocol for dose-adjustment rules at this level and confirm with your prescriber.</div>'
+      ? '<div class=al>Systolic under 110. ' + esc(REG.bpLow || 'Check your protocol for dose-adjustment rules at this level and') + (REG.bpLow ? ' Confirm' : ' confirm') + ' with your prescriber.</div>'
       : '';
 }
 function vitalsV() {
@@ -482,17 +445,35 @@ const fxAuto = () => {
     return null;
   }
 };
+let regMsg = '',
+  regPend: any = null,
+  regBack = false,
+  bkPend: any = null;
+function regCard() {
+  const own = !!mem.reg;
+  return `<div class=card><h3>Regimen</h3><p class=sm>${esc(REG.name || 'Regimen')}: ${I.length} items in ${Wn.length} windows${own ? ', loaded from a file on this device' : ', built into the app'}.</p><button class=btn data-a=rgs>Save regimen file</button> <button class=btn data-a=rgl>Load regimen file</button>${own ? ` <button class=btn data-a=rgb>${regBack ? 'Tap again to switch' : 'Use built-in regimen'}</button>` : ''}<input type=file id=rgf accept=".json,application/json" hidden><p class=sm>A regimen file holds your windows, items and version notes. Loading one replaces the list on this device and goes into backups. Past check marks follow item positions, so keep the order when you edit it.</p>${regPend ? `<div class=al>Replace the regimen on this device with ${esc(regPend.name || 'this file')} (${regPend.items.length} items)? Your logs stay.</div><button class=btn data-a=rgy>Replace</button> <button class=btn data-a=rgn>Cancel</button>` : ''}${regMsg ? `<p class=sm role=status>${esc(regMsg)}</p>` : ''}</div>`;
+}
+async function saveFile(name: string, text: string) {
+  try {
+    const dl = await claude.use('downloads');
+    if (dl) await dl.save({ filename: name, data: text });
+  } catch (x) {}
+}
+/** Applies a backup object (from a pasted backup, transfer code or file). */
+function restoreAll(o: Record<string, any>) {
+  Object.keys(o).forEach((k) => (/^(w-|wcfg$|prog$)/.test(k) && window.L_ ? L_.put(k, o[k]) : put(k, o[k])));
+}
 function customCard() {
   const cu = cfg().custom || [];
   return `<div class=card><h3>Customize</h3><button class=btn data-a=ed>${edit ? 'Finish editing' : 'Hide or show items'}</button>
 <label class=f>Add your own item</label><select id=cw>${Wn.map((w, i) => `<option value=${i}>${w[0]} ${w[1]}</option>`).join('')}</select><input type=text id=cl placeholder="Item and dose" style="margin-top:8px"><select id=ct style="margin-top:8px"><option value=A>Every day</option><option value=L>Lifting days only</option><option value=R>Recovery days only</option></select><select id=cdy style="margin-top:8px" aria-label="Which days"><option value="">Every day of the week</option><option value=wd>Weekdays (Mon to Fri)</option><option value=mt>Mondays and Thursdays</option><option value=mo>Mondays only</option></select><button class=btn data-a=add style="margin-top:8px">Add item</button>
-${cu.map((x, i) => `<div class=r><span>${esc(x.l)} <small class=sm>(${Wn[x.w][0]}${x.d ? ', ' + ({ wd: 'weekdays', mt: 'Mon and Thu', mo: 'Mondays' } as any)[x.d] : ''})</small></span><button data-a=del data-v=${i}>Remove</button></div>`).join('')}</div>`;
+${cu.map((x, i) => `<div class=r><span>${esc(x.l)} <small class=sm>(${Wn[Math.min(x.w, lastWin())][0]}${x.d ? ', ' + ({ wd: 'weekdays', mt: 'Mon and Thu', mo: 'Mondays' } as any)[x.d] : ''})</small></span><button data-a=del data-v=${i}>Remove</button></div>`).join('')}</div>`;
 }
 function sumCard() {
   return `<div class=card><h3>Summary for your prescriber</h3><p class=sm>Last 14 logged days: adherence, BP, sleep, symptoms, and labs.</p><button class=btn data-a=sum>Generate summary</button> <button class=btn data-a=pdf>Save 1-page PDF</button>${sumT ? `<textarea rows=12 readonly style="margin-top:10px">${esc(sumT)}</textarea><button class=lk data-a=sdl>Save as text file</button>` : ''}</div>`;
 }
 function dataCard() {
-  return `<div class=card><h3>Data</h3><button class=btn data-a=csv>Export CSV</button> <button class=btn data-a=bk>Backup</button> <button class=btn data-a=tc>Transfer code</button>${tcode ? `<textarea id=tcv rows=3 readonly style="margin-top:10px">${esc(tcode)}</textarea>` : ''}<textarea id=rs rows=2 placeholder="Paste a backup to restore" style="margin-top:10px"></textarea><button class=lk data-a=rs>Restore from pasted backup</button><p class=sm>${mode === 'local' ? 'Saved in the local database on this device. Use Backup to move it.' : mode === 'unsaved' ? 'Last save failed. Reload and try again.' : 'Saved on this device only.'}</p>${persisted === true ? '<p class=sm>Browser storage protection: on.</p>' : persisted === false ? '<p class=sm>Browser storage protection: off. The browser may clear data when space is low, so ' + ((window as any).DAILY_STANDALONE ? 'download a backup now and then.' : 'keep cloud backups on.') + '</p>' : ''}<p class=sm>A tracking log, not medical advice. Bring changes to your prescriber.</p></div>`;
+  return `<div class=card><h3>Data</h3><button class=btn data-a=csv>Export CSV</button> <button class=btn data-a=bk>Backup</button> <button class=btn data-a=tc>Transfer code</button>${tcode ? `<textarea id=tcv rows=3 readonly style="margin-top:10px">${esc(tcode)}</textarea>` : ''}<textarea id=rs rows=2 placeholder="Paste a backup to restore" style="margin-top:10px"></textarea><button class=lk data-a=rs>Restore from pasted backup</button> <button class=lk data-a=rsf>Restore from backup file</button><input type=file id=rsfi accept=".json,application/json" hidden>${bkPend ? `<div class=al>Restore this backup file? It overwrites matching data on this device.</div><button class=btn data-a=rsy>Restore</button> <button class=btn data-a=rsn>Cancel</button>` : ''}<p class=sm>${mode === 'local' ? 'Saved in the local database on this device. Use Backup to move it.' : mode === 'unsaved' ? 'Last save failed. Reload and try again.' : 'Saved on this device only.'}</p>${persisted === true ? '<p class=sm>Browser storage protection: on.</p>' : persisted === false ? '<p class=sm>Browser storage protection: off. The browser may clear data when space is low, so ' + ((window as any).DAILY_STANDALONE ? 'download a backup now and then.' : 'keep cloud backups on.') + '</p>' : ''}<p class=sm>A tracking log, not medical advice. Bring changes to your prescriber.</p></div>`;
 }
 let secs = new Set<string>();
 function sec(id: string, title: string, sum: string, body: () => string) {
@@ -537,8 +518,8 @@ function moreV() {
     sec(
       'settings',
       'Customize and settings',
-      'Hide items, theme, PIN, effects, version notes',
-      () => customCard() + setCard() + verCard(),
+      'Regimen, hide items, theme, PIN, effects, version notes',
+      () => regCard() + customCard() + setCard() + verCard(),
     )
   );
 }
@@ -684,9 +665,9 @@ let sumT = '';
 /** Peptide and injection panels (vials, cycle) appear once the regimen has an injectable item or vials are logged. */
 const medsOn = () => all().some((x) => isInj(x) && !(cfg().hide || {})[x.id]) || ((mem.vials || {}).r || []).length > 0;
 const isInj = (x) => /SubQ|\bIM\b/.test(x.l),
-  PEP = /peptide/i,
+  PEP = { test: (l: string) => reTest(REG.peptides || 'peptide', l) },
   ABD = ['Abdomen L', 'Abdomen R'],
-  // peptides go in the abdominal fat pad; other injectables rotate thigh, abdomen and deltoid.
+  // peptides (regimen 'peptides' pattern) go in the abdominal fat pad; other injectables rotate thigh, abdomen and deltoid.
   sitesFor = (x) => (/\bIM\b/.test(x.l) ? IMS : PEP.test(x.l) ? ABD : SQ);
 function lastSite(id, before) {
   const k = Object.keys(mem)
@@ -1185,17 +1166,19 @@ const LAB = {
   HDL: [40, 100],
   Triglycerides: [0, 150],
   Estradiol: [10, 40],
+  Testosterone: [264, 916],
 };
 const planned = (l) => {
   const m = l.match(/[\d.,-]+ ?(mg|mcg|units|IU|g)/);
   return m ? 'Actual dose (planned ' + m[0] + ')' : 'Actual dose';
 };
+const holdWhat = () => (all().some((x) => /biotin/i.test(x.l)) ? 'biotin' : 'supplements');
 const drawTxt = () => {
   const c = cfg();
   if (!c.draw) return 'No draw scheduled. Pick a date and interval in weeks.';
   const n = days2(iso(new Date()), c.draw);
   return n >= 0
-    ? `Next draw in ${n} days (${c.draw}). Hold supplements 72 hours before.`
+    ? `Next draw in ${n} days (${c.draw}). Hold ${holdWhat()} 72 hours before.`
     : `Draw was ${-n} days ago. Next due ${addD(c.draw, 7 * (c.dint || 12))}.`;
 };
 function chart(pts, o: any = {}) {
@@ -1601,7 +1584,7 @@ const ICM =
 function quickRow() {
   return date !== iso(new Date())
     ? ''
-    : `${vbar('today', 'Say: took morning meds, done')}<div class=chips style="margin:6px 0 10px"><button data-a=qw>+8 oz water</button><button data-a=qg data-v=fuel>Add meal</button><button data-a=qg data-v=vitals>Log vitals</button></div>`;
+    : `${vbar('today', REG.voice ? 'Say: took ' + REG.voice + ', meds done' : 'Say: took morning meds, done')}<div class=chips style="margin:6px 0 10px"><button data-a=qw>+8 oz water</button><button data-a=qg data-v=fuel>Add meal</button><button data-a=qg data-v=vitals>Log vitals</button></div>`;
 }
 function recents() {
   const seen = {},
@@ -1673,22 +1656,7 @@ let voiceMsg = '',
   vacts = [],
   vmsg = '';
 const actF = (x) => (cfg().act || {})[x.id] || x.f;
-const DOCLOG = [
-  [
-    'v2',
-    'Sample',
-    [
-      'Weekly weigh-in moved to Monday mornings, before breakfast.',
-      'Rest days: lighter Meal 1 and Meal 2; most carbs at dinner.',
-      'Afternoon walk added on weekdays.',
-    ],
-  ],
-  [
-    'v1',
-    'Sample',
-    ['Sample regimen: rename, hide or add items under Customize and settings.', 'Version notes are where you record what changed and why.'],
-  ],
-];
+const DOCLOG = () => REG.notes || [];
 function vialAdj(id, on) {
   const V = mem.vials;
   if (!V) return;
@@ -1713,7 +1681,7 @@ function vialAdj(id, on) {
   }
   if (!ch) return;
   put('vials', C);
-  const it = all().find((x) => /Sample peptide 300 mcg SubQ \(weekdays\)/.test(x.l));
+  const it = REG.retire && all().find((x) => reTest(REG.retire!.item, x.l));
   if (it && id === it.id) {
     const mine = C.r.filter((v) => v.k === it.id);
     if (mine.length && mine.every((v) => v.c <= 0) && !cfg().p2) {
@@ -1733,13 +1701,13 @@ function vialCard() {
       const dl = v.rd ? v.sd - days2(v.rd, t) : null;
       return `<div class=r><span>${esc(v.n)}: ${v.c} of ${v.t} doses<br><small class=sm>${v.rd ? 'opened ' + v.rd.slice(5) + ', discard ' + addD(v.rd, v.sd).slice(5) + (dl <= 7 ? ' (' + (dl < 0 ? 'expired' : dl + ' days left') + ')' : '') : 'not opened'}${v.k ? ', linked' : ''}</small></span><button data-a=vm data-v="${i}|-1">-</button><button data-a=vm data-v="${i}|1">+</button><button data-a=vx data-v=${i}>Remove</button></div>`;
     }).join('') ||
-    '<p class=sm>Add each reconstituted vial. Linked doses count down when you check the item, oldest vial first. When the last linked sample peptide vial empties, Window 7A retires.</p>'
-  }<input type=text id=vn placeholder="Name, for example Sample peptide vial 1"><div class=g style="grid-template-columns:.8fr 1.6fr .8fr"><input type=number id=vt placeholder="Doses"><input type=date id=vd value="${t}"><input type=number id=vs value=28></div><p class=sm>Total doses, date opened, days until discard</p><select id=vk><option value="">Not linked</option>${all()
+    '<p class=sm>Add each reconstituted vial. Linked doses count down when you check the item, oldest vial first. ' + (REG.retire ? `When the last linked ${esc(REG.retire.vial)} vial empties, ${esc(REG.retire.window)} retires.` : '') + '</p>'
+  }<input type=text id=vn placeholder="Name, for example ${esc((REG.retire && REG.retire.vial) || 'Peptide')} vial 1"><div class=g style="grid-template-columns:.8fr 1.6fr .8fr"><input type=number id=vt placeholder="Doses"><input type=date id=vd value="${t}"><input type=number id=vs value=28></div><p class=sm>Total doses, date opened, days until discard</p><select id=vk><option value="">Not linked</option>${all()
     .filter(isInj)
     .map((x) => `<option value=${x.id}>${esc(x.l.slice(0, 44))}</option>`)
     .join(
       '',
-    )}</select><button class=btn data-a=va style="margin-top:8px">Add vial</button>${cfg().p2 ? `<p class=sm>Window 7A retired ${cfg().p2}. You are on the 2-pulse standard.</p>` : ''}</div>`;
+    )}</select><button class=btn data-a=va style="margin-top:8px">Add vial</button>${cfg().p2 && REG.retire ? `<p class=sm>${esc(REG.retire.window)} retired ${cfg().p2}. You are on ${esc(REG.retire.after)}.</p>` : ''}</div>`;
 }
 function vialAlerts() {
   const t = iso(new Date());
@@ -1752,8 +1720,8 @@ function vialAlerts() {
     }
   });
   const c = cfg();
-  if (c.p2 && days2(c.p2, t) <= 14)
-    h += `<div class=al>Window 7A retired on ${c.p2}. You are now on the 2-pulse standard.</div>`;
+  if (c.p2 && REG.retire && days2(c.p2, t) <= 14)
+    h += `<div class=al>${esc(REG.retire.window)} retired on ${c.p2}. You are now on ${esc(REG.retire.after)}.</div>`;
   return h;
 }
 function arrCard() {
@@ -1772,7 +1740,7 @@ function verCard() {
     .map((x) => `<div class=sm style="color:var(--tx)"><b>${esc(x.v)}</b> ${x.d}: ${esc(x.t)}</div>`)
     .join(
       '',
-    )}${DOCLOG.map((v) => `<details><summary>${v[0]} (${v[1]})</summary><ul style="margin:6px 0 10px;padding-left:18px;font-size:14px">${(v[2] as string[]).map((t) => `<li>${t}</li>`).join('')}</ul></details>`).join('')}<div class=g style="grid-template-columns:1fr 2fr"><input type=text id=lv2 placeholder="Version"><input type=text id=lt placeholder="Your note"></div><button class=btn data-a=vla>Add note</button></div>`;
+    )}${DOCLOG().map((v) => `<details><summary>${v[0]} (${v[1]})</summary><ul style="margin:6px 0 10px;padding-left:18px;font-size:14px">${(v[2] as string[]).map((t) => `<li>${t}</li>`).join('')}</ul></details>`).join('')}<div class=g style="grid-template-columns:1fr 2fr"><input type=text id=lv2 placeholder="Version"><input type=text id=lt placeholder="Your note"></div><button class=btn data-a=vla>Add note</button></div>`;
 }
 function sleepCard(d) {
   const tin = (k, l) =>
@@ -1846,7 +1814,7 @@ function runCmd(s) {
   }
   voiceMsg = msg.length
     ? 'Logged: ' + msg.join(', ')
-    : 'Did not catch that. Try "BP 118 over 72" or "took morning meds".';
+    : 'Did not catch that. Try "BP 118 over 72" or "took ' + (REG.voice || 'morning meds') + '".';
 }
 const LX: [string, RegExp][] = [
   ['AST', /\b(?:ast|sgot|aspartate)\b/i],
@@ -1869,12 +1837,13 @@ const LX: [string, RegExp][] = [
   ['Ferritin', /\bferritin\b/i],
   ['TSH', /\btsh\b/i],
   ['Magnesium', /\bmagnesium\b/i],
+  ['Testosterone', /\btestosterone\b/i],
   ['Estradiol', /\bestradiol\b/i],
 ];
 let labPrev = null,
   labPd = '';
 const EM = ['Sleep', 'Wakes', 'Systolic', 'Weight', 'Resting HR'],
-  HOLDRE = /fish oil|curcumin|garlic|grape seed|green tea|\bnac\b/i;
+  HOLDRE = /nattokinase|fish oil|curcumin|garlic|grape seed|green tea|\bnac\b/i;
 function parseLabs(t) {
   const out = [],
     dm = t.match(/(\d{4}-\d{2}-\d{2})|(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
@@ -1964,8 +1933,7 @@ function awakeCard() {
     it = (n) => all().find((x) => n.test(x.l)),
     mg = it(/magnesium/i),
     gl = it(/glycine/i),
-    cj = it(/sample peptide/i),
-    pw = it(/pre-workout/i),
+    ex = (REG.sleep || []).map(([lbl, re]) => [lbl, all().find((x) => reTest(re, x.l))] as [string, any]),
     N = [];
   ks.forEach((k) => {
     const d = mem[k];
@@ -1989,8 +1957,7 @@ function awakeCard() {
         'Water (oz)': pv.w || null,
         'Magnesium taken': mg ? (c[mg.id] ? 1 : 0) : null,
         'Bedtime amino stack': gl ? (c[gl.id] ? 1 : 0) : null,
-        'Peptide pin taken': cj ? (c[cj.id] ? 1 : 0) : null,
-        'Pre-workout day': pw ? (c[pw.id] ? 1 : 0) : null,
+        ...Object.fromEntries(ex.map(([lbl, x]) => [lbl, x ? (c[x.id] ? 1 : 0) : null])),
       },
     });
   });
@@ -2021,7 +1988,7 @@ function procCard() {
         return true;
       }),
     t = iso(new Date());
-  return `<div class=card><h3>Procedure prep</h3><p class=sm>Enter hold days only as your prescriber or surgeon instructs.</p><div class=g style="grid-template-columns:1fr 1fr"><input type=text id=pn value="${esc(pr.n || '')}" placeholder="Procedure"><input type=date id=pdt value="${pr.d || ''}"></div>${rows.map((x) => `<div class=g style="grid-template-columns:2fr 1fr"><span class=sm style="color:var(--tx)">${esc(x.l.slice(0, 34))}</span><input type=number data-ph=${x.id} placeholder="Days" value="${(pr.h || {})[x.id] ?? ''}"></div>`).join('')}<p class=sm>Also worth raising with your team: injectables, blood-pressure items, and hormones.</p><button class=btn data-a=pps>Save plan</button>${pr.d ? `<p class=sm>${days2(t, pr.d) >= 0 ? days2(t, pr.d) + ' days until ' + esc(pr.n || 'procedure') : 'Procedure date has passed.'}</p>` : ''}</div>`;
+  return `<div class=card><h3>Procedure prep</h3><p class=sm>Enter hold days only as your prescriber or surgeon instructs.</p><div class=g style="grid-template-columns:1fr 1fr"><input type=text id=pn value="${esc(pr.n || '')}" placeholder="Procedure"><input type=date id=pdt value="${pr.d || ''}"></div>${rows.map((x) => `<div class=g style="grid-template-columns:2fr 1fr"><span class=sm style="color:var(--tx)">${esc(x.l.slice(0, 34))}</span><input type=number data-ph=${x.id} placeholder="Days" value="${(pr.h || {})[x.id] ?? ''}"></div>`).join('')}<p class=sm>Also worth raising with your team: ${esc(REG.procedure || 'injectables, blood-pressure items, and hormones')}.</p><button class=btn data-a=pps>Save plan</button>${pr.d ? `<p class=sm>${days2(t, pr.d) >= 0 ? days2(t, pr.d) + ' days until ' + esc(pr.n || 'procedure') : 'Procedure date has passed.'}</p>` : ''}</div>`;
 }
 function procAlerts() {
   const pr = cfg().proc;
@@ -2126,7 +2093,7 @@ function parseToday(s) {
 }
 const NOHEAR = (sc) =>
   sc === 'today'
-    ? 'Did not catch that. Try: took morning meds, or window 4 done.'
+    ? 'Did not catch that. Try: took ' + (REG.voice ? REG.voice + ', morning meds done' : 'morning meds') + ', or window 4 done.'
     : sc === 'fuel'
       ? 'Did not catch that. Try: ate eggs 520 calories 34 protein.'
       : 'Did not catch that. Try: BP 118 over 72, weight 204.6.';
@@ -2333,6 +2300,16 @@ const undoKey = (a: string) =>
   })[a];
 let undoSt: any = null,
   uto = 0;
+function showNote(msg: string) {
+  undoSt = null;
+  const t = $('#ut') as HTMLElement;
+  t.textContent = msg;
+  t.hidden = false;
+  clearTimeout(uto);
+  uto = window.setTimeout(() => {
+    t.hidden = true;
+  }, 5000);
+}
 function showUndo(k: string, snap: string, msg: string) {
   undoSt = { k, snap };
   const t = $('#ut') as HTMLElement;
@@ -2930,22 +2907,47 @@ app.addEventListener('click', async (e) => {
     const S = JSON.parse(JSON.stringify(mem.sup));
     S.r.splice(+v, 1);
     put('sup', S);
+  } else if (a === 'rgs') {
+    await saveFile('daily-regimen.json', JSON.stringify(REG, null, 1));
+  } else if (a === 'rgl') {
+    ($('#rgf') as HTMLInputElement).click();
+    return;
+  } else if (a === 'rsf') {
+    ($('#rsfi') as HTMLInputElement).click();
+    return;
+  } else if (a === 'rgb') {
+    if (!regBack) {
+      regBack = true;
+      regMsg = 'Switch this device back to the built-in regimen? Your logs stay.';
+    } else {
+      regBack = false;
+      put('reg', null);
+      regMsg = 'Using the built-in regimen.';
+    }
+  } else if (a === 'rgy' && regPend) {
+    put('reg', regPend);
+    regMsg = 'Loaded ' + (regPend.name || 'the regimen') + '.';
+    regPend = null;
+  } else if (a === 'rgn') {
+    regPend = null;
+    regMsg = '';
+  } else if (a === 'rsy' && bkPend) {
+    restoreAll(bkPend);
+    bkPend = null;
+    window.L_ && L_.r && L_.r();
+  } else if (a === 'rsn') {
+    bkPend = null;
   } else if (a === 'bk') {
     const A = window.Cloud.gather(),
       c = JSON.parse(JSON.stringify(cfg()));
     c.lastBk = iso(new Date());
     put('cfg', c);
-    try {
-      const dl = await claude.use('downloads');
-      if (dl) await dl.save({ filename: 'daily-backup.json', data: JSON.stringify(A) });
-    } catch (x) {}
+    await saveFile('daily-backup.json', JSON.stringify(A));
   } else if (a === 'rs') {
     try {
       const tv = $('#rs').value.trim(),
         o = tv.startsWith('DLY1:') ? await dec(tv) : JSON.parse(tv);
-      Object.keys(o).forEach((k) =>
-        /^(w-|wcfg$|prog$)/.test(k) && window.L_ ? L_.put(k, o[k]) : put(k, o[k]),
-      );
+      restoreAll(o);
     } catch (x) {
       return;
     }
@@ -3025,8 +3027,27 @@ app.addEventListener('keydown', (e) => {
     render();
   }
 });
-app.addEventListener('change', (e) => {
+app.addEventListener('change', async (e) => {
   const t = e.target;
+  if (t.id === 'rgf' || t.id === 'rsfi') {
+    const f = t.files && t.files[0];
+    t.value = '';
+    if (!f) return;
+    let o: any = null;
+    try {
+      o = JSON.parse(await f.text());
+    } catch (x) {}
+    if (t.id === 'rgf') {
+      const why = o ? checkRegimen(o) : 'This file is not valid JSON.';
+      regPend = why ? null : o;
+      regMsg = why ? 'Not loaded. ' + why : '';
+    } else if (!o || typeof o !== 'object' || Array.isArray(o) || o.format === 'daily-regimen') {
+      bkPend = null;
+      showNote(o && o.format === 'daily-regimen' ? 'That is a regimen file. Load it under Customize and settings.' : 'That file is not a Daily backup.');
+    } else bkPend = o;
+    render();
+    return;
+  }
   if (t.dataset.k === 'bt' || t.dataset.k === 'wk') {
     setK(t.dataset.k, t.value);
     const dd = mem['d-' + date] || {};
@@ -3112,6 +3133,7 @@ app.addEventListener('change', (e) => {
 });
 window.P_ = {
   mem: () => mem,
+  reg: () => REG,
   put: (k, v) => put(k, v),
   g: () => date,
   s: (v) => {

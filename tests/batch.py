@@ -1,11 +1,7 @@
 from playwright.sync_api import sync_playwright
 import sys, os, re, datetime, random
 path = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else 'dist/daily.html')
-src = open(os.path.join(os.path.dirname(path), '..', 'src', 'protocol.ts')).read()
-block = src[src.index('const I = ['):]
-block = block[:block.index('\n];')]
-rows = [l for l in block.split('\n')[1:] if l.strip().startswith('[')]
-# The default sample regimen has no injectables, so add one the way a user would (a custom item, Mondays only).
+# Add an injectable the way a user would (a custom item, Mondays only), so this works with any regimen.
 PEP_ITEM = 'c0'
 random.seed(7); td = datetime.date.today(); mem = {'cfg': {'custom': [{'w': 3, 'l': 'Sample peptide 5 mg (50 units) SubQ, Mondays', 'tag': 'A', 'd': 'mo'}]}}
 last_mon = next(td - datetime.timedelta(days=n) for n in range(1, 8) if (td - datetime.timedelta(days=n)).weekday() == 0)

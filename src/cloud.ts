@@ -36,6 +36,8 @@ function gather(): Record<string, any> {
   Object.keys(l).forEach((k) => {
     if (LIFT_KEY.test(k)) o[k] = l[k];
   });
+  // Backups carry the regimen in use, so restoring on a new device (or in the installed app) brings it along.
+  if (!o.reg && window.P_.reg) o.reg = window.P_.reg();
   return o;
 }
 

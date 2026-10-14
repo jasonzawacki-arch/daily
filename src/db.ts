@@ -50,6 +50,7 @@ window.IDB = (() => {
   return {
     all: () => all('kv'),
     set: (k, v) => set('kv', k, v),
+    del: (k) => del('kv', k),
     phAll: async () => Object.values(await all('ph')),
     phSet: (k, v) => set('ph', k, v),
     phDel: (k) => del('ph', k),

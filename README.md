@@ -17,11 +17,29 @@ A configurable daily regimen + lifting tracker. TypeScript source compiles to **
 
 **https://jasonzawacki-arch.github.io/daily/** is the same app, published from this repository. Open it in Chrome on Android, then tap the menu (three dots) and **Install app**. It gets its own icon and works offline.
 
-- It opens on Lift the first time, then on whichever side you used last. The checklist starts with an everyday sample regimen (supplements, meals, water, walks). Make it yours under **More > Customize and settings**: hide sample items and add your own, each with its time window and days (every day, weekdays, Mon/Thu or Mondays). Peptide vials and the peptide cycle appear once you add an injectable item. To bring over data you already have, use **Backup** (or **Transfer code**) where you have it now, then **Restore from pasted backup** in the app.
+- It opens on Lift the first time, then on whichever side you used last. The checklist starts with an everyday sample regimen (supplements, meals, water, walks). Make it yours under **More > Customize and settings**: hide sample items and add your own, each with its time window and days (every day, weekdays, Mon/Thu or Mondays). Peptide vials and the peptide cycle appear once you add an injectable item. To bring over data you already have, use **Backup** (or **Transfer code**) where you have it now, then **Restore from backup file** (or **Restore from pasted backup**) in the app. Backups include the regimen, so your own list comes with them.
+- A whole regimen can also be a file: **More > Customize and settings > Regimen** saves the current one as `daily-regimen.json` and loads another. A loaded regimen stays on that device and goes into its backups. See [Regimen files](#regimen-files).
 - Everything stays in the phone's browser storage. Download a backup now and then (**More > Reports and backup**); clearing Chrome's site data deletes the app's data.
 - Cloud backup needs Daily to be opened inside Claude, so in the installed app it explains that instead.
 
 *Publishing (once, for the repository owner):* **Settings > Pages > Source: GitHub Actions**. The `phone app` workflow then publishes `dist/site` on every push to `main`.
+
+## Regimen files
+
+The checklist (time windows, items, version notes and a few labels) is data, not code. The built-in one is [`src/regimen.json`](src/regimen.json); a file loaded in the app replaces it on that device. So one public app can run a private regimen: the regimen lives only on the phone and in its backups, and a private copy of this repository only needs its own `src/regimen.json`.
+
+```json
+{
+ "format": "daily-regimen", "version": 1, "name": "My plan",
+ "windows": [["06:00", "Morning"], ["12:00", "Midday"], ["21:30", "Lights out"]],
+ "items": [[0, "Vitamin D3 2,000 IU", "A"], [1, "Walk 20 min", "A", "wd"], [2, "Magnesium 400 mg", "A", "", "2026-11-01"]],
+ "notes": [["v1", "Nov 1, 2026", ["Started the plan."]]]
+}
+```
+
+- `windows`: `[time, name]` in time order; the last one is lights out.
+- `items`: `[window number from 0, label, "A" every day | "L" lifting days | "R" recovery days, days "" | "wd" weekdays | "mt" Mon/Thu | "mo" Mondays, start date]`. Check marks are stored by position, so add new items at the end when you edit a regimen you already use.
+- Optional: `peptides` (pattern for injectables that go in the abdominal fat pad), `bpLow`, `voice`, `procedure`, `retire` and `sleep`. See `src/regcheck.ts` for each one. Labels cannot contain `<` or `>`.
 
 ## Tech
 
@@ -35,6 +53,7 @@ node build.mjs                          # -> dist/daily.html, and dist/site/ (th
 tsc -p .                                # type-check
 python3 tests/smoke.py dist/daily.html  # Playwright smoke test
 python3 tests/standalone.py             # the installed app: no Claude, offline, backup files
+python3 tests/regimen.py                # regimen files: save, load, refuse bad files, backups
 ```
 
 ## Data

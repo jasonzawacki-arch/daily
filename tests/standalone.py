@@ -1,7 +1,7 @@
 """The installable phone app (dist/site served as plain files, as GitHub Pages does): runs without Claude,
 saves data on the device, downloads backups as files, explains cloud backup, and works offline.
 Run: node build.mjs && python3 tests/standalone.py"""
-import functools, http.server, json, os, sys, threading
+import functools, http.server, json, os, re, sys, threading
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -31,7 +31,9 @@ with sync_playwright() as p:
     check("runs without Claude", pg.evaluate("window.DAILY_STANDALONE === true"))
     check("opens on Lift the first time", pg.evaluate("document.getElementById('hl').style.display !== 'none' && document.getElementById('hp').style.display === 'none'"))
     seen = pg.evaluate("document.getElementById('hp').shadowRoot.textContent + document.getElementById('hl').shadowRoot.textContent").lower()
-    check("sample regimen has no medication items", not any(w in seen for w in ("peptide", "subq", "injection")))
+    REG = json.loads((SITE.parent.parent / "src" / "regimen.json").read_text())
+    if not any(re.search(r"SubQ|\bIM\b", x[1]) for x in REG["items"]):  # only for a med-free built-in regimen (the public sample)
+        check("sample regimen has no medication items", not any(w in seen for w in ("peptide", "subq", "injection")))
     pg.evaluate("window.gomod('p')"); pg.wait_for_timeout(300)
     m = pg.evaluate("fetch('manifest.webmanifest').then(r => r.json())")
     check("installable manifest", m["display"] == "standalone" and m["start_url"] == "./" and len(m["icons"]) == 3)

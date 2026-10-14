@@ -16,6 +16,7 @@ const add = (name) => {
   if (mods[name]) return;
   const file = path.join(SRC, name);
   const text = fs.readFileSync(file, 'utf8');
+  if (name.endsWith('.json')) { mods[name] = 'module.exports={__esModule:true,default:' + JSON.stringify(JSON.parse(text)) + '};'; return; }
   if (name.endsWith('.css')) { mods[name] = 'module.exports={__esModule:true,default:' + JSON.stringify(text) + '};'; return; }
   const out = ts.transpileModule(text, { fileName: file, compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true } });
   mods[name] = out.outputText;
