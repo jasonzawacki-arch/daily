@@ -1,7 +1,7 @@
 import protocolCss from './protocol.css';
 import REG0 from './regimen.json';
 import { checkRegimen, programData, reTest, type Regimen } from './regcheck.js';
-import { DEFAULT_BUFFER, PLAN_DAYS, checksPerDay, cleanLabel, firstJson, plan, project, type Store, type Supply } from './supply.js';
+import { DEFAULT_BUFFER, MAX_PRICES, PLAN_DAYS, checksPerDay, cleanLabel, cleanPrices, firstJson, plan, project, type Price, type Store, type Supply } from './supply.js';
 import { BRISTOL, FOOD_TAGS, GUT_SY, RED_FLAG, compareDays, elimResults, fodmapOf, gutAlerts, summarize, tagPatterns, tracked, type Elim, type GutDay } from './gut.js';
 const SR = document.getElementById('hp').attachShadow({ mode: 'open' });
 SR.innerHTML =
@@ -1754,7 +1754,7 @@ function suppCard2() {
   const rows = supRows().sort((a, b) => (a.p.reorderBy || '9') < (b.p.reorderBy || '9') ? -1 : 1);
   return `<div class=card><h3>Supplies</h3>${
     rows
-      .map((r) => r.i === supEd ? supForm(r.x, r.i) : `<div class="r sp" data-sp=${r.i}><span>${esc(r.x.n)}${r.x.b ? ` <small class=sm>${esc(r.x.b)}</small>` : ''}<br><small class=sm>${supStock(r.x)}</small><br><small class="sm spl">${supLine(r)}</small></span><button data-a=sm data-v="${r.i}|-1" aria-label="One less">-</button><button data-a=sm data-v="${r.i}|1" aria-label="One more">+</button><button data-a=spe data-v=${r.i}>Edit</button></div>`)
+      .map((r) => r.i === supEd ? supForm(r.x, r.i) : `<div class="r sp" data-sp=${r.i}><span>${esc(r.x.n)}${r.x.b ? ` <small class=sm>${esc(r.x.b)}</small>` : ''}<br><small class=sm>${supStock(r.x)}</small><br><small class="sm spl">${supLine(r)}</small>${pxLine(r.x)}</span><button data-a=sm data-v="${r.i}|-1" aria-label="One less">-</button><button data-a=sm data-v="${r.i}|1" aria-label="One more">+</button>${r.x.rx ? '' : `<button data-a=sppx data-v=${r.i}${pxBusy === r.i ? ' disabled' : ''}>${pxBusy === r.i ? 'Searching...' : 'Prices'}</button>`}<button data-a=spe data-v=${r.i}>Edit</button></div>`)
       .join('') || '<p class=sm>Add what you take to see how long it lasts and when to reorder. Link it to a checklist item and checking it off uses it up.</p>'
   }${supEd === -1 ? supForm({ n: '', c: 0 } as Supply, -1) : `<button class=btn data-a=spn>Add a supply</button>`}${supMsg ? `<p class="sm spm" role=status>${esc(supMsg)}</p>` : ''}</div>${planCard(rows.concat(vialRows()))}${storeCard()}`;
 }
@@ -1785,7 +1785,7 @@ function planCard(rows: ReturnType<typeof supRows>): string {
     const st = stores().find((s) => s.id === k);
     h += `<p class=sm style="margin:10px 0 4px"><b>${k === 'rx' ? 'Prescription refills' : st ? esc(st.n) + ` <span class=sm>(arrives in about ${st.days} day${st.days === 1 ? '' : 's'})</span>` : 'Store not set'}</b></p>`;
     h += rs
-      .map((r) => `<div class=r><span>${esc(r.x.n)}<br><small class=sm>${r.p.status === 'now' ? 'now' : 'by ' + shortD(r.p.reorderBy)}${!r.x.rx && r.x.price ? ` · last paid ${r.x.price}` : ''}${!r.x.rx && r.x.link ? ` · <a href="${esc(r.x.link)}" target=_blank rel=noopener>product page</a>` : ''}</small></span><button data-a=sprc data-v=${r.i}>Received</button></div>`)
+      .map((r) => `<div class=r><span>${esc(r.x.n)}<br><small class=sm>${r.p.status === 'now' ? 'now' : 'by ' + shortD(r.p.reorderBy)}${!r.x.rx && r.x.px && r.x.px.r[0] ? ` · best ${money(r.x.px.r[0].price)} at <a href="${esc(r.x.px.r[0].url)}" target=_blank rel=noopener>${esc(r.x.px.r[0].seller)}</a>` : !r.x.rx && r.x.price ? ` · last paid ${r.x.price}` : ''}${!r.x.rx && r.x.link ? ` · <a href="${esc(r.x.link)}" target=_blank rel=noopener>product page</a>` : ''}</small></span><button data-a=sprc data-v=${r.i}>Received</button></div>`)
       .join('');
   });
   return `<div class=card><h3>Reorder plan</h3><p class=sm>Everything to order in the next ${PLAN_DAYS} days, so one order covers it.</p>${h}<button class=lk data-a=spcp>Copy list</button></div>`;
@@ -1881,6 +1881,7 @@ async function supAct(a: string, v: string) {
     if (supEd != null && supEd >= 0) {
       const old = S.r[supEd];
       if (old && old.o && !x.o) x.o = old.o;
+      if (old && old.px && old.n === x.n && old.b === x.b && old.per === x.per) x.px = old.px;
       S.r[supEd] = x;
     } else S.r.push(x);
     put('sup', S);
@@ -1950,12 +1951,77 @@ async function supAct(a: string, v: string) {
     } catch (e) {}
     aiOpen = false;
     supMsg = k ? 'AI key saved on this device only.' : 'AI key removed.';
+  } else if (a === 'sppx') {
+    await supPrices(+v);
   } else if (a === 'aitg') {
     aiOpen = !aiOpen;
   } else if (a === 'aismp') {
     supFill(SAMPLE_LABEL);
     supMsg = 'Filled from a sample label. Check each field, then Save.';
   }
+}
+// ---------- best prices, found by AI web search with the user's own key ----------
+let pxBusy: number | null = null;
+const money = (n: number) => '$' + n.toFixed(2);
+function pxLine(x: Supply): string {
+  if (x.rx || !x.px || !x.px.r.length) return '';
+  return `<small class="sm spl">Best prices, ${shortD(x.px.at)}: ${x.px.r
+    .map((p) => `<a href="${esc(p.url)}" target=_blank rel=noopener>${money(p.price)} ${esc(p.seller)}</a>${p.units ? ` (${money(p.each!)} per ${esc((x.u || 'unit').replace(/s$/, ''))})` : ''}`)
+    .join(' · ')}. Found by AI web search; check the page before buying.</small>`;
+}
+const pricePrompt = (x: Supply) =>
+  `Search the web for current prices of this exact product: ${x.b ? x.b + ' ' : ''}${x.n}${x.per ? `, a container of ${x.per} ${x.u || 'units'}` : ''}. Only use listings from established retailers or the brand's own store, for this product and brand. Reply with only a JSON object: {"results":[{"seller":"store name","price":12.34,"url":"https://the listing page","units":number of ${x.u || 'units'} in that listing}]}, up to 5 listings, prices in US dollars for one container before shipping. Leave out listings you could not open or whose price you could not see.`;
+async function aiSearch(prompt: string): Promise<string> {
+  const c = aiCfg(),
+    m = c.m || AI_DEFAULT[c.p];
+  let r: Response;
+  if (c.p === 'openai') {
+    r = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: 'Bearer ' + c.k },
+      body: JSON.stringify({ model: m, tools: [{ type: 'web_search' }], input: prompt }),
+    });
+  } else if (c.p === 'gemini') {
+    r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-goog-api-key': c.k },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] }),
+    });
+  } else {
+    r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': c.k, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: m, max_tokens: 1500, tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 5 }], messages: [{ role: 'user', content: prompt }] }),
+    });
+  }
+  if (r.status === 401 || r.status === 403) throw new Error('The provider did not accept the key. Check it under Change.');
+  if (r.status === 429) throw new Error('The provider says the key is over its limit. Try again later.');
+  if (r.status === 400) throw new Error('The provider would not search the web with this key or model. Web search may need turning on for your account, or a different model under Change.');
+  if (!r.ok) throw new Error(`The provider answered ${r.status}.`);
+  const j = await r.json();
+  if (c.p === 'openai') return j.output_text || (j.output || []).flatMap((o) => o.content || []).filter((x) => x.type === 'output_text').map((x) => x.text).join('');
+  if (c.p === 'gemini') return (j.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('');
+  return (j.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
+}
+async function supPrices(i: number) {
+  const x = supList()[i];
+  if (!x || x.rx) return;
+  if (!aiCfg().k) {
+    supMsg = 'Finding prices needs your own AI key: open Edit on any supply, then Add a key.';
+    return;
+  }
+  pxBusy = i;
+  render();
+  try {
+    const found = cleanPrices(firstJson(await aiSearch(pricePrompt(x))));
+    const S = JSON.parse(JSON.stringify(mem.sup));
+    S.r[i].px = { at: iso(new Date()), r: found };
+    put('sup', S);
+    supMsg = found.length ? `${x.n}: ${found.length} price${found.length === 1 ? '' : 's'} found.` : `${x.n}: no prices with a working link were found.`;
+  } catch (e: any) {
+    supMsg = e && e.message ? e.message : 'Could not look up prices.';
+  }
+  pxBusy = null;
 }
 // ---------- reading a label photo with the user's own AI key ----------
 let aiOpen = false;

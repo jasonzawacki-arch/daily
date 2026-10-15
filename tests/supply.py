@@ -33,6 +33,14 @@ out.fits = S.project({ n: 'f', c: 20, per: 30, sub: { every: 28, qty: 1, next: '
 out.cpdHist = S.checksPerDay([true, true, false, true, true, true, true], 7, 'A');
 out.cpdSched = S.checksPerDay([true], 2, 'A');
 out.label = S.cleanLabel({ brand: ' Now <b>', product: 'Fish Oil', unit: 'Softgels', amountPerContainer: '200', servingSize: 2, prescription: 'yes' });
+out.prices = S.cleanPrices({ results: [
+  { seller: 'A', price: 30, url: 'https://a.example/x', units: 120 },
+  { seller: 'B', price: '$20.00', url: 'https://b.example/x', units: 60 },
+  { seller: 'Bad', price: 5, url: 'javascript:alert(1)', units: 60 },
+  { seller: 'Free', price: 0, url: 'https://f.example/x', units: 60 },
+  { seller: 'C', price: 26, url: 'https://c.example/x', units: 120 },
+  { seller: 'A again', price: 30, url: 'https://a.example/x', units: 120 },
+  { seller: 'D', price: 40, url: 'https://d.example/x', units: 120 } ] });
 out.json = S.firstJson('Here you go:\n```json\n{"brand":"X","product":"Y"}\n```');
 console.log(JSON.stringify(out));
 """
@@ -57,6 +65,9 @@ check("daily use from the schedule before that", abs(o["cpdSched"] - 2 / 7) < 1e
 L = o["label"]
 check("label details are cleaned: markup stripped, numbers parsed, unclear prescription flag ignored",
       L["brand"] == "Now b" and L["per"] == 200 and L["unit"] == "softgels" and L["rx"] is False, L)
+px = o["prices"]
+check("prices: bad links and zero prices dropped, duplicates removed, cheapest per unit first, at most 3",
+      [p["seller"] for p in px] == ["C", "A", "B"] and px[2]["price"] == 20, px)
 check("label JSON found inside a fenced reply", o["json"] == {"brand": "X", "product": "Y"}, o["json"])
 
 # ---- the screens ----
@@ -161,6 +172,25 @@ with sync_playwright() as p:
     P("#splab").set_input_files(str(png)); pg.wait_for_timeout(800)
     check("a rejected key is explained", "did not accept the key" in P(".spm").inner_text(), P(".spm").all_inner_texts())
     P("button[data-a=spcx]").click(); W()
+
+    # best prices by AI web search
+    def search(route):
+        body = json.loads(route.request.post_data)
+        seen.append(body)
+        txt = json.dumps({"results": [
+            {"seller": "Store B", "price": 34.99, "url": "https://b.example/creatine", "units": 500},
+            {"seller": "Store A", "price": 29.99, "url": "https://a.example/creatine", "units": 500},
+            {"seller": "Store C", "price": 31.50, "url": "https://c.example/creatine", "units": 500},
+            {"seller": "Store D", "price": 39.00, "url": "https://d.example/creatine", "units": 500}]})
+        route.fulfill(status=200, content_type="application/json", body=json.dumps({"content": [{"type": "server_tool_use"}, {"type": "text", "text": "Here are prices: " + txt}]}))
+    seen.clear()
+    pg.unroute("https://api.anthropic.com/**"); pg.route("https://api.anthropic.com/**", search)
+    P(".sp", has_text="Creatine").locator("button[data-a=sppx]").click(); pg.wait_for_timeout(800)
+    cr = row("Creatine")
+    check("Prices lists the 3 best, cheapest first, with links", "Best prices" in cr and cr.index("$29.99") < cr.index("$31.50") < cr.index("$34.99") and "$39.00" not in cr, cr)
+    check("price search uses the provider's web search tool and names the exact product", seen and seen[-1]["tools"][0]["name"] == "web_search" and "Creatine" in seen[-1]["messages"][0]["content"], seen[-1:] )
+    add("Thyroid med", spu="tablets", spper="90", spc="30", sppd="1", sprx=True)
+    check("prescription items have no price lookup", P(".sp", has_text="Thyroid med").locator("button[data-a=sppx]").count() == 0)
 
     # checking off a linked item uses stock and opens a sealed container
     P(".sp", has_text="Creatine").locator("button[data-a=spe]").click(); W()

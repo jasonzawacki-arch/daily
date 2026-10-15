@@ -33,6 +33,7 @@ export interface Supply {
   rf?: number; // refills remaining
   buf?: number; // days of margin before running out (default 7)
   sub?: Sub | null;
+  px?: { at: string; r: Price[] }; // best prices found, and when
 }
 
 export const DEFAULT_BUFFER = 7;
@@ -163,6 +164,39 @@ export function cleanLabel(raw: any): Label {
 /** Pull the first JSON object out of a model's reply, which may wrap it in prose or a code fence. */
 export function firstJson(text: string): any {
   const m = /\{[\s\S]*\}/.exec(text || '');
-  if (!m) throw new Error('The reply had no label details in it.');
+  if (!m) throw new Error('The reply had nothing usable in it.');
   return JSON.parse(m[0]);
+}
+
+/** A price found by AI web search: checked and cleaned before it is shown. */
+export interface Price {
+  seller: string;
+  price: number; // for the listing, in the listing's currency
+  url: string;
+  units?: number; // amount in the listing, in the supply's unit, when given
+  each?: number; // price per unit, when units is known
+}
+export const MAX_PRICES = 3;
+/** Keep listings with a real price and an http(s) link, cheapest first (per unit when every listing gives its size), at most 3. */
+export function cleanPrices(raw: any): Price[] {
+  const list = Array.isArray(raw) ? raw : raw && Array.isArray(raw.results) ? raw.results : [];
+  const out: Price[] = [];
+  for (const r of list) {
+    if (!r || typeof r !== 'object') continue;
+    const price = typeof r.price === 'number' ? r.price : parseFloat(String(r.price ?? '').replace(/[^0-9.]/g, ''));
+    if (!isFinite(price) || price <= 0 || price > 10000) continue;
+    let url = '';
+    try {
+      const u = new URL(String(r.url || ''));
+      if (u.protocol === 'https:' || u.protocol === 'http:') url = u.href;
+    } catch (e) {}
+    if (!url) continue;
+    const seller = String(r.seller || new URL(url).hostname.replace(/^www\./, '')).replace(/[<>]/g, '').trim().slice(0, 40);
+    const units = typeof r.units === 'number' && r.units > 0 && r.units < 1e6 ? r.units : undefined;
+    out.push({ seller, price: Math.round(price * 100) / 100, url, ...(units ? { units, each: price / units } : {}) });
+  }
+  const perUnit = out.length > 0 && out.every((p) => p.each != null);
+  out.sort((a, b) => (perUnit ? a.each! - b.each! : a.price - b.price));
+  const seen = new Set<string>();
+  return out.filter((p) => !seen.has(p.url) && seen.add(p.url)).slice(0, MAX_PRICES);
 }
