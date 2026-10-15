@@ -2,7 +2,7 @@
 
 A configurable daily regimen + lifting tracker. TypeScript source compiles to **one self-contained HTML file** — no server, no framework, no build dependencies beyond the TypeScript compiler.
 
-![Daily on a phone: the day's checklist, the workout log and the program editor with templates](docs/screenshots/daily.jpg)
+![A tour of Daily on a phone: checking off the day's items, the fuel log, history, then the workout log and the program editor with templates](docs/screenshots/daily-tour.gif)
 
 **Try it: https://jasonzawacki-arch.github.io/daily/** (sample data; installable, works offline).
 
