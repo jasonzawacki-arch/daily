@@ -97,6 +97,12 @@ def reports(pg):
 
 def today(pg):
     P(pg, "button[data-a=tab][data-v=today]").tap(); pg.wait_for_timeout(300)
+    # Which time window starts open depends on the time of day; open windows until at least two items can be checked.
+    boxes = P(pg, "label.r input[type=checkbox]")
+    for i in range(P(pg, "button[data-a=o]").count()):
+        if boxes.count() >= 2:
+            break
+        P(pg, "button[data-a=o]").nth(i).tap(); pg.wait_for_timeout(250)
 
 
 def checked(pg):
