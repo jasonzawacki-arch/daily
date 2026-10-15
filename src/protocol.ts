@@ -1,6 +1,7 @@
 import protocolCss from './protocol.css';
 import REG0 from './regimen.json';
 import { checkRegimen, programData, reTest, type Regimen } from './regcheck.js';
+import { DEFAULT_BUFFER, PLAN_DAYS, checksPerDay, cleanLabel, firstJson, plan, project, type Store, type Supply } from './supply.js';
 import { BRISTOL, FOOD_TAGS, GUT_SY, RED_FLAG, compareDays, elimResults, fodmapOf, gutAlerts, summarize, tagPatterns, tracked, type Elim, type GutDay } from './gut.js';
 const SR = document.getElementById('hp').attachShadow({ mode: 'open' });
 SR.innerHTML =
@@ -1643,7 +1644,7 @@ function alertHTML() {
       h;
   if (window.Cloud && /failed/i.test(window.Cloud.st.msg || ''))
     h += `<div class=al>${esc(window.Cloud.st.msg)} <button class=lk data-a=gbk>Open backup</button></div>`;
-  h += vialAlerts() + procAlerts();
+  h += vialAlerts() + procAlerts() + supAlerts();
   return h;
 }
 function alertCard() {
@@ -1670,26 +1671,363 @@ function supAdj(id, on) {
   let ch = false;
   C.r.forEach((x) => {
     if (x.k === id && x.q) {
-      x.c = Math.max(0, +(x.c + (on ? -x.q : x.q)).toFixed(2));
+      let c = +(x.c + (on ? -x.q : x.q)).toFixed(3);
+      // the open container ran out: open a sealed one
+      while (on && c < 0 && x.per && (x.s || 0) > 0) {
+        c += x.per;
+        x.s--;
+      }
+      x.c = Math.max(0, +c.toFixed(3));
       ch = true;
     }
   });
   if (ch) put('sup', C);
 }
+// ---------- supplies: stock on hand, run-out and reorder dates, subscriptions, reorder plan ----------
+let supEd: number | null = null; // index being edited, -1 for a new supply
+let supDraft: any = null; // label details read from a photo, waiting in the form
+let supMsg = '';
+let supBusy = false;
+const UNITS = ['capsules', 'tablets', 'softgels', 'gummies', 'scoops', 'servings', 'g', 'mL', 'mg', 'units'];
+const stores = (): Store[] => ((mem.stores || {}).r || []) as Store[];
+const supList = (): Supply[] => ((mem.sup || {}).r || []) as Supply[];
+/** Daily use of a supply: from its linked checklist item (history, or schedule at first), or the amount per day set on it. */
+function supPerDay(x: Supply): number {
+  if (x.k && x.q) {
+    const it = all().find((i) => i.id === x.k);
+    const ks = Object.keys(mem).filter((k) => k.startsWith('d-')).sort().slice(-14);
+    const hist = ks.map((k) => !!(mem[k].c || {})[x.k as string]);
+    return checksPerDay(hist, it ? sch(it).length : 7, it ? it.tag : 'A') * x.q;
+  }
+  return x.pd || 0;
+}
+function supRows() {
+  const t = iso(new Date());
+  return supList().map((x, i) => {
+    const st = stores().find((s) => s.id === x.st);
+    return { i, x, st, p: project(x, supPerDay(x), t, st ? st.days : 0) };
+  });
+}
+const shortD = (s: string | null) => (s ? new Date(s + 'T12:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '');
+const amt = (n: number) => String(Math.round(n * 100) / 100);
+const wk = (d: number) => (d % 7 === 0 ? `${d / 7} week${d === 7 ? '' : 's'}` : `${d} days`);
+function supLine(r): string {
+  const { x, p } = r;
+  if (p.status === 'unknown') return x.k ? 'Not enough history yet to tell how fast it goes' : 'Set the amount used per day to see how long it lasts';
+  if (p.sub) {
+    const s = p.sub;
+    if (s.verdict === 'over')
+      return `On subscription every ${wk(x.sub!.every)}. Each delivery lasts about ${wk(Math.round(s.lasts))}, so stock builds up${s.extraPerYear >= 1 ? ` (about ${amt(s.extraPerYear)} extra a year)` : ''}. Try every ${wk(s.suggestEvery)}.`;
+    if (s.verdict === 'short')
+      return `On subscription every ${wk(x.sub!.every)}, but each delivery lasts about ${wk(Math.round(s.lasts))}.${p.runOut ? ` Runs out ${shortD(p.runOut)}.` : ''} Try every ${wk(s.suggestEvery)}${p.reorderBy ? ' or order one by ' + shortD(p.reorderBy) : ''}.`;
+    return `On subscription every ${wk(x.sub!.every)}; deliveries keep up with what you use.`;
+  }
+  const verb = x.rx ? 'Refill' : 'Reorder';
+  const lead = p.status === 'now' ? `<b style="color:var(--nw)">${verb} now</b>` : `${verb} by ${shortD(p.reorderBy)}`;
+  return `${lead}. Lasts about ${p.daysLeft} day${p.daysLeft === 1 ? '' : 's'} (to ${shortD(p.runOut)})${x.rx && x.rf != null ? `, ${x.rf} refill${x.rf === 1 ? '' : 's'} left` : ''}.`;
+}
+function supStock(x: Supply): string {
+  const u = x.u ? ' ' + esc(x.u) : '';
+  if (!x.per) return `${amt(x.c)}${u}`;
+  return `${amt(x.c)}${u} open${x.s ? ` + ${x.s} sealed` : ''} <span class=sm>(${amt(x.per)} per container)</span>`;
+}
 function suppCard2() {
-  const R = (mem.sup || {}).r || [];
+  const rows = supRows().sort((a, b) => (a.p.reorderBy || '9') < (b.p.reorderBy || '9') ? -1 : 1);
   return `<div class=card><h3>Supplies</h3>${
-    R.map((x, i) => {
-      const r = x.k ? supRate(x.k) * (x.q || 0) : 0,
-        dl = r > 0 ? Math.floor(x.c / r) : null;
-      return `<div class=r><span>${esc(x.n)}${x.k ? ' <small class=sm>auto: ' + x.q + ' per check</small>' : ''}${dl != null ? ' <small class=sm>about ' + dl + ' days left</small>' : ''}${x.c <= 2 || (dl != null && dl <= 7) ? ' <small style="color:var(--nw)">low</small>' : ''}</span><button data-a=sm data-v="${i}|-1">-</button><b>${x.c}</b><button data-a=sm data-v="${i}|1">+</button><button data-a=sx data-v=${i}>Remove</button></div>`;
-    }).join('') ||
-    '<p class=sm>Track stock. Link an item to use stock up automatically when you check it off.</p>'
-  }<div class=g style="grid-template-columns:2fr 1fr"><input type=text id=sn placeholder="Item"><input type=number id=sc placeholder="Count"></div><select id=sk><option value="">Not linked</option>${all()
-    .map((x) => `<option value=${x.id}>${esc(x.l.slice(0, 40))}</option>`)
-    .join(
-      '',
-    )}</select><input type=number id=sq placeholder="Used per check" aria-label="Amount used per check, for example 0.1 mL or 1 capsule" step=any style="margin:8px 0"><button class=btn data-a=sa2>Add item</button></div>`;
+    rows
+      .map((r) => r.i === supEd ? supForm(r.x, r.i) : `<div class="r sp" data-sp=${r.i}><span>${esc(r.x.n)}${r.x.b ? ` <small class=sm>${esc(r.x.b)}</small>` : ''}<br><small class=sm>${supStock(r.x)}</small><br><small class="sm spl">${supLine(r)}</small></span><button data-a=sm data-v="${r.i}|-1" aria-label="One less">-</button><button data-a=sm data-v="${r.i}|1" aria-label="One more">+</button><button data-a=spe data-v=${r.i}>Edit</button></div>`)
+      .join('') || '<p class=sm>Add what you take to see how long it lasts and when to reorder. Link it to a checklist item and checking it off uses it up.</p>'
+  }${supEd === -1 ? supForm({ n: '', c: 0 } as Supply, -1) : `<button class=btn data-a=spn>Add a supply</button>`}${supMsg ? `<p class="sm spm" role=status>${esc(supMsg)}</p>` : ''}</div>${planCard(rows)}${storeCard()}`;
+}
+function supForm(x: Supply, i: number): string {
+  const d = supDraft || {};
+  const v = (k: string, fb: any) => esc(String(d[k] ?? fb ?? ''));
+  const sub = x.sub;
+  const opt = (val: string, label: string, sel: boolean) => `<option value="${esc(val)}"${sel ? ' selected' : ''}>${esc(label)}</option>`;
+  return `<div class=spf><h3 style="margin-top:4px">${i < 0 ? 'New supply' : 'Edit ' + esc(x.n)}</h3>
+<div class=row2><button class=btn data-a=spcam>Read a label photo</button><input type=file id=splab accept="image/*" capture=environment hidden></div>${aiSetup()}
+<label class=f>Name</label><input type=text id=spn value="${v('n', x.n)}" placeholder="Creatine monohydrate">
+<div class=g style="grid-template-columns:1fr 1fr"><div><label class=f>Brand</label><input type=text id=spb value="${v('b', x.b)}"></div><div><label class=f>Unit</label><input type=text id=spu list=spul value="${v('u', x.u)}" placeholder="capsules"><datalist id=spul>${UNITS.map((u) => `<option>${u}</option>`).join('')}</datalist></div></div>
+<div class=g style="grid-template-columns:1fr 1fr 1fr"><div><label class=f>Per container</label><input type=number step=any min=0 id=spper value="${v('per', x.per)}"></div><div><label class=f>Open, left</label><input type=number step=any min=0 id=spc value="${v('c', x.c)}"></div><div><label class=f>Sealed</label><input type=number step=1 min=0 id=sps value="${v('s', x.s || 0)}"></div></div>
+<label class=f>Uses it up</label><select id=spk><option value="">Not linked: set an amount per day</option>${all().map((it) => opt(it.id, it.l.slice(0, 44), it.id === (d.k ?? x.k))).join('')}</select>
+<div class=g style="grid-template-columns:1fr 1fr"><div><label class=f>Per check</label><input type=number step=any min=0 id=spq value="${v('q', x.q)}"></div><div><label class=f>Or per day</label><input type=number step=any min=0 id=sppd value="${v('pd', x.pd)}"></div></div>
+<div class=g style="grid-template-columns:1.4fr 1fr"><div><label class=f>Bought from</label><select id=spst><option value="">Not set</option>${stores().map((s) => opt(s.id, `${s.n} (${s.days} day${s.days === 1 ? '' : 's'})`, s.id === (d.st ?? x.st))).join('')}</select></div><div><label class=f>Margin (days)</label><input type=number step=1 min=0 id=spbuf value="${v('buf', x.buf ?? DEFAULT_BUFFER)}"></div></div>
+<div class=g style="grid-template-columns:2fr 1fr"><div><label class=f>Product link</label><input type=text inputmode=url id=splink value="${v('link', x.link)}" placeholder="https://"></div><div><label class=f>Price paid</label><input type=number step=any min=0 id=spprice value="${v('price', x.price)}"></div></div>
+<details${sub ? ' open' : ''}><summary class=sm>Subscription</summary><label class=f style="display:flex;gap:8px;align-items:center"><input type=checkbox id=spsub${sub ? ' checked' : ''} style="width:auto"> Delivered on a schedule</label><div class=g style="grid-template-columns:1fr 1fr 1.4fr"><div><label class=f>Every (weeks)</label><input type=number step=1 min=1 id=spev value="${sub ? Math.round(sub.every / 7) : 4}"></div><div><label class=f>Containers</label><input type=number step=1 min=1 id=spqty value="${sub ? sub.qty : 1}"></div><div><label class=f>Next delivery</label><input type=date id=spnx value="${sub ? sub.next : addD(iso(new Date()), 28)}"></div></div></details>
+<details${x.rx || d.rx ? ' open' : ''}><summary class=sm>Prescription</summary><label class=f style="display:flex;gap:8px;align-items:center"><input type=checkbox id=sprx${x.rx || d.rx ? ' checked' : ''} style="width:auto"> Prescription: show refill dates, not prices</label><label class=f>Refills left</label><input type=number step=1 min=0 id=sprf value="${esc(String(x.rf ?? ''))}"></details>
+<div class=row2 style="margin-top:10px"><button class=btn data-a=sps>Save</button><button class=lk data-a=spcx>Cancel</button>${i >= 0 ? `<button class=lk data-a=spx data-v=${i}>Remove</button>` : ''}</div></div>`;
+}
+function planCard(rows: ReturnType<typeof supRows>): string {
+  const t = iso(new Date());
+  const g = plan(rows.filter((r) => !r.p.sub || r.p.sub.verdict === 'short'), t);
+  if (!g.size) return '';
+  let h = '';
+  g.forEach((rs, k) => {
+    const st = stores().find((s) => s.id === k);
+    h += `<p class=sm style="margin:10px 0 4px"><b>${k === 'rx' ? 'Prescription refills' : st ? esc(st.n) + ` <span class=sm>(arrives in about ${st.days} day${st.days === 1 ? '' : 's'})</span>` : 'Store not set'}</b></p>`;
+    h += rs
+      .map((r) => `<div class=r><span>${esc(r.x.n)}<br><small class=sm>${r.p.status === 'now' ? 'now' : 'by ' + shortD(r.p.reorderBy)}${!r.x.rx && r.x.price ? ` · last paid ${r.x.price}` : ''}${!r.x.rx && r.x.link ? ` · <a href="${esc(r.x.link)}" target=_blank rel=noopener>product page</a>` : ''}</small></span><button data-a=sprc data-v=${r.i}>Received</button></div>`)
+      .join('');
+  });
+  return `<div class=card><h3>Reorder plan</h3><p class=sm>Everything to order in the next ${PLAN_DAYS} days, so one order covers it.</p>${h}<button class=lk data-a=spcp>Copy list</button></div>`;
+}
+function storeCard(): string {
+  const S = stores();
+  return `<div class=card><h3>Stores</h3><p class=sm>Where you buy, and how long an order usually takes to arrive. Reorder dates allow for it.</p>${S.map((s, i) => `<div class=r><span>${esc(s.n)}<br><small class=sm>${s.days} day${s.days === 1 ? '' : 's'} to arrive</small></span><button data-a=stx data-v=${i}>Remove</button></div>`).join('')}<div class=g style="grid-template-columns:2fr 1fr"><input type=text id=stn placeholder="Amazon Prime"><input type=number id=std min=0 step=1 placeholder="Days"></div><button class=btn data-a=sta style="margin-top:8px">Add store</button></div>`;
+}
+/** One line on Today when something should be ordered within a week. */
+function supAlerts(): string {
+  const due = supRows().filter((r) => r.p.status === 'now' || r.p.status === 'soon');
+  if (!due.length) return '';
+  const txt = due
+    .sort((a, b) => (a.p.reorderBy! < b.p.reorderBy! ? -1 : 1))
+    .map((r) => `${esc(r.x.n)} (${r.p.status === 'now' ? 'now' : 'by ' + shortD(r.p.reorderBy)})`)
+    .join(', ');
+  return `<div class=al>Reorder soon: ${txt}. <button class=lk data-a=spgo>Open supplies</button></div>`;
+}
+/** Subscription deliveries whose date has passed are added to sealed stock, once. */
+function supTick() {
+  const t = iso(new Date());
+  const S = supList();
+  if (!S.some((x) => x.sub && x.sub.next && x.sub.next <= t && x.sub.every > 0)) return;
+  const C = JSON.parse(JSON.stringify(mem.sup));
+  for (const x of C.r as Supply[]) {
+    while (x.sub && x.sub.every > 0 && x.sub.next && x.sub.next <= t) {
+      x.s = (x.s || 0) + x.sub.qty;
+      x.sub.next = addD(x.sub.next, x.sub.every);
+    }
+  }
+  put('sup', C);
+}
+function supRead(): Supply | string {
+  const val = (id: string) => (($('#' + id) as HTMLInputElement | null)?.value || '').trim();
+  const num = (id: string) => {
+    const f = parseFloat(val(id));
+    return isFinite(f) && f >= 0 ? f : undefined;
+  };
+  const n = val('spn');
+  if (!n) return 'Give it a name.';
+  const x: Supply = { n, c: num('spc') ?? 0 };
+  const opt = { b: val('spb'), u: val('spu'), link: val('splink'), st: val('spst'), k: val('spk') };
+  for (const [k, v] of Object.entries(opt)) if (v) (x as any)[k] = v;
+  if (x.link && !/^https?:\/\//i.test(x.link)) return 'The product link should start with https://';
+  const per = num('spper'), s = num('sps'), q = num('spq'), pd = num('sppd'), price = num('spprice'), buf = num('spbuf'), rf = num('sprf');
+  if (per) x.per = per;
+  if (s) x.s = Math.round(s);
+  if (x.k) {
+    if (!q) return 'Set how much one check uses, or leave it unlinked and set an amount per day.';
+    x.q = q;
+  } else if (pd) x.pd = pd;
+  if (price) x.price = price;
+  if (buf != null && buf !== DEFAULT_BUFFER) x.buf = Math.round(buf);
+  if (($('#sprx') as HTMLInputElement)?.checked) {
+    x.rx = true;
+    if (rf != null) x.rf = Math.round(rf);
+  }
+  if (($('#spsub') as HTMLInputElement)?.checked) {
+    if (!x.per) return 'A subscription needs the amount per container.';
+    const every = Math.round((num('spev') || 4) * 7), qty = Math.max(1, Math.round(num('spqty') || 1)), next = val('spnx') || iso(new Date());
+    x.sub = { every, qty, next };
+  }
+  return x;
+}
+/** Keep what is typed in the form, so a message or a photo read does not wipe it. */
+function supSnap() {
+  if (supEd == null || !$('#spn')) return;
+  const ids: Record<string, string> = { n: 'spn', b: 'spb', u: 'spu', per: 'spper', c: 'spc', s: 'sps', q: 'spq', pd: 'sppd', link: 'splink', price: 'spprice', buf: 'spbuf', k: 'spk', st: 'spst' };
+  supDraft = supDraft || {};
+  for (const [k, id] of Object.entries(ids)) supDraft[k] = (($('#' + id) as HTMLInputElement).value || '').trim();
+  supDraft.rx = ($('#sprx') as HTMLInputElement).checked;
+}
+async function supAct(a: string, v: string) {
+  supMsg = '';
+  if (!['spn', 'spe', 'spcx', 'sps', 'spx'].includes(a)) supSnap();
+  if (a === 'spn') {
+    supEd = -1;
+    supDraft = null;
+  } else if (a === 'spe') {
+    supEd = +v;
+    supDraft = null;
+  } else if (a === 'spcx') {
+    supEd = null;
+    supDraft = null;
+  } else if (a === 'sps') {
+    const x = supRead();
+    if (typeof x === 'string') {
+      supSnap();
+      supMsg = x;
+      return;
+    }
+    const S = JSON.parse(JSON.stringify(mem.sup || { r: [] }));
+    if (supEd != null && supEd >= 0) {
+      const old = S.r[supEd];
+      if (old && old.o && !x.o) x.o = old.o;
+      S.r[supEd] = x;
+    } else S.r.push(x);
+    put('sup', S);
+    supEd = null;
+    supDraft = null;
+  } else if (a === 'spx') {
+    const S = JSON.parse(JSON.stringify(mem.sup));
+    S.r.splice(+v, 1);
+    put('sup', S);
+    supEd = null;
+  } else if (a === 'sprc') {
+    const S = JSON.parse(JSON.stringify(mem.sup)),
+      x = S.r[+v];
+    if (x.per) x.s = (x.s || 0) + 1;
+    else x.c = (x.c || 0) + 1;
+    if (x.rx && x.rf > 0) x.rf--;
+    put('sup', S);
+    supMsg = `${x.n}: added one${x.per ? ' sealed container' : ''}.`;
+  } else if (a === 'spcp') {
+    const t = iso(new Date());
+    const g = plan(supRows().filter((r) => !r.p.sub || r.p.sub.verdict === 'short'), t);
+    const lines: string[] = [];
+    g.forEach((rs, k) => {
+      const st = stores().find((s) => s.id === k);
+      lines.push(k === 'rx' ? 'Prescription refills' : st ? st.n : 'Other');
+      rs.forEach((r) => lines.push(`- ${r.x.n}${r.x.b ? ' (' + r.x.b + ')' : ''}${r.x.link ? ' ' + r.x.link : ''}`));
+    });
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'));
+      supMsg = 'Reorder list copied.';
+    } catch (e) {
+      supMsg = 'Copying is blocked here.';
+    }
+  } else if (a === 'sta') {
+    const n = (($('#stn') as HTMLInputElement).value || '').trim(),
+      dd = parseInt(($('#std') as HTMLInputElement).value);
+    if (!n || isNaN(dd) || dd < 0) return;
+    const S = JSON.parse(JSON.stringify(mem.stores || { r: [] }));
+    S.r.push({ id: 's' + Date.now().toString(36), n, days: dd });
+    put('stores', S);
+  } else if (a === 'stx') {
+    const S = JSON.parse(JSON.stringify(mem.stores));
+    S.r.splice(+v, 1);
+    put('stores', S);
+  } else if (a === 'spgo') {
+    tab = 'more';
+    secs.add('supply');
+  } else if (a === 'spcam') {
+    if (!aiCfg().k) {
+      supMsg = 'Add an AI key below first, or try the sample label.';
+      aiOpen = true;
+      return;
+    }
+    ($('#splab') as HTMLInputElement).click();
+  } else if (a === 'aisv') {
+    const p = ($('#aip') as HTMLSelectElement).value,
+      k = ($('#aik') as HTMLInputElement).value.trim(),
+      m = ($('#aim') as HTMLInputElement).value.trim();
+    try {
+      localStorage.setItem('ai', JSON.stringify({ p, k, m }));
+    } catch (e) {}
+    aiOpen = false;
+    supMsg = k ? 'AI key saved on this device only.' : 'AI key removed.';
+  } else if (a === 'aitg') {
+    aiOpen = !aiOpen;
+  } else if (a === 'aismp') {
+    supFill(SAMPLE_LABEL);
+    supMsg = 'Filled from a sample label. Check each field, then Save.';
+  }
+}
+// ---------- reading a label photo with the user's own AI key ----------
+let aiOpen = false;
+const AI_DEFAULT: Record<string, string> = { claude: 'claude-haiku-5-5', openai: 'gpt-4.1-mini', gemini: 'gemini-2.5-flash' };
+function aiCfg(): { p: string; k: string; m: string } {
+  try {
+    const o = JSON.parse(localStorage.getItem('ai') || '{}');
+    return { p: o.p || 'claude', k: o.k || '', m: o.m || '' };
+  } catch (e) {
+    return { p: 'claude', k: '', m: '' };
+  }
+}
+const SAMPLE_LABEL = { brand: 'Sample Labs', product: 'Magnesium glycinate', unit: 'capsules', amountPerContainer: 120, servingSize: 2 };
+function aiSetup(): string {
+  const c = aiCfg();
+  if (!aiOpen && c.k) return `<p class=sm>Labels are read with your ${{ claude: 'Claude', openai: 'OpenAI', gemini: 'Gemini' }[c.p] || c.p} key. <button class=lk data-a=aitg>Change</button></p>`;
+  if (!aiOpen) return `<p class=sm>Reading a label needs your own AI key. <button class=lk data-a=aitg>Add a key</button> <button class=lk data-a=aismp>Try a sample label</button></p>`;
+  return `<div class=card style="margin:8px 0"><p class=sm>The photo goes straight from this device to the provider you pick. The key stays on this device and is never in backups or sync. A key with a low spending limit is best; one label costs well under a cent.</p><div class=g style="grid-template-columns:1fr 1.6fr"><select id=aip>${['claude', 'openai', 'gemini'].map((p) => `<option value=${p}${p === c.p ? ' selected' : ''}>${{ claude: 'Claude', openai: 'OpenAI', gemini: 'Gemini' }[p]}</option>`).join('')}</select><input type=password id=aik autocomplete=off value="${esc(c.k)}" placeholder="API key"></div><input type=text id=aim value="${esc(c.m)}" placeholder="Model (blank for the default)" style="margin-top:8px"><div class=row2 style="margin-top:8px"><button class=btn data-a=aisv>Save key</button><button class=lk data-a=aismp>Try a sample label</button></div></div>`;
+}
+/** Shrink a photo to at most 1280 px on its long side, as JPEG, so the request is small and cheap. */
+async function shrink(f: File): Promise<{ data: string; type: string }> {
+  const url = URL.createObjectURL(f);
+  try {
+    const img = await new Promise<HTMLImageElement>((ok, no) => {
+      const i = new Image();
+      i.onload = () => ok(i);
+      i.onerror = () => no(new Error('That file is not an image this browser can open.'));
+      i.src = url;
+    });
+    const s = Math.min(1, 1280 / Math.max(img.naturalWidth, img.naturalHeight));
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(img.naturalWidth * s);
+    cv.height = Math.round(img.naturalHeight * s);
+    cv.getContext('2d')!.drawImage(img, 0, 0, cv.width, cv.height);
+    return { data: cv.toDataURL('image/jpeg', 0.85).split(',')[1], type: 'image/jpeg' };
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+const LABEL_PROMPT =
+  'This is a photo of a supplement or medication label. Reply with only a JSON object with these keys: brand, product, unit (what one serving is counted in, such as capsules, tablets, softgels, gummies, scoops, g or mL), servingSize (number of units in one serving), amountPerContainer (total units in the container, for example servings per container times serving size), prescription (true only for a pharmacy label). Use null for anything you cannot read. Do not guess.';
+async function aiLabel(img: { data: string; type: string }): Promise<string> {
+  const c = aiCfg(),
+    m = c.m || AI_DEFAULT[c.p];
+  let r: Response;
+  if (c.p === 'openai') {
+    r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: 'Bearer ' + c.k },
+      body: JSON.stringify({ model: m, max_tokens: 300, messages: [{ role: 'user', content: [{ type: 'text', text: LABEL_PROMPT }, { type: 'image_url', image_url: { url: `data:${img.type};base64,${img.data}` } }] }] }),
+    });
+  } else if (c.p === 'gemini') {
+    r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-goog-api-key': c.k },
+      body: JSON.stringify({ contents: [{ parts: [{ inline_data: { mime_type: img.type, data: img.data } }, { text: LABEL_PROMPT }] }] }),
+    });
+  } else {
+    r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': c.k, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: m, max_tokens: 300, messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: img.type, data: img.data } }, { type: 'text', text: LABEL_PROMPT }] }] }),
+    });
+  }
+  if (r.status === 401 || r.status === 403) throw new Error('The provider did not accept the key. Check it under Change.');
+  if (r.status === 429) throw new Error('The provider says the key is over its limit. Try again later.');
+  if (!r.ok) throw new Error(`The provider answered ${r.status}. If the model name is out of date, set another under Change.`);
+  const j = await r.json();
+  return c.p === 'openai' ? j.choices?.[0]?.message?.content || '' : c.p === 'gemini' ? (j.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('') : (j.content || []).map((p) => p.text || '').join('');
+}
+function supFill(raw: any) {
+  const L = cleanLabel(raw);
+  const prev = supDraft || {};
+  supDraft = { ...prev };
+  if (L.product) supDraft.n = L.product;
+  if (L.brand) supDraft.b = L.brand;
+  if (L.unit) supDraft.u = L.unit;
+  if (L.per) {
+    supDraft.per = L.per;
+    if (supEd === -1) supDraft.c = L.per;
+  }
+  if (L.serving) supDraft.q = L.serving;
+  if (L.rx) supDraft.rx = true;
+}
+async function supPhoto(f: File) {
+  supSnap();
+  supBusy = true;
+  supMsg = 'Reading the label...';
+  render();
+  try {
+    supFill(firstJson(await aiLabel(await shrink(f))));
+    supMsg = 'Filled from the photo. Check each field, then Save.';
+  } catch (e: any) {
+    supMsg = e && e.message ? e.message : 'Could not read the label.';
+  }
+  supBusy = false;
+  render();
 }
 function chgDelta(pts) {
   const R = allMarks();
@@ -2385,6 +2723,9 @@ function fin(d, a, b) {
     : `<div class="card"><button class=btn data-a=fin style="width:100%;padding:14px">Complete day${b - a ? ' (' + (b - a) + ' unchecked)' : ''}</button><p class=sm>Everything saves as you go. Completing marks the day done in History.</p></div>`;
 }
 function render() {
+  try {
+    supTick();
+  } catch (e) {}
   const d = mem['d-' + date] || {},
     t = typeOf(date),
     [a, b] = prog(date),
@@ -2468,6 +2809,7 @@ const UNDO_MSG = {
   arx: 'Alert rule removed',
   cx: 'Change removed',
   sx: 'Supply removed',
+  spx: 'Supply removed',
   vx: 'Vial removed',
   ex2: 'Experiment removed',
   nfx: 'Favorite removed',
@@ -2480,6 +2822,7 @@ const undoKey = (a: string) =>
     arx: 'cfg',
     cx: 'chg',
     sx: 'sup',
+    spx: 'sup',
     vx: 'vials',
     ex2: 'exp',
     nfx: 'fav',
@@ -2739,6 +3082,8 @@ app.addEventListener('click', async (e) => {
     window.setZoom(+v);
   } else if (a === 'fx') {
     window.setFx(v === 'lite');
+  } else if (/^(sp|st[ax]$|ai)/.test(a)) {
+    await supAct(a, v);
   } else if (a === 'sa2') {
     const n = $('#sn').value.trim(),
       c = parseFloat($('#sc').value);
@@ -3369,6 +3714,12 @@ document.addEventListener('visibilitychange', () => {
 });
 app.addEventListener('change', async (e) => {
   const t = e.target;
+  if (t.id === 'splab') {
+    const f = t.files && t.files[0];
+    t.value = '';
+    if (f) await supPhoto(f);
+    return;
+  }
   if (t.dataset.mfb != null) {
     const d = JSON.parse(JSON.stringify(mem['d-' + date] || {})),
       x = (d.nu || [])[+t.dataset.mfb];

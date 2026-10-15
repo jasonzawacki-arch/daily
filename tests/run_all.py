@@ -5,7 +5,7 @@ import re, subprocess, sys
 from pathlib import Path
 
 TESTS = ["smoke", "checkoff", "batch", "batch2", "batch3", "cloud", "contrast", "hit", "pdf", "polish", "polish2",
-         "standalone", "regimen", "program", "gsync", "gut"]
+         "standalone", "regimen", "program", "gsync", "gut", "supply"]
 BAD = re.compile(r"^FAIL|Traceback|ERRORS \[.+\]|page errors \[.+\]", re.M)
 here = Path(__file__).resolve().parent
 failed = []

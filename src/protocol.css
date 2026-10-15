@@ -1607,3 +1607,42 @@ td:last-child{min-width:64px}
   line-height: 1.25;
   color: var(--mu);
 }
+/* supplies: rows hold several lines, with their buttons underneath */
+.r.sp {
+  height: auto;
+  flex-wrap: wrap;
+  align-items: center;
+  cursor: default;
+  border-bottom: 1px solid var(--ln);
+  border-radius: 0;
+  padding-bottom: 12px;
+}
+.r.sp > span {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+.r.sp > button:first-of-type {
+  margin-left: auto;
+}
+.r.sp > button {
+  margin-left: 0;
+}
+.spl {
+  display: block;
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.spf {
+  border-top: 1px solid var(--ln);
+  padding-top: 6px;
+}
+.spf .row2 {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.spf label.f {
+  display: block;
+  margin-top: 8px;
+}
