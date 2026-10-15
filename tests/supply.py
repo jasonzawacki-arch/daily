@@ -219,7 +219,7 @@ with sync_playwright() as p:
     mix.locator("button[data-a=vmix]").click(); W()
     check("Mix one starts the next vial and clears the line", P(".al", has_text="no mixed doses left").count() == 0)
     supplies()
-    vc = P(".card", has_text="Peptide vials").inner_text()
+    vc = P(".card:has(h3:text-is('Vials'))").inner_text()
     spr = P(".card", has_text="Spare vials").locator(".sp").first.inner_text()
     check("the mixed vial appears with its doses, and one fewer spare", "BPC-157 vial 1: 10 of 10 doses" in vc and "10 mixed doses left + 8 spare vials" in spr, (vc[:200], spr))
 

@@ -536,7 +536,7 @@ function moreV() {
     ) +
     sec(
       'supply',
-      medsOn() ? 'Supplies and peptides' : 'Supplies',
+      medsOn() ? 'Supplies and vials' : 'Supplies',
       `${ns} suppl${ns === 1 ? 'y' : 'ies'}${medsOn() ? ' - ' + nv + ' vial' + (nv === 1 ? '' : 's') : ''}${na ? ' - ' + na + ' arriving' : ''}`,
       () => suppCard2() + (medsOn() ? vialCard() + spareCard() : '') + arrCard() + (medsOn() ? cycCard() : ''),
     ) +
@@ -693,7 +693,7 @@ function suppCard() {
 const SQ = ['Abdomen L', 'Abdomen R', 'Thigh L', 'Thigh R', 'Deltoid L', 'Deltoid R'],
   IMS = ['Glute L', 'Glute R', 'Deltoid L', 'Deltoid R'];
 let sumT = '';
-/** Peptide and injection panels (vials, cycle) appear once the regimen has an injectable item or vials are logged. */
+/** Injectable panels (vials, cycle) appear once the regimen has an injectable item or vials are logged. */
 const medsOn = () => all().some((x) => isInj(x) && !(cfg().hide || {})[x.id]) || ((mem.vials || {}).r || []).length > 0 || ((mem.vials || {}).sp || []).length > 0;
 const isInj = (x) => /SubQ|\bIM\b/.test(x.l),
   PEP = { test: (l: string) => reTest(REG.peptides || 'peptide', l) },
@@ -1167,7 +1167,7 @@ function cycCard() {
           ? `Washout week ${w - c.cap} of ${c.wo}.`
           : 'Washout complete. Start a new cycle when ready.';
   }
-  return `<div class=card><h3>Peptide cycle</h3><p class=sm>${st}</p><div class=g style="grid-template-columns:1.5fr 1fr .8fr"><input type=date id=cs value="${c ? c.s : t}"><select id=cc>${[0, 12, 14, 16].map((n) => `<option value=${n} ${(c ? c.cap : 0) === n ? 'selected' : ''}>${n || 'No cap'}</option>`).join('')}</select><select id=cw2>${[2, 3, 4].map((n) => `<option value=${n} ${(c ? c.wo : 2) === n ? 'selected' : ''}>${n}</option>`).join('')}</select></div><p class=sm>Start date, weeks on (No cap matches v15.4), washout weeks (10 to 14 days is about 2)</p><button class=btn data-a=cy>Save cycle</button></div>`;
+  return `<div class=card><h3>Medication cycle</h3><p class=sm>${st}</p><div class=g style="grid-template-columns:1.5fr 1fr .8fr"><input type=date id=cs value="${c ? c.s : t}"><select id=cc>${[0, 12, 14, 16].map((n) => `<option value=${n} ${(c ? c.cap : 0) === n ? 'selected' : ''}>${n || 'No cap'}</option>`).join('')}</select><select id=cw2>${[2, 3, 4].map((n) => `<option value=${n} ${(c ? c.wo : 2) === n ? 'selected' : ''}>${n}</option>`).join('')}</select></div><p class=sm>Start date, weeks on (No cap matches v15.4), washout weeks (10 to 14 days is about 2)</p><button class=btn data-a=cy>Save cycle</button></div>`;
 }
 function chgCard() {
   const R = (mem.chg || {}).r || [],
@@ -1708,7 +1708,7 @@ function supRows() {
     return { i: i as number | string, x, st, p: project(x, supPerDay(x), t, st ? st.days : 0) };
   });
 }
-/** Spare (unmixed) peptide vials, one stock per linked injectable: mixed doses left plus spares times doses per vial. */
+/** Spare (unmixed) vials, one stock per linked injectable: mixed doses left plus spares times doses per vial. */
 const spares = (): any[] => (mem.vials || {}).sp || [];
 function vialStock(sp: any): Supply {
   const mixed = ((mem.vials || {}).r || []).filter((v) => v.k === sp.k).reduce((a, v) => a + Math.max(0, v.c || 0), 0);
@@ -2310,13 +2310,13 @@ function vialAdj(id, on) {
 function vialCard() {
   const V = (mem.vials || {}).r || [],
     t = iso(new Date());
-  return `<div class=card><h3>Peptide vials</h3>${
+  return `<div class=card><h3>Vials</h3>${
     V.map((v, i) => {
       const dl = v.rd ? v.sd - days2(v.rd, t) : null;
       return `<div class=r><span>${esc(v.n)}: ${v.c} of ${v.t} doses<br><small class=sm>${v.rd ? 'opened ' + v.rd.slice(5) + ', discard ' + addD(v.rd, v.sd).slice(5) + (dl <= 7 ? ' (' + (dl < 0 ? 'expired' : dl + ' days left') + ')' : '') : 'not opened'}${v.k ? ', linked' : ''}</small></span><button data-a=vm data-v="${i}|-1">-</button><button data-a=vm data-v="${i}|1">+</button><button data-a=vx data-v=${i}>Remove</button></div>`;
     }).join('') ||
     '<p class=sm>Add each reconstituted vial. Linked doses count down when you check the item, oldest vial first. ' + (REG.retire ? `When the last linked ${esc(REG.retire.vial)} vial empties, ${esc(REG.retire.window)} retires.` : '') + '</p>'
-  }<input type=text id=vn placeholder="Name, for example ${esc((REG.retire && REG.retire.vial) || 'Peptide')} vial 1"><div class=g style="grid-template-columns:.8fr 1.6fr .8fr"><input type=number id=vt placeholder="Doses"><input type=date id=vd value="${t}"><input type=number id=vs value=28></div><p class=sm>Total doses, date opened, days until discard</p><select id=vk><option value="">Not linked</option>${all()
+  }<input type=text id=vn placeholder="Name, for example ${esc((REG.retire && REG.retire.vial) || 'Medication')} vial 1"><div class=g style="grid-template-columns:.8fr 1.6fr .8fr"><input type=number id=vt placeholder="Doses"><input type=date id=vd value="${t}"><input type=number id=vs value=28></div><p class=sm>Total doses, date opened, days until discard</p><select id=vk><option value="">Not linked</option>${all()
     .filter(isInj)
     .map((x) => `<option value=${x.id}>${esc(x.l.slice(0, 44))}</option>`)
     .join(
@@ -2332,7 +2332,7 @@ function spareWaste(r, sp): string {
     extra = (sp.c || 0) - Math.max(0, usable);
   return extra > 0 ? ` <b style="color:var(--nw)">About ${extra} spare vial${extra === 1 ? '' : 's'} won't be used before ${shortD(sp.ub)} at this pace.</b>` : '';
 }
-/** Spare vials not mixed yet: they count toward how long a peptide lasts, and Mix one starts the next vial. */
+/** Spare vials not mixed yet: they count toward how long a medication lasts, and Mix one starts the next vial. */
 function spareCard() {
   const rows = vialRows();
   return `<div class=card><h3>Spare vials</h3>${
@@ -2342,7 +2342,7 @@ function spareCard() {
         return `<div class="r sp"><span>${esc(r.x.n)}<br><small class=sm>${amt(r.x.c)} mixed dose${r.x.c === 1 ? '' : 's'} left + ${sp.c} spare vial${sp.c === 1 ? '' : 's'} (${sp.t} doses each)${sp.ub ? ', use by ' + shortD(sp.ub) : ''}</small><br><small class="sm spl">${supLine(r)}${spareWaste(r, sp)}</small></span><button data-a=vsm data-v="${j}|-1" aria-label="One less spare">-</button><button data-a=vsm data-v="${j}|1" aria-label="One more spare">+</button><button data-a=vmix data-v=${j}${sp.c > 0 ? '' : ' disabled'}>Mix one</button><button data-a=vsx data-v=${j}>Remove</button></div>`;
       })
       .join('') || '<p class=sm>Bought a box of vials? Add the unmixed ones here. They count toward how long it lasts and when to reorder, and Mix one starts the next vial.</p>'
-  }<input type=text id=vsn placeholder="Peptide name"><select id=vsk><option value="">Linked dose item</option>${all()
+  }<input type=text id=vsn placeholder="Medication name"><select id=vsk><option value="">Linked dose item</option>${all()
     .filter(isInj)
     .map((x) => `<option value=${x.id}>${esc(x.l.slice(0, 44))}</option>`)
     .join('')}</select><div class=g style="grid-template-columns:1fr 1fr 1fr"><input type=number id=vsc min=0 step=1 placeholder="Spares"><input type=number id=vst min=1 step=1 placeholder="Doses"><input type=number id=vsd min=1 step=1 value=28 aria-label="Days until discard after mixing"></div><p class=sm>Spare vials, doses per vial, days until discard once mixed</p><label class=f>Use by (optional, from the label or your storage)</label><input type=date id=vsu aria-label="Use spare vials by"><select id=vss><option value="">Bought from: not set</option>${stores()

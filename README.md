@@ -10,10 +10,10 @@ A configurable daily regimen + lifting tracker. TypeScript source compiles to **
 
 - **Daily checkoffs** — regimen items organized into time windows (morning, training, meals, evening, pre-bed), with weekday / day-of-week filters and date-gated items
 - **Dose planner** — "up next" scheduling, missed-dose flags, and a dose-change log with chart markers
-- **Titration view** — weight, blood pressure, and sleep trends around dose changes, with lab values overlaid
-- **Injection-site rotation** — site maps with rotation rules per injectable type
+- **Titration view** — weight, blood pressure, and sleep trends around dose changes (stepping up a GLP-1, for example), with lab values overlaid
+- **Injectable medications** — doses left in each vial or pen, discard dates, spare vials, and injection-site rotation, for weekly or daily injections such as a GLP-1
 - **Gut tracking** — quick-tap symptoms with severity and time, the Bristol scale, food tags (with FODMAP groups) and fiber on meals; a Gut patterns screen compares symptoms after each food against other meals, with counts and a minimum sample before anything is flagged, plus fiber and water on symptom days, an elimination plan with reintroduction results, and prompts to contact a clinician for red flags
-- **Supplies and reorders** — stock per item (open container plus sealed ones), used up automatically as you check items off; how long each lasts and the date to reorder, allowing for each store's delivery time; a reorder plan that groups what is due so one order covers it; subscriptions checked against what you actually use ("stock builds up, try every 8 weeks"); prescription items shown as refills, never prices; an optional label reader that fills in a new supply from a photo, and a Prices button that finds the 3 best current prices by AI web search, both using your own Claude, OpenAI or Gemini key, which stays on the device (prescription items and peptides get no price lookup)
+- **Supplies and reorders** — stock per item (open container plus sealed ones), used up automatically as you check items off; how long each lasts and the date to reorder, allowing for each store's delivery time; a reorder plan that groups what is due so one order covers it; subscriptions checked against what you actually use ("stock builds up, try every 8 weeks"); prescription items shown as refills, never prices; an optional label reader that fills in a new supply from a photo, and a Prices button that finds the 3 best current prices by AI web search, both using your own Claude, OpenAI or Gemini key, which stays on the device (prescription items and injectables get no price lookup)
 - **Lift tracking** — workout templates, set logging with validation warnings, progressive-overload analytics, weekly volume by muscle
 - **Reports** — one-page PDF summaries and weekly reviews
 - **Local-first** — all data stays in IndexedDB on the device; optional cloud backup to the user's own store
@@ -23,7 +23,7 @@ A configurable daily regimen + lifting tracker. TypeScript source compiles to **
 
 **https://jasonzawacki-arch.github.io/daily/** is the same app, published from this repository. Open it in Chrome on Android, then tap the menu (three dots) and **Install app**. It gets its own icon and works offline.
 
-- It opens on Lift the first time, then on whichever side you used last. The checklist starts with an everyday sample regimen (supplements, meals, water, walks). Make it yours under **More > Customize and settings**: hide sample items and add your own, each with its time window and days (every day, weekdays, Mon/Thu or Mondays). Peptide vials and the peptide cycle appear once you add an injectable item. To bring over data you already have, use **Backup** (or **Transfer code**) where you have it now, then **Restore from backup file** (or **Restore from pasted backup**) in the app. Backups include the regimen, so your own list comes with them.
+- It opens on Lift the first time, then on whichever side you used last. The checklist starts with an everyday sample regimen (supplements, meals, water, walks). Make it yours under **More > Customize and settings**: hide sample items and add your own, each with its time window and days (every day, weekdays, Mon/Thu or Mondays). Vial tracking and the medication cycle appear once you add an injectable item. To bring over data you already have, use **Backup** (or **Transfer code**) where you have it now, then **Restore from backup file** (or **Restore from pasted backup**) in the app. Backups include the regimen, so your own list comes with them.
 - A whole regimen can also be a file: **More > Customize and settings > Regimen** saves the current one as `daily-regimen.json` and loads another. A loaded regimen stays on that device and goes into its backups. See [Regimen files](#regimen-files).
 - Everything stays in the phone's browser storage. Download a backup now and then (**More > Reports and backup**); clearing Chrome's site data deletes the app's data.
 - Cloud backup needs Daily to be opened inside Claude, so in the installed app it explains that instead.
@@ -66,7 +66,7 @@ The checklist (time windows, items, version notes and a few labels) is data, not
 
 - `windows`: `[time, name]` in time order; the last one is lights out.
 - `items`: `[window number from 0, label, "A" every day | "L" lifting days | "R" recovery days, days "" | "wd" weekdays | "mt" Mon/Thu | "mo" Mondays, start date]`. Check marks are stored by position, so add new items at the end when you edit a regimen you already use.
-- Optional: `peptides` (pattern for injectables that go in the abdominal fat pad), `bpLow`, `voice`, `procedure`, `retire` and `sleep`. See `src/regcheck.ts` for each one. Labels cannot contain `<` or `>`.
+- Optional: `peptides` (pattern for injectables given only in the abdomen), `bpLow`, `voice`, `procedure`, `retire` and `sleep`. See `src/regcheck.ts` for each one. Labels cannot contain `<` or `>`.
 
 ## Lifting programs
 
