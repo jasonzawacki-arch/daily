@@ -1785,7 +1785,7 @@ function planCard(rows: ReturnType<typeof supRows>): string {
     const st = stores().find((s) => s.id === k);
     h += `<p class=sm style="margin:10px 0 4px"><b>${k === 'rx' ? 'Prescription refills' : st ? esc(st.n) + ` <span class=sm>(arrives in about ${st.days} day${st.days === 1 ? '' : 's'})</span>` : 'Store not set'}</b></p>`;
     h += rs
-      .map((r) => `<div class=r><span>${esc(r.x.n)}<br><small class=sm>${r.p.status === 'now' ? 'now' : 'by ' + shortD(r.p.reorderBy)}${!r.x.rx && r.x.px && r.x.px.r[0] ? ` · best ${money(r.x.px.r[0].price)} at <a href="${esc(r.x.px.r[0].url)}" target=_blank rel=noopener>${esc(r.x.px.r[0].seller)}</a>` : !r.x.rx && r.x.price ? ` · last paid ${r.x.price}` : ''}${!r.x.rx && r.x.link ? ` · <a href="${esc(r.x.link)}" target=_blank rel=noopener>product page</a>` : ''}</small></span><button data-a=sprc data-v=${r.i}>Received</button></div>`)
+      .map((r) => `<div class=r><span>${esc(r.x.n)}<br><small class=sm>${r.p.status === 'now' ? 'now' : 'by ' + shortD(r.p.reorderBy)}${!r.x.rx && r.x.px && r.x.px.r[0] ? ` · best ${money(r.x.px.r[0].price)} at <a href="${esc(r.x.px.r[0].url)}" target=_blank rel=noopener>${esc(r.x.px.r[0].seller)}</a>` : !r.x.rx && r.x.price ? ` · last paid ${money(r.x.price)}` : ''}${!r.x.rx && r.x.link ? ` · <a href="${esc(r.x.link)}" target=_blank rel=noopener>product page</a>` : ''}</small></span><button data-a=sprc data-v=${r.i}>Received</button></div>`)
       .join('');
   });
   return `<div class=card><h3>Reorder plan</h3><p class=sm>Everything to order in the next ${PLAN_DAYS} days, so one order covers it.</p>${h}<button class=lk data-a=spcp>Copy list</button></div>`;
