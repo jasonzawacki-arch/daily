@@ -538,7 +538,7 @@ function moreV() {
       'supply',
       medsOn() ? 'Supplies and peptides' : 'Supplies',
       `${ns} suppl${ns === 1 ? 'y' : 'ies'}${medsOn() ? ' - ' + nv + ' vial' + (nv === 1 ? '' : 's') : ''}${na ? ' - ' + na + ' arriving' : ''}`,
-      () => suppCard2() + (medsOn() ? vialCard() : '') + arrCard() + (medsOn() ? cycCard() : ''),
+      () => suppCard2() + (medsOn() ? vialCard() + spareCard() : '') + arrCard() + (medsOn() ? cycCard() : ''),
     ) +
     sec(
       'reports',
@@ -694,7 +694,7 @@ const SQ = ['Abdomen L', 'Abdomen R', 'Thigh L', 'Thigh R', 'Deltoid L', 'Deltoi
   IMS = ['Glute L', 'Glute R', 'Deltoid L', 'Deltoid R'];
 let sumT = '';
 /** Peptide and injection panels (vials, cycle) appear once the regimen has an injectable item or vials are logged. */
-const medsOn = () => all().some((x) => isInj(x) && !(cfg().hide || {})[x.id]) || ((mem.vials || {}).r || []).length > 0;
+const medsOn = () => all().some((x) => isInj(x) && !(cfg().hide || {})[x.id]) || ((mem.vials || {}).r || []).length > 0 || ((mem.vials || {}).sp || []).length > 0;
 const isInj = (x) => /SubQ|\bIM\b/.test(x.l),
   PEP = { test: (l: string) => reTest(REG.peptides || 'peptide', l) },
   ABD = ['Abdomen L', 'Abdomen R'],
@@ -1705,9 +1705,28 @@ function supRows() {
   const t = iso(new Date());
   return supList().map((x, i) => {
     const st = stores().find((s) => s.id === x.st);
-    return { i, x, st, p: project(x, supPerDay(x), t, st ? st.days : 0) };
+    return { i: i as number | string, x, st, p: project(x, supPerDay(x), t, st ? st.days : 0) };
   });
 }
+/** Spare (unmixed) peptide vials, one stock per linked injectable: mixed doses left plus spares times doses per vial. */
+const spares = (): any[] => (mem.vials || {}).sp || [];
+function vialStock(sp: any): Supply {
+  const mixed = ((mem.vials || {}).r || []).filter((v) => v.k === sp.k).reduce((a, v) => a + Math.max(0, v.c || 0), 0);
+  return { n: sp.n, c: mixed, per: sp.t, s: sp.c, u: 'doses', st: sp.st, k: sp.k, q: 1, buf: sp.buf, price: sp.price, link: sp.link };
+}
+function vialRows() {
+  const t = iso(new Date());
+  return spares().map((sp, j) => {
+    const x = vialStock(sp),
+      st = stores().find((s) => s.id === x.st),
+      pd = supPerDay(x);
+    // spares past their use-by date are not counted: only the ones that will be used in time keep you supplied
+    const usable = sp.ub && pd > 0 ? Math.max(0, Math.floor((Math.max(0, days2(t, sp.ub)) * pd - x.c) / sp.t + 1e-9)) : Infinity;
+    const counted = usable < (x.s || 0) ? { ...x, s: usable } : x;
+    return { i: 'v' + j, x, st, p: project(counted, pd, t, st ? st.days : 0) };
+  });
+}
+const allRows = () => supRows().concat(vialRows());
 const shortD = (s: string | null) => (s ? new Date(s + 'T12:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '');
 const amt = (n: number) => String(Math.round(n * 100) / 100);
 const wk = (d: number) => (d % 7 === 0 ? `${d / 7} week${d === 7 ? '' : 's'}` : `${d} days`);
@@ -1737,7 +1756,7 @@ function suppCard2() {
     rows
       .map((r) => r.i === supEd ? supForm(r.x, r.i) : `<div class="r sp" data-sp=${r.i}><span>${esc(r.x.n)}${r.x.b ? ` <small class=sm>${esc(r.x.b)}</small>` : ''}<br><small class=sm>${supStock(r.x)}</small><br><small class="sm spl">${supLine(r)}</small></span><button data-a=sm data-v="${r.i}|-1" aria-label="One less">-</button><button data-a=sm data-v="${r.i}|1" aria-label="One more">+</button><button data-a=spe data-v=${r.i}>Edit</button></div>`)
       .join('') || '<p class=sm>Add what you take to see how long it lasts and when to reorder. Link it to a checklist item and checking it off uses it up.</p>'
-  }${supEd === -1 ? supForm({ n: '', c: 0 } as Supply, -1) : `<button class=btn data-a=spn>Add a supply</button>`}${supMsg ? `<p class="sm spm" role=status>${esc(supMsg)}</p>` : ''}</div>${planCard(rows)}${storeCard()}`;
+  }${supEd === -1 ? supForm({ n: '', c: 0 } as Supply, -1) : `<button class=btn data-a=spn>Add a supply</button>`}${supMsg ? `<p class="sm spm" role=status>${esc(supMsg)}</p>` : ''}</div>${planCard(rows.concat(vialRows()))}${storeCard()}`;
 }
 function supForm(x: Supply, i: number): string {
   const d = supDraft || {};
@@ -1777,7 +1796,7 @@ function storeCard(): string {
 }
 /** One line on Today when something should be ordered within a week. */
 function supAlerts(): string {
-  const due = supRows().filter((r) => r.p.status === 'now' || r.p.status === 'soon');
+  const due = allRows().filter((r) => r.p.status === 'now' || r.p.status === 'soon');
   if (!due.length) return '';
   const txt = due
     .sort((a, b) => (a.p.reorderBy! < b.p.reorderBy! ? -1 : 1))
@@ -1872,6 +1891,12 @@ async function supAct(a: string, v: string) {
     S.r.splice(+v, 1);
     put('sup', S);
     supEd = null;
+  } else if (a === 'sprc' && v[0] === 'v') {
+    const V = JSON.parse(JSON.stringify(mem.vials)),
+      sp = V.sp[+v.slice(1)];
+    sp.c = (sp.c || 0) + 1;
+    put('vials', V);
+    supMsg = `${sp.n}: added one spare vial.`;
   } else if (a === 'sprc') {
     const S = JSON.parse(JSON.stringify(mem.sup)),
       x = S.r[+v];
@@ -1882,7 +1907,7 @@ async function supAct(a: string, v: string) {
     supMsg = `${x.n}: added one${x.per ? ' sealed container' : ''}.`;
   } else if (a === 'spcp') {
     const t = iso(new Date());
-    const g = plan(supRows().filter((r) => !r.p.sub || r.p.sub.verdict === 'short'), t);
+    const g = plan(allRows().filter((r) => !r.p.sub || r.p.sub.verdict === 'short'), t);
     const lines: string[] = [];
     g.forEach((rs, k) => {
       const st = stores().find((s) => s.id === k);
@@ -2232,6 +2257,32 @@ function vialCard() {
       '',
     )}</select><button class=btn data-a=va style="margin-top:8px">Add vial</button>${cfg().p2 && REG.retire ? `<p class=sm>${esc(REG.retire.window)} retired ${cfg().p2}. You are on ${esc(REG.retire.after)}.</p>` : ''}</div>`;
 }
+/** Spares that will not be used before their use-by date, at the current pace. */
+function spareWaste(r, sp): string {
+  if (!sp.ub || !(r.p.perDay > 0)) return '';
+  const t = iso(new Date()),
+    days = Math.max(0, days2(t, sp.ub)),
+    usable = Math.floor((days * r.p.perDay - r.x.c) / sp.t + 1e-9),
+    extra = (sp.c || 0) - Math.max(0, usable);
+  return extra > 0 ? ` <b style="color:var(--nw)">About ${extra} spare vial${extra === 1 ? '' : 's'} won't be used before ${shortD(sp.ub)} at this pace.</b>` : '';
+}
+/** Spare vials not mixed yet: they count toward how long a peptide lasts, and Mix one starts the next vial. */
+function spareCard() {
+  const rows = vialRows();
+  return `<div class=card><h3>Spare vials</h3>${
+    rows
+      .map((r, j) => {
+        const sp = spares()[j];
+        return `<div class="r sp"><span>${esc(r.x.n)}<br><small class=sm>${amt(r.x.c)} mixed dose${r.x.c === 1 ? '' : 's'} left + ${sp.c} spare vial${sp.c === 1 ? '' : 's'} (${sp.t} doses each)${sp.ub ? ', use by ' + shortD(sp.ub) : ''}</small><br><small class="sm spl">${supLine(r)}${spareWaste(r, sp)}</small></span><button data-a=vsm data-v="${j}|-1" aria-label="One less spare">-</button><button data-a=vsm data-v="${j}|1" aria-label="One more spare">+</button><button data-a=vmix data-v=${j}${sp.c > 0 ? '' : ' disabled'}>Mix one</button><button data-a=vsx data-v=${j}>Remove</button></div>`;
+      })
+      .join('') || '<p class=sm>Bought a box of vials? Add the unmixed ones here. They count toward how long it lasts and when to reorder, and Mix one starts the next vial.</p>'
+  }<input type=text id=vsn placeholder="Peptide name"><select id=vsk><option value="">Linked dose item</option>${all()
+    .filter(isInj)
+    .map((x) => `<option value=${x.id}>${esc(x.l.slice(0, 44))}</option>`)
+    .join('')}</select><div class=g style="grid-template-columns:1fr 1fr 1fr"><input type=number id=vsc min=0 step=1 placeholder="Spares"><input type=number id=vst min=1 step=1 placeholder="Doses"><input type=number id=vsd min=1 step=1 value=28 aria-label="Days until discard after mixing"></div><p class=sm>Spare vials, doses per vial, days until discard once mixed</p><label class=f>Use by (optional, from the label or your storage)</label><input type=date id=vsu aria-label="Use spare vials by"><select id=vss><option value="">Bought from: not set</option>${stores()
+    .map((x) => `<option value=${x.id}>${esc(x.n)} (${x.days} day${x.days === 1 ? '' : 's'})</option>`)
+    .join('')}</select><button class=btn data-a=vsa style="margin-top:8px">Add spares</button></div>`;
+}
 function vialAlerts() {
   const t = iso(new Date());
   let h = '';
@@ -2241,6 +2292,9 @@ function vialAlerts() {
       if (dl <= 3)
         h += `<div class=al>${esc(v.n)}: ${dl < 0 ? 'past its discard date' : 'discard in ' + dl + ' days'} with ${v.c} doses left.</div>`;
     }
+  });
+  vialRows().forEach((r, j) => {
+    if (r.x.c <= 0 && (r.x.s || 0) > 0) h += `<div class=al>${esc(r.x.n)}: no mixed doses left, ${r.x.s} spare vial${r.x.s === 1 ? '' : 's'}. <button class=lk data-a=vmix data-v=${j}>Mix one</button></div>`;
   });
   const c = cfg();
   if (c.p2 && REG.retire && days2(c.p2, t) <= 14)
@@ -3160,6 +3214,35 @@ app.addEventListener('click', async (e) => {
       sd,
       k: $('#vk').value || null,
     });
+    put('vials', V);
+  } else if (a === 'vsa') {
+    const n = $('#vsn').value.trim(),
+      k = $('#vsk').value,
+      c = parseInt($('#vsc').value),
+      t = parseInt($('#vst').value),
+      sd = parseInt($('#vsd').value) || 28;
+    if (!n || !k || isNaN(c) || c < 0 || !(t > 0)) return;
+    const V = JSON.parse(JSON.stringify(mem.vials || { r: [] }));
+    V.sp = V.sp || [];
+    const ub = $('#vsu').value;
+    V.sp.push({ n, k, c, t, sd, st: $('#vss').value || undefined, ub: /^\d{4}-\d{2}-\d{2}$/.test(ub) ? ub : undefined });
+    put('vials', V);
+  } else if (a === 'vsm') {
+    const [j, n] = v.split('|'),
+      V = JSON.parse(JSON.stringify(mem.vials));
+    V.sp[+j].c = Math.max(0, (V.sp[+j].c || 0) + +n);
+    put('vials', V);
+  } else if (a === 'vsx') {
+    const V = JSON.parse(JSON.stringify(mem.vials));
+    V.sp.splice(+v, 1);
+    put('vials', V);
+  } else if (a === 'vmix') {
+    const V = JSON.parse(JSON.stringify(mem.vials)),
+      sp = V.sp[+v];
+    if (!sp || !(sp.c > 0)) return;
+    sp.c--;
+    const made = V.r.filter((x) => x.k === sp.k).length;
+    V.r.push({ n: `${sp.n} vial ${made + 1}`, t: sp.t, c: sp.t, rd: iso(new Date()), sd: sp.sd || 28, k: sp.k });
     put('vials', V);
   } else if (a === 'vm') {
     const [i, n] = v.split('|'),
