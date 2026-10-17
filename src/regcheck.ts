@@ -110,7 +110,14 @@ export interface ProgramFile {
   /** HIT style: one working set to failure, feeder sets and short rest options. */
   hit?: boolean;
   /** Days in cycle order; a day with off: true is a rest day. */
-  days: { n: string; off?: boolean; ex: { n: string; s: number; r: string; t?: string; g?: string; rp?: boolean; ss?: boolean; wu?: string }[] }[];
+  /** Exercise extras: k kind (bw bodyweight, as assisted, tm timed in seconds), tq technique (rp rest-pause, myo
+   *  myo-reps, drop drop sets, fr forced reps; rp: true is the older way to say rest-pause), rir target reps in
+   *  reserve (0 to 5), u one side at a time, rs rest between sets in seconds (10 to 600). */
+  days: {
+    n: string;
+    off?: boolean;
+    ex: { n: string; s: number; r: string; t?: string; g?: string; rp?: boolean; ss?: boolean; wu?: string; k?: 'bw' | 'as' | 'tm'; tq?: 'rp' | 'myo' | 'drop' | 'fr'; rir?: number; u?: boolean; rs?: number }[];
+  }[];
 }
 
 /** Returns a reason the program cannot be used, or '' when it is valid. */
@@ -135,15 +142,19 @@ export function checkProgram(p: any): string {
       if (typeof e.r !== 'string' || !/^\d{1,3}(-\d{1,3})?$/.test(e.r)) return '"' + e.n + '": reps must look like 8 or 6-8.';
       if ((e.t != null && !str(e.t, 300)) || (e.wu != null && !str(e.wu, 200)) || (e.g != null && !str(e.g, 20)))
         return '"' + e.n + '": a note is too long or has < or >.';
-      if ((e.rp != null && typeof e.rp !== 'boolean') || (e.ss != null && typeof e.ss !== 'boolean'))
-        return '"' + e.n + '": rp and ss must be true or false.';
+      if ((e.rp != null && typeof e.rp !== 'boolean') || (e.ss != null && typeof e.ss !== 'boolean') || (e.u != null && typeof e.u !== 'boolean'))
+        return '"' + e.n + '": rp, ss and u must be true or false.';
+      if (e.k != null && !['bw', 'as', 'tm'].includes(e.k)) return '"' + e.n + '": "k" must be "bw", "as" or "tm".';
+      if (e.tq != null && !['rp', 'myo', 'drop', 'fr'].includes(e.tq)) return '"' + e.n + '": "tq" must be "rp", "myo", "drop" or "fr".';
+      if (e.rs != null && (!Number.isInteger(e.rs) || e.rs < 10 || e.rs > 600)) return '"' + e.n + '": "rs" (rest) must be whole seconds from 10 to 600.';
+      if (e.rir != null && (!Number.isInteger(e.rir) || e.rir < 0 || e.rir > 5)) return '"' + e.n + '": "rir" must be a whole number from 0 to 5.';
     }
   }
   return '';
 }
 
-const EXK = ['n', 's', 'r', 't', 'g', 'rp', 'ss', 'wu'];
-const pick = (e: any) => Object.fromEntries(EXK.filter((k) => e[k] != null && e[k] !== false && !(k === 't' && e[k] === '')).map((k) => [k, e[k]]));
+const EXK = ['n', 's', 'r', 't', 'g', 'rp', 'ss', 'wu', 'k', 'tq', 'rir', 'u', 'rs'];
+const pick = (e: any) => Object.fromEntries(EXK.filter((k) => e[k] != null && e[k] !== false && e[k] !== '' && !(k === 't' && e[k] === '')).map((k) => [k, e[k]]));
 /** The program as the app stores it (mem.prog), without the file fields. */
 export const programData = (p: ProgramFile) => ({
   ...(p.name ? { name: p.name } : {}),

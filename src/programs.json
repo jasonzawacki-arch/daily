@@ -275,37 +275,43 @@
       "n": "Bench press",
       "s": 4,
       "r": "5-8",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 180
      },
      {
       "n": "Overhead press",
       "s": 3,
       "r": "8-10",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 150
      },
      {
       "n": "Incline dumbbell press",
       "s": 3,
       "r": "8-12",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Lateral raise",
       "s": 3,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      },
      {
       "n": "Triceps pushdown",
       "s": 3,
       "r": "10-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 75
      },
      {
       "n": "Overhead triceps extension",
       "s": 3,
       "r": "10-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 75
      }
     ]
    },
@@ -316,37 +322,43 @@
       "n": "Deadlift",
       "s": 3,
       "r": "5",
-      "g": "Back"
+      "g": "Back",
+      "rs": 180
      },
      {
       "n": "Pull-up",
       "s": 3,
       "r": "6-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Barbell row",
       "s": 3,
       "r": "8-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 150
      },
      {
       "n": "Face pull",
       "s": 3,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      },
      {
       "n": "Hammer curl",
       "s": 3,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      },
      {
       "n": "Biceps curl",
       "s": 3,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      }
     ]
    },
@@ -357,31 +369,36 @@
       "n": "Back squat",
       "s": 4,
       "r": "5-8",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 180
      },
      {
       "n": "Romanian deadlift",
       "s": 3,
       "r": "8-10",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 150
      },
      {
       "n": "Leg press",
       "s": 3,
       "r": "10-12",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Leg curl",
       "s": 3,
       "r": "10-12",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 75
      },
      {
       "n": "Standing calf raise",
       "s": 4,
       "r": "10-15",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 75
      }
     ]
    },
@@ -392,37 +409,43 @@
       "n": "Overhead press",
       "s": 4,
       "r": "5-8",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 180
      },
      {
       "n": "Incline bench press",
       "s": 3,
       "r": "8-10",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 150
      },
      {
       "n": "Dip",
       "s": 3,
       "r": "8-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 120
      },
      {
       "n": "Cable fly",
       "s": 3,
       "r": "12-15",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 60
      },
      {
       "n": "Lateral raise",
       "s": 3,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      },
      {
       "n": "Skull crusher",
       "s": 3,
       "r": "10-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 75
      }
     ]
    },
@@ -433,37 +456,43 @@
       "n": "Barbell row",
       "s": 4,
       "r": "5-8",
-      "g": "Back"
+      "g": "Back",
+      "rs": 180
      },
      {
       "n": "Lat pulldown",
       "s": 3,
       "r": "8-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Seated cable row",
       "s": 3,
       "r": "10-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Rear delt fly",
       "s": 3,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      },
      {
       "n": "Incline dumbbell curl",
       "s": 3,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      },
      {
       "n": "Hammer curl",
       "s": 3,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      }
     ]
    },
@@ -474,31 +503,36 @@
       "n": "Front squat",
       "s": 4,
       "r": "6-8",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Hip thrust",
       "s": 3,
       "r": "8-10",
-      "g": "Glutes"
+      "g": "Glutes",
+      "rs": 150
      },
      {
       "n": "Bulgarian split squat",
       "s": 3,
       "r": "8-12",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 120
      },
      {
       "n": "Seated leg curl",
       "s": 3,
       "r": "10-12",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 75
      },
      {
       "n": "Seated calf raise",
       "s": 4,
       "r": "12-15",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 60
      }
     ]
    },
@@ -525,43 +559,50 @@
       "n": "Bench press",
       "s": 4,
       "r": "3-5",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 180
      },
      {
       "n": "Incline dumbbell press",
       "s": 4,
       "r": "6-10",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Barbell row",
       "s": 4,
       "r": "3-5",
-      "g": "Back"
+      "g": "Back",
+      "rs": 180
      },
      {
       "n": "Lat pulldown",
       "s": 4,
       "r": "6-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Overhead press",
       "s": 3,
       "r": "5-8",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 180
      },
      {
       "n": "EZ-bar curl",
       "s": 3,
       "r": "6-10",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 90
      },
      {
       "n": "Skull crusher",
       "s": 3,
       "r": "6-10",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 90
      }
     ]
    },
@@ -572,31 +613,36 @@
       "n": "Back squat",
       "s": 4,
       "r": "3-5",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 180
      },
      {
       "n": "Deadlift",
       "s": 4,
       "r": "3-5",
-      "g": "Back"
+      "g": "Back",
+      "rs": 180
      },
      {
       "n": "Leg press",
       "s": 4,
       "r": "10-15",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Leg curl",
       "s": 4,
       "r": "6-10",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 90
      },
      {
       "n": "Standing calf raise",
       "s": 4,
       "r": "6-10",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 90
      }
     ]
    },
@@ -612,43 +658,50 @@
       "n": "Incline bench press",
       "s": 4,
       "r": "8-12",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 150
      },
      {
       "n": "Dumbbell fly",
       "s": 4,
       "r": "8-12",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 90
      },
      {
       "n": "Seated cable row",
       "s": 4,
       "r": "8-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Dumbbell row",
       "s": 4,
       "r": "8-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Lateral raise",
       "s": 4,
       "r": "8-12",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 90
      },
      {
       "n": "Incline dumbbell curl",
       "s": 4,
       "r": "8-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 90
      },
      {
       "n": "Triceps pushdown",
       "s": 4,
       "r": "8-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 90
      }
     ]
    },
@@ -659,37 +712,43 @@
       "n": "Front squat",
       "s": 4,
       "r": "8-12",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Lunge",
       "s": 4,
       "r": "8-12",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 120
      },
      {
       "n": "Leg extension",
       "s": 4,
       "r": "10-15",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 75
      },
      {
       "n": "Leg curl",
       "s": 4,
       "r": "10-15",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 75
      },
      {
       "n": "Seated calf raise",
       "s": 4,
       "r": "8-12",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 90
      },
      {
       "n": "Standing calf raise",
       "s": 4,
       "r": "8-12",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 90
      }
     ]
    },
@@ -721,49 +780,57 @@
       "n": "Pendlay row",
       "s": 3,
       "r": "3-5",
-      "g": "Back"
+      "g": "Back",
+      "rs": 180
      },
      {
       "n": "Weighted pull-up",
       "s": 2,
       "r": "6-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Rack chin",
       "s": 2,
       "r": "6-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 90
      },
      {
       "n": "Flat dumbbell press",
       "s": 3,
       "r": "3-5",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Weighted dip",
       "s": 2,
       "r": "6-10",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 120
      },
      {
       "n": "Seated dumbbell press",
       "s": 3,
       "r": "6-10",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 120
      },
      {
       "n": "EZ-bar curl",
       "s": 3,
       "r": "6-10",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 90
      },
      {
       "n": "Skull crusher",
       "s": 3,
       "r": "6-10",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 90
      }
     ]
    },
@@ -774,43 +841,50 @@
       "n": "Back squat",
       "s": 3,
       "r": "3-5",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 180
      },
      {
       "n": "Hack squat",
       "s": 2,
       "r": "6-10",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Leg extension",
       "s": 2,
       "r": "6-10",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 90
      },
      {
       "n": "Stiff-leg deadlift",
       "s": 3,
       "r": "5-8",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 180
      },
      {
       "n": "Leg curl",
       "s": 2,
       "r": "6-10",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 90
      },
      {
       "n": "Standing calf raise",
       "s": 3,
       "r": "6-8",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 90
      },
      {
       "n": "Seated calf raise",
       "s": 2,
       "r": "6-10",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 90
      }
     ]
    },
@@ -827,49 +901,57 @@
       "s": 6,
       "r": "3",
       "g": "Back",
-      "t": "Speed sets"
+      "t": "Speed sets",
+      "rs": 180
      },
      {
       "n": "Rack chin",
       "s": 3,
       "r": "8-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 90
      },
      {
       "n": "Seated cable row",
       "s": 3,
       "r": "8-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Dumbbell row",
       "s": 2,
       "r": "12-15",
-      "g": "Back"
+      "g": "Back",
+      "rs": 90
      },
      {
       "n": "Close-grip pulldown",
       "s": 2,
       "r": "15-20",
-      "g": "Back"
+      "g": "Back",
+      "rs": 90
      },
      {
       "n": "Seated dumbbell press",
       "s": 3,
       "r": "8-12",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 120
      },
      {
       "n": "Upright row",
       "s": 2,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 90
      },
      {
       "n": "Lateral raise",
       "s": 3,
       "r": "12-20",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      }
     ]
    },
@@ -881,55 +963,64 @@
       "s": 6,
       "r": "3",
       "g": "Quads",
-      "t": "Speed sets"
+      "t": "Speed sets",
+      "rs": 180
      },
      {
       "n": "Hack squat",
       "s": 3,
       "r": "8-12",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Leg press",
       "s": 2,
       "r": "12-15",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Leg extension",
       "s": 3,
       "r": "15-20",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 60
      },
      {
       "n": "Romanian deadlift",
       "s": 3,
       "r": "8-12",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 150
      },
      {
       "n": "Leg curl",
       "s": 2,
       "r": "12-15",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 60
      },
      {
       "n": "Seated leg curl",
       "s": 2,
       "r": "15-20",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 60
      },
      {
       "n": "Donkey calf raise",
       "s": 4,
       "r": "10-12",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 75
      },
      {
       "n": "Seated calf raise",
       "s": 3,
       "r": "15-20",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 60
      }
     ]
    },
@@ -941,61 +1032,71 @@
       "s": 6,
       "r": "3",
       "g": "Chest",
-      "t": "Speed sets"
+      "t": "Speed sets",
+      "rs": 120
      },
      {
       "n": "Incline dumbbell press",
       "s": 3,
       "r": "8-12",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Machine chest press",
       "s": 3,
       "r": "12-15",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 90
      },
      {
       "n": "Incline cable fly",
       "s": 2,
       "r": "15-20",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 60
      },
      {
       "n": "EZ-bar preacher curl",
       "s": 3,
       "r": "8-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 90
      },
      {
       "n": "Concentration curl",
       "s": 2,
       "r": "12-15",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 60
      },
      {
       "n": "Spider curl",
       "s": 2,
       "r": "15-20",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 60
      },
      {
       "n": "Overhead triceps extension",
       "s": 3,
       "r": "8-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 90
      },
      {
       "n": "Triceps pushdown",
       "s": 2,
       "r": "12-15",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 60
      },
      {
       "n": "Cable kickback",
       "s": 2,
       "r": "15-20",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 60
      }
     ]
    },
@@ -1022,37 +1123,43 @@
       "n": "Bench press",
       "s": 4,
       "r": "5-8",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 180
      },
      {
       "n": "Barbell row",
       "s": 4,
       "r": "5-8",
-      "g": "Back"
+      "g": "Back",
+      "rs": 180
      },
      {
       "n": "Overhead press",
       "s": 3,
       "r": "8-10",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 150
      },
      {
       "n": "Lat pulldown",
       "s": 3,
       "r": "8-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Biceps curl",
       "s": 2,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      },
      {
       "n": "Triceps pushdown",
       "s": 2,
       "r": "10-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 75
      }
     ]
    },
@@ -1063,31 +1170,36 @@
       "n": "Back squat",
       "s": 4,
       "r": "5-8",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 180
      },
      {
       "n": "Romanian deadlift",
       "s": 3,
       "r": "8-10",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 150
      },
      {
       "n": "Leg press",
       "s": 3,
       "r": "10-12",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Leg curl",
       "s": 3,
       "r": "10-12",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 75
      },
      {
       "n": "Standing calf raise",
       "s": 3,
       "r": "12-15",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 60
      }
     ]
    },
@@ -1103,37 +1215,43 @@
       "n": "Incline dumbbell press",
       "s": 4,
       "r": "8-10",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Pull-up",
       "s": 4,
       "r": "6-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Seated dumbbell press",
       "s": 3,
       "r": "10-12",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 120
      },
      {
       "n": "Seated cable row",
       "s": 3,
       "r": "10-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Hammer curl",
       "s": 2,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      },
      {
       "n": "Overhead triceps extension",
       "s": 2,
       "r": "10-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 75
      }
     ]
    },
@@ -1144,31 +1262,36 @@
       "n": "Deadlift",
       "s": 3,
       "r": "3-5",
-      "g": "Back"
+      "g": "Back",
+      "rs": 180
      },
      {
       "n": "Front squat",
       "s": 3,
       "r": "8-10",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Bulgarian split squat",
       "s": 3,
       "r": "10-12",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 120
      },
      {
       "n": "Seated leg curl",
       "s": 3,
       "r": "10-12",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 75
      },
      {
       "n": "Seated calf raise",
       "s": 3,
       "r": "12-15",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 60
      }
     ]
    },
@@ -1200,32 +1323,37 @@
       "n": "Back squat",
       "s": 3,
       "r": "5-8",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 180
      },
      {
       "n": "Bench press",
       "s": 3,
       "r": "5-8",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 180
      },
      {
       "n": "Barbell row",
       "s": 3,
       "r": "8-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 150
      },
      {
       "n": "Lateral raise",
       "s": 2,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      },
      {
       "n": "Plank",
       "s": 2,
       "r": "30-60",
       "g": "Core",
-      "t": "Seconds"
+      "t": "Seconds",
+      "rs": 60
      }
     ]
    },
@@ -1241,31 +1369,36 @@
       "n": "Deadlift",
       "s": 3,
       "r": "3-5",
-      "g": "Back"
+      "g": "Back",
+      "rs": 180
      },
      {
       "n": "Overhead press",
       "s": 3,
       "r": "6-8",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 150
      },
      {
       "n": "Lat pulldown",
       "s": 3,
       "r": "8-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Leg curl",
       "s": 2,
       "r": "10-12",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 75
      },
      {
       "n": "Hanging leg raise",
       "s": 2,
       "r": "8-12",
-      "g": "Core"
+      "g": "Core",
+      "rs": 60
      }
     ]
    },
@@ -1281,31 +1414,36 @@
       "n": "Leg press",
       "s": 3,
       "r": "10-12",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Incline dumbbell press",
       "s": 3,
       "r": "8-12",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Seated cable row",
       "s": 3,
       "r": "10-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Biceps curl",
       "s": 2,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      },
      {
       "n": "Triceps pushdown",
       "s": 2,
       "r": "10-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 75
      }
     ]
    },
@@ -1337,19 +1475,22 @@
       "n": "Back squat",
       "s": 5,
       "r": "5",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 180
      },
      {
       "n": "Bench press",
       "s": 5,
       "r": "5",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 180
      },
      {
       "n": "Barbell row",
       "s": 5,
       "r": "5",
-      "g": "Back"
+      "g": "Back",
+      "rs": 180
      }
     ]
    },
@@ -1365,19 +1506,22 @@
       "n": "Back squat",
       "s": 5,
       "r": "5",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 180
      },
      {
       "n": "Overhead press",
       "s": 5,
       "r": "5",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 180
      },
      {
       "n": "Deadlift",
       "s": 1,
       "r": "5",
-      "g": "Back"
+      "g": "Back",
+      "rs": 180
      }
     ]
    },
@@ -1407,21 +1551,24 @@
       "s": 3,
       "r": "5",
       "g": "Quads",
-      "t": "Add 5 lb (2.5 kg) each session while you can."
+      "t": "Add 5 lb (2.5 kg) each session while you can.",
+      "rs": 180
      },
      {
       "n": "Bench press",
       "s": 3,
       "r": "5",
       "g": "Chest",
-      "t": "Alternates with overhead press."
+      "t": "Alternates with overhead press.",
+      "rs": 180
      },
      {
       "n": "Deadlift",
       "s": 1,
       "r": "5",
       "g": "Back",
-      "t": "One heavy set after warm-ups."
+      "t": "One heavy set after warm-ups.",
+      "rs": 180
      }
     ]
    },
@@ -1437,20 +1584,23 @@
       "n": "Back squat",
       "s": 3,
       "r": "5",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 180
      },
      {
       "n": "Overhead press",
       "s": 3,
       "r": "5",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 180
      },
      {
       "n": "Barbell row",
       "s": 3,
       "r": "5",
       "g": "Back",
-      "t": "Or power clean 5 x 3 if you know the lift."
+      "t": "Or power clean 5 x 3 if you know the lift.",
+      "rs": 180
      }
     ]
    },
@@ -1467,21 +1617,24 @@
       "s": 3,
       "r": "5",
       "g": "Quads",
-      "t": "Add 5 lb (2.5 kg) each session while you can."
+      "t": "Add 5 lb (2.5 kg) each session while you can.",
+      "rs": 180
      },
      {
       "n": "Bench press",
       "s": 3,
       "r": "5",
       "g": "Chest",
-      "t": "Alternates with overhead press."
+      "t": "Alternates with overhead press.",
+      "rs": 180
      },
      {
       "n": "Deadlift",
       "s": 1,
       "r": "5",
       "g": "Back",
-      "t": "One heavy set after warm-ups."
+      "t": "One heavy set after warm-ups.",
+      "rs": 180
      }
     ]
    },
@@ -1514,21 +1667,24 @@
       "s": 5,
       "r": "3",
       "g": "Quads",
-      "t": "T1. Last set: as many reps as possible."
+      "t": "T1. Last set: as many reps as possible.",
+      "rs": 180
      },
      {
       "n": "Bench press",
       "s": 3,
       "r": "10",
       "g": "Chest",
-      "t": "T2"
+      "t": "T2",
+      "rs": 120
      },
      {
       "n": "Lat pulldown",
       "s": 3,
       "r": "15",
       "g": "Back",
-      "t": "T3. Last set: as many reps as possible."
+      "t": "T3. Last set: as many reps as possible.",
+      "rs": 60
      }
     ]
    },
@@ -1540,21 +1696,24 @@
       "s": 5,
       "r": "3",
       "g": "Shoulders",
-      "t": "T1. Last set: as many reps as possible."
+      "t": "T1. Last set: as many reps as possible.",
+      "rs": 180
      },
      {
       "n": "Deadlift",
       "s": 3,
       "r": "10",
       "g": "Back",
-      "t": "T2"
+      "t": "T2",
+      "rs": 120
      },
      {
       "n": "Dumbbell row",
       "s": 3,
       "r": "15",
       "g": "Back",
-      "t": "T3"
+      "t": "T3",
+      "rs": 60
      }
     ]
    },
@@ -1566,21 +1725,24 @@
       "s": 5,
       "r": "3",
       "g": "Chest",
-      "t": "T1. Last set: as many reps as possible."
+      "t": "T1. Last set: as many reps as possible.",
+      "rs": 180
      },
      {
       "n": "Back squat",
       "s": 3,
       "r": "10",
       "g": "Quads",
-      "t": "T2"
+      "t": "T2",
+      "rs": 120
      },
      {
       "n": "Lat pulldown",
       "s": 3,
       "r": "15",
       "g": "Back",
-      "t": "T3"
+      "t": "T3",
+      "rs": 60
      }
     ]
    },
@@ -1592,21 +1754,24 @@
       "s": 5,
       "r": "3",
       "g": "Back",
-      "t": "T1. Last set: as many reps as possible."
+      "t": "T1. Last set: as many reps as possible.",
+      "rs": 180
      },
      {
       "n": "Overhead press",
       "s": 3,
       "r": "10",
       "g": "Shoulders",
-      "t": "T2"
+      "t": "T2",
+      "rs": 120
      },
      {
       "n": "Dumbbell row",
       "s": 3,
       "r": "15",
       "g": "Back",
-      "t": "T3"
+      "t": "T3",
+      "rs": 60
      }
     ]
    },
@@ -1634,21 +1799,24 @@
       "s": 3,
       "r": "1-5",
       "g": "Shoulders",
-      "t": "Main sets: 65/75/85% wk1, 70/80/90% wk2, 75/85/95% wk3. Last set: as many reps as possible."
+      "t": "Main sets: 65/75/85% wk1, 70/80/90% wk2, 75/85/95% wk3. Last set: as many reps as possible.",
+      "rs": 180
      },
      {
       "n": "Overhead press",
       "s": 5,
       "r": "10",
       "g": "Shoulders",
-      "t": "Boring But Big: 50 to 60% of training max."
+      "t": "Boring But Big: 50 to 60% of training max.",
+      "rs": 90
      },
      {
       "n": "Pull-up",
       "s": 5,
       "r": "10",
       "g": "Back",
-      "t": "Assistance"
+      "t": "Assistance",
+      "rs": 120
      }
     ]
    },
@@ -1660,21 +1828,24 @@
       "s": 3,
       "r": "1-5",
       "g": "Back",
-      "t": "Main sets, as for press. Last set: as many reps as possible."
+      "t": "Main sets, as for press. Last set: as many reps as possible.",
+      "rs": 180
      },
      {
       "n": "Deadlift",
       "s": 5,
       "r": "10",
       "g": "Back",
-      "t": "Boring But Big: 50 to 60%."
+      "t": "Boring But Big: 50 to 60%.",
+      "rs": 90
      },
      {
       "n": "Hanging leg raise",
       "s": 5,
       "r": "10-15",
       "g": "Core",
-      "t": "Assistance"
+      "t": "Assistance",
+      "rs": 60
      }
     ]
    },
@@ -1691,21 +1862,24 @@
       "s": 3,
       "r": "1-5",
       "g": "Chest",
-      "t": "Main sets. Last set: as many reps as possible."
+      "t": "Main sets. Last set: as many reps as possible.",
+      "rs": 180
      },
      {
       "n": "Bench press",
       "s": 5,
       "r": "10",
       "g": "Chest",
-      "t": "Boring But Big: 50 to 60%."
+      "t": "Boring But Big: 50 to 60%.",
+      "rs": 90
      },
      {
       "n": "Dumbbell row",
       "s": 5,
       "r": "10",
       "g": "Back",
-      "t": "Assistance"
+      "t": "Assistance",
+      "rs": 120
      }
     ]
    },
@@ -1717,21 +1891,24 @@
       "s": 3,
       "r": "1-5",
       "g": "Quads",
-      "t": "Main sets. Last set: as many reps as possible."
+      "t": "Main sets. Last set: as many reps as possible.",
+      "rs": 180
      },
      {
       "n": "Back squat",
       "s": 5,
       "r": "10",
       "g": "Quads",
-      "t": "Boring But Big: 50 to 60%."
+      "t": "Boring But Big: 50 to 60%.",
+      "rs": 90
      },
      {
       "n": "Leg curl",
       "s": 5,
       "r": "10",
       "g": "Hamstrings",
-      "t": "Assistance"
+      "t": "Assistance",
+      "rs": 75
      }
     ]
    },
@@ -1764,20 +1941,23 @@
       "s": 5,
       "r": "5",
       "g": "Quads",
-      "t": "About 90% of Friday's top set."
+      "t": "About 90% of Friday's top set.",
+      "rs": 180
      },
      {
       "n": "Bench press",
       "s": 5,
       "r": "5",
       "g": "Chest",
-      "t": "Alternates weekly with overhead press."
+      "t": "Alternates weekly with overhead press.",
+      "rs": 180
      },
      {
       "n": "Deadlift",
       "s": 1,
       "r": "5",
-      "g": "Back"
+      "g": "Back",
+      "rs": 180
      }
     ]
    },
@@ -1794,26 +1974,30 @@
       "s": 2,
       "r": "5",
       "g": "Quads",
-      "t": "About 80% of Monday's weight."
+      "t": "About 80% of Monday's weight.",
+      "rs": 180
      },
      {
       "n": "Overhead press",
       "s": 3,
       "r": "5",
       "g": "Shoulders",
-      "t": "Light"
+      "t": "Light",
+      "rs": 180
      },
      {
       "n": "Pull-up",
       "s": 3,
       "r": "5-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Back extension",
       "s": 3,
       "r": "10",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 75
      }
     ]
    },
@@ -1830,21 +2014,24 @@
       "s": 1,
       "r": "5",
       "g": "Quads",
-      "t": "Work up to a new 5-rep best."
+      "t": "Work up to a new 5-rep best.",
+      "rs": 180
      },
      {
       "n": "Bench press",
       "s": 1,
       "r": "5",
       "g": "Chest",
-      "t": "New 5-rep best."
+      "t": "New 5-rep best.",
+      "rs": 180
      },
      {
       "n": "Power clean",
       "s": 5,
       "r": "3",
       "g": "Other",
-      "t": "Or barbell row 3 x 5."
+      "t": "Or barbell row 3 x 5.",
+      "rs": 180
      }
     ]
    },
@@ -1876,38 +2063,44 @@
       "n": "Bench press",
       "s": 4,
       "r": "6-10",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 150
      },
      {
       "n": "Incline dumbbell press",
       "s": 4,
       "r": "8-10",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Dumbbell fly",
       "s": 3,
       "r": "10-12",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 75
      },
      {
       "n": "Pull-up",
       "s": 4,
       "r": "6-10",
       "g": "Back",
-      "t": "Wide grip"
+      "t": "Wide grip",
+      "rs": 120
      },
      {
       "n": "Barbell row",
       "s": 4,
       "r": "8-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 150
      },
      {
       "n": "Dumbbell pullover",
       "s": 3,
       "r": "10-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 75
      }
     ]
    },
@@ -1918,43 +2111,50 @@
       "n": "Seated shoulder press",
       "s": 4,
       "r": "6-10",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 120
      },
      {
       "n": "Lateral raise",
       "s": 4,
       "r": "10-12",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 75
      },
      {
       "n": "Rear delt fly",
       "s": 3,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      },
      {
       "n": "Barbell curl",
       "s": 4,
       "r": "8-10",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 90
      },
      {
       "n": "Incline dumbbell curl",
       "s": 3,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      },
      {
       "n": "Close-grip bench press",
       "s": 4,
       "r": "8-10",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 150
      },
      {
       "n": "Overhead triceps extension",
       "s": 3,
       "r": "10-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 75
      }
     ]
    },
@@ -1965,43 +2165,50 @@
       "n": "Back squat",
       "s": 4,
       "r": "6-10",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Leg press",
       "s": 3,
       "r": "10-12",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Leg extension",
       "s": 3,
       "r": "12-15",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 60
      },
      {
       "n": "Romanian deadlift",
       "s": 4,
       "r": "8-10",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 150
      },
      {
       "n": "Leg curl",
       "s": 3,
       "r": "10-12",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 75
      },
      {
       "n": "Standing calf raise",
       "s": 5,
       "r": "12-15",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 60
      },
      {
       "n": "Hanging leg raise",
       "s": 3,
       "r": "10-15",
-      "g": "Core"
+      "g": "Core",
+      "rs": 60
      }
     ]
    },
@@ -2012,38 +2219,44 @@
       "n": "Bench press",
       "s": 4,
       "r": "6-10",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 150
      },
      {
       "n": "Incline dumbbell press",
       "s": 4,
       "r": "8-10",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Dumbbell fly",
       "s": 3,
       "r": "10-12",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 75
      },
      {
       "n": "Pull-up",
       "s": 4,
       "r": "6-10",
       "g": "Back",
-      "t": "Wide grip"
+      "t": "Wide grip",
+      "rs": 120
      },
      {
       "n": "Barbell row",
       "s": 4,
       "r": "8-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 150
      },
      {
       "n": "Dumbbell pullover",
       "s": 3,
       "r": "10-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 75
      }
     ]
    },
@@ -2054,43 +2267,50 @@
       "n": "Seated shoulder press",
       "s": 4,
       "r": "6-10",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 120
      },
      {
       "n": "Lateral raise",
       "s": 4,
       "r": "10-12",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 75
      },
      {
       "n": "Rear delt fly",
       "s": 3,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      },
      {
       "n": "Barbell curl",
       "s": 4,
       "r": "8-10",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 90
      },
      {
       "n": "Incline dumbbell curl",
       "s": 3,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      },
      {
       "n": "Close-grip bench press",
       "s": 4,
       "r": "8-10",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 150
      },
      {
       "n": "Overhead triceps extension",
       "s": 3,
       "r": "10-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 75
      }
     ]
    },
@@ -2101,43 +2321,50 @@
       "n": "Back squat",
       "s": 4,
       "r": "6-10",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Leg press",
       "s": 3,
       "r": "10-12",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Leg extension",
       "s": 3,
       "r": "12-15",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 60
      },
      {
       "n": "Romanian deadlift",
       "s": 4,
       "r": "8-10",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 150
      },
      {
       "n": "Leg curl",
       "s": 3,
       "r": "10-12",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 75
      },
      {
       "n": "Standing calf raise",
       "s": 5,
       "r": "12-15",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 60
      },
      {
       "n": "Hanging leg raise",
       "s": 3,
       "r": "10-15",
-      "g": "Core"
+      "g": "Core",
+      "rs": 60
      }
     ]
    },
@@ -2164,25 +2391,29 @@
       "n": "Bench press",
       "s": 4,
       "r": "6-10",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 150
      },
      {
       "n": "Incline dumbbell press",
       "s": 3,
       "r": "8-10",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Cable fly",
       "s": 3,
       "r": "12-15",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 60
      },
      {
       "n": "Dip",
       "s": 3,
       "r": "8-12",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      }
     ]
    },
@@ -2193,25 +2424,29 @@
       "n": "Deadlift",
       "s": 3,
       "r": "5",
-      "g": "Back"
+      "g": "Back",
+      "rs": 180
      },
      {
       "n": "Pull-up",
       "s": 3,
       "r": "6-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Barbell row",
       "s": 3,
       "r": "8-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 150
      },
      {
       "n": "Seated cable row",
       "s": 3,
       "r": "10-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      }
     ]
    },
@@ -2222,25 +2457,29 @@
       "n": "Overhead press",
       "s": 4,
       "r": "6-10",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 150
      },
      {
       "n": "Lateral raise",
       "s": 4,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      },
      {
       "n": "Rear delt fly",
       "s": 3,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      },
      {
       "n": "Shrug",
       "s": 3,
       "r": "10-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 75
      }
     ]
    },
@@ -2251,31 +2490,36 @@
       "n": "Back squat",
       "s": 4,
       "r": "6-10",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Leg press",
       "s": 3,
       "r": "10-12",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Romanian deadlift",
       "s": 3,
       "r": "8-10",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 150
      },
      {
       "n": "Leg curl",
       "s": 3,
       "r": "10-12",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 75
      },
      {
       "n": "Standing calf raise",
       "s": 4,
       "r": "12-15",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 60
      }
     ]
    },
@@ -2286,31 +2530,36 @@
       "n": "Barbell curl",
       "s": 4,
       "r": "8-10",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 90
      },
      {
       "n": "Hammer curl",
       "s": 3,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      },
      {
       "n": "Skull crusher",
       "s": 4,
       "r": "8-10",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 90
      },
      {
       "n": "Triceps pushdown",
       "s": 3,
       "r": "10-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 75
      },
      {
       "n": "Cable crunch",
       "s": 3,
       "r": "12-15",
-      "g": "Core"
+      "g": "Core",
+      "rs": 60
      }
     ]
    },
@@ -2510,31 +2759,36 @@
       "n": "Bench press",
       "s": 4,
       "r": "6-8",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 150
      },
      {
       "n": "Overhead press",
       "s": 3,
       "r": "8-10",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 150
      },
      {
       "n": "Incline dumbbell press",
       "s": 3,
       "r": "10-12",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Lateral raise",
       "s": 3,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      },
      {
       "n": "Triceps pushdown",
       "s": 3,
       "r": "10-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 75
      }
     ]
    },
@@ -2550,31 +2804,36 @@
       "n": "Barbell row",
       "s": 4,
       "r": "6-8",
-      "g": "Back"
+      "g": "Back",
+      "rs": 150
      },
      {
       "n": "Lat pulldown",
       "s": 3,
       "r": "8-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Face pull",
       "s": 3,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      },
      {
       "n": "Biceps curl",
       "s": 3,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      },
      {
       "n": "Hammer curl",
       "s": 2,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      }
     ]
    },
@@ -2590,31 +2849,36 @@
       "n": "Back squat",
       "s": 4,
       "r": "6-8",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Romanian deadlift",
       "s": 3,
       "r": "8-10",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 150
      },
      {
       "n": "Leg press",
       "s": 3,
       "r": "10-12",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Leg curl",
       "s": 3,
       "r": "10-12",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 75
      },
      {
       "n": "Standing calf raise",
       "s": 4,
       "r": "12-15",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 60
      }
     ]
    },
@@ -2647,25 +2911,29 @@
       "s": 4,
       "r": "3-5",
       "g": "Quads",
-      "t": "Heavy. 3 to 4 min rest."
+      "t": "Heavy. 3 to 4 min rest.",
+      "rs": 210
      },
      {
       "n": "Leg press",
       "s": 3,
       "r": "10-12",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Leg extension",
       "s": 3,
       "r": "12-15",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 60
      },
      {
       "n": "Standing calf raise",
       "s": 4,
       "r": "10-15",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 75
      }
     ]
    },
@@ -2677,25 +2945,29 @@
       "s": 4,
       "r": "3-5",
       "g": "Chest",
-      "t": "Heavy. 3 to 4 min rest."
+      "t": "Heavy. 3 to 4 min rest.",
+      "rs": 210
      },
      {
       "n": "Incline dumbbell press",
       "s": 3,
       "r": "8-12",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Lateral raise",
       "s": 3,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      },
      {
       "n": "Triceps pushdown",
       "s": 3,
       "r": "10-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 75
      }
     ]
    },
@@ -2712,25 +2984,29 @@
       "s": 3,
       "r": "3-5",
       "g": "Back",
-      "t": "Heavy. 3 to 4 min rest."
+      "t": "Heavy. 3 to 4 min rest.",
+      "rs": 210
      },
      {
       "n": "Pull-up",
       "s": 3,
       "r": "6-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Seated cable row",
       "s": 3,
       "r": "10-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Leg curl",
       "s": 3,
       "r": "10-12",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 75
      }
     ]
    },
@@ -2742,25 +3018,29 @@
       "s": 4,
       "r": "3-5",
       "g": "Shoulders",
-      "t": "Heavy. 3 min rest."
+      "t": "Heavy. 3 min rest.",
+      "rs": 180
      },
      {
       "n": "Close-grip bench press",
       "s": 3,
       "r": "8-10",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 150
      },
      {
       "n": "Biceps curl",
       "s": 3,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      },
      {
       "n": "Face pull",
       "s": 3,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      }
     ]
    },
@@ -2792,26 +3072,30 @@
       "n": "Back squat",
       "s": 3,
       "r": "6-8",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 150
      },
      {
       "n": "Bench press",
       "s": 3,
       "r": "6-8",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 150
      },
      {
       "n": "Barbell row",
       "s": 3,
       "r": "8-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 150
      },
      {
       "n": "Plank",
       "s": 2,
       "r": "30-60",
       "g": "Core",
-      "t": "Seconds, not reps."
+      "t": "Seconds, not reps.",
+      "rs": 60
      }
     ]
    },
@@ -2832,26 +3116,30 @@
       "n": "Romanian deadlift",
       "s": 3,
       "r": "6-8",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 150
      },
      {
       "n": "Overhead press",
       "s": 3,
       "r": "6-8",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 150
      },
      {
       "n": "Lat pulldown",
       "s": 3,
       "r": "8-10",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Lunge",
       "s": 2,
       "r": "10-12",
       "g": "Quads",
-      "t": "Per leg."
+      "t": "Per leg.",
+      "rs": 120
      }
     ]
    },
@@ -2888,27 +3176,31 @@
       "n": "Goblet squat",
       "s": 3,
       "r": "10-15",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 120
      },
      {
       "n": "Dumbbell bench press",
       "s": 3,
       "r": "8-12",
       "g": "Chest",
-      "t": "Or floor press."
+      "t": "Or floor press.",
+      "rs": 120
      },
      {
       "n": "Dumbbell row",
       "s": 3,
       "r": "10-12",
       "g": "Back",
-      "t": "Per arm."
+      "t": "Per arm.",
+      "rs": 120
      },
      {
       "n": "Dumbbell shoulder press",
       "s": 2,
       "r": "10-12",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 120
      }
     ]
    },
@@ -2924,31 +3216,36 @@
       "n": "Dumbbell Romanian deadlift",
       "s": 3,
       "r": "10-12",
-      "g": "Hamstrings"
+      "g": "Hamstrings",
+      "rs": 150
      },
      {
       "n": "Push-up",
       "s": 3,
       "r": "8-20",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Dumbbell pullover",
       "s": 3,
       "r": "10-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 75
      },
      {
       "n": "Hammer curl",
       "s": 2,
       "r": "10-12",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 75
      },
      {
       "n": "Overhead triceps extension",
       "s": 2,
       "r": "10-12",
-      "g": "Triceps"
+      "g": "Triceps",
+      "rs": 75
      }
     ]
    },
@@ -2965,31 +3262,36 @@
       "s": 3,
       "r": "8-12",
       "g": "Quads",
-      "t": "Per leg. Back foot on a bench if you have one."
+      "t": "Per leg. Back foot on a bench if you have one.",
+      "rs": 120
      },
      {
       "n": "Incline dumbbell press",
       "s": 3,
       "r": "8-12",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Dumbbell row",
       "s": 3,
       "r": "10-12",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Lateral raise",
       "s": 3,
       "r": "12-15",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 60
      },
      {
       "n": "Dead bug",
       "s": 2,
       "r": "10-12",
-      "g": "Core"
+      "g": "Core",
+      "rs": 60
      }
     ]
    },
@@ -3021,27 +3323,31 @@
       "n": "Push-up",
       "s": 3,
       "r": "8-20",
-      "g": "Chest"
+      "g": "Chest",
+      "rs": 120
      },
      {
       "n": "Pull-up",
       "s": 3,
       "r": "3-10",
       "g": "Back",
-      "t": "Use a band or negatives if needed."
+      "t": "Use a band or negatives if needed.",
+      "rs": 120
      },
      {
       "n": "Bodyweight squat",
       "s": 3,
       "r": "15-25",
-      "g": "Quads"
+      "g": "Quads",
+      "rs": 90
      },
      {
       "n": "Plank",
       "s": 3,
       "r": "30-60",
       "g": "Core",
-      "t": "Seconds."
+      "t": "Seconds.",
+      "rs": 60
      }
     ]
    },
@@ -3057,32 +3363,37 @@
       "n": "Pike push-up",
       "s": 3,
       "r": "6-12",
-      "g": "Shoulders"
+      "g": "Shoulders",
+      "rs": 120
      },
      {
       "n": "Inverted row",
       "s": 3,
       "r": "8-15",
-      "g": "Back"
+      "g": "Back",
+      "rs": 120
      },
      {
       "n": "Lunge",
       "s": 3,
       "r": "10-15",
       "g": "Quads",
-      "t": "Per leg."
+      "t": "Per leg.",
+      "rs": 120
      },
      {
       "n": "Glute bridge",
       "s": 3,
       "r": "12-20",
-      "g": "Glutes"
+      "g": "Glutes",
+      "rs": 60
      },
      {
       "n": "Hanging leg raise",
       "s": 3,
       "r": "6-12",
-      "g": "Core"
+      "g": "Core",
+      "rs": 60
      }
     ]
    },
@@ -3099,26 +3410,30 @@
       "s": 3,
       "r": "5-12",
       "g": "Triceps",
-      "t": "Between chairs or bars."
+      "t": "Between chairs or bars.",
+      "rs": 120
      },
      {
       "n": "Chin-up",
       "s": 3,
       "r": "3-10",
-      "g": "Biceps"
+      "g": "Biceps",
+      "rs": 120
      },
      {
       "n": "Bulgarian split squat",
       "s": 3,
       "r": "8-12",
       "g": "Quads",
-      "t": "Per leg."
+      "t": "Per leg.",
+      "rs": 120
      },
      {
       "n": "Single-leg calf raise",
       "s": 3,
       "r": "12-20",
-      "g": "Calves"
+      "g": "Calves",
+      "rs": 60
      }
     ]
    },

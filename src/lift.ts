@@ -1,9 +1,31 @@
 import liftCss from './lift.css';
 import { checkProgram, programData, programFile } from './regcheck.js';
 import TEMPLATES from './programs.json';
+import {
+  ADDON,
+  EQUIP,
+  ROWLAB,
+  TECH,
+  TECH_ROWS,
+  HEAVY,
+  LIBX,
+  e1rm,
+  effLoad,
+  importCSV,
+  libFind,
+  loadFor,
+  logged,
+  progress,
+  setE1,
+  swaps,
+  techOf,
+  warmups,
+  working,
+} from './train.js';
+import type { Imported, Kind } from './train.js';
 const SR = document.getElementById('hl').attachShadow({ mode: 'open' });
 SR.innerHTML =
-  '<style>' + liftCss + '</style><div id=app></div><div id=tm hidden></div><div id=ut hidden></div><div id=ob hidden role=dialog aria-label="Set up Daily"></div><input type=file id=pgf class=fi tabindex=-1 aria-hidden=true>';
+  '<style>' + liftCss + '</style><div id=app></div><div id=tm hidden></div><div id=ut hidden></div><div id=ob hidden role=dialog aria-label="Set up Daily"></div><input type=file id=pgf class=fi tabindex=-1 aria-hidden=true><input type=file id=imf accept=".csv,text/csv,text/plain" class=fi tabindex=-1 aria-hidden=true>';
 
 const $ = (s) => SR.querySelector(s),
   esc = (s) =>
@@ -60,6 +82,8 @@ const LIB = {
   'Pike push-up': 'Shoulders',
   'Dead bug': 'Core',
 };
+// The exercise library (src/train.ts) fills in muscle groups for everything it knows.
+Object.values(LIBX).forEach((x) => (LIB[x.n] = LIB[x.n] || x.g));
 const GR = [
   'Chest',
   'Back',
@@ -183,6 +207,7 @@ async function pgPicked() {
   }, 15000);
 }
 ($('#pgf') as HTMLInputElement).addEventListener('change', pgPicked);
+setTimeout(() => ($('#imf') as HTMLInputElement).addEventListener('change', () => impPicked()), 0);
 window.addEventListener('focus', () => setTimeout(pgPicked, 400));
 SR.addEventListener('click', (e) => {
   if ((e.target as HTMLElement).closest('#ut button[data-pa]')) {
@@ -306,17 +331,37 @@ const logs = () =>
     Object.keys(mem)
       .filter((k) => k.startsWith('w-'))
       .sort(),
-  e1 = (s) => (s && s.w > 0 && s.r > 0 && s.t !== 'W' && s.t !== 'R' ? s.w * (1 + s.r / 30) : 0),
+  // Estimated 1RM of a set, using reps in reserve and the exercise's kind (bodyweight, assisted, timed).
+  e1 = (s, n?: any) => setE1(s, typeof n === 'string' ? kindOf(n) : 'w', bwNow()),
   all = (d) =>
     Object.values(d.sets || {})
       .flat()
-      .filter((s) => s && s.w && s.r && s.t !== 'W');
+      .filter((s) => logged(s) && s.t !== 'W');
+// What kind of exercise a name is: the program's setting, then a kind learned on import, then the library.
+function kindOf(n: string): Kind {
+  for (const D of prog().days || []) for (const e of D.ex || []) if (e.n === n && e.k) return e.k;
+  const x = (cfg().xk || {})[n];
+  if (x) return x;
+  const L = libFind(n);
+  return L ? L.k : 'w';
+}
+// Latest body weight from the daily log (for bodyweight and assisted lifts), cached briefly.
+let bwC = { t: 0, v: 0 };
+function bwNow(): number {
+  if (Date.now() - bwC.t < 1500) return bwC.v;
+  let v = 0;
+  try {
+    v = +P_.get(date, 'wt') || +(P_.hist('wt', 120).slice(-1)[0] || 0);
+  } catch (x) {}
+  bwC = { t: Date.now(), v };
+  return v;
+}
 function lastFor(n, b) {
   for (const k of logs()
     .filter((k) => k.slice(2) < b)
     .reverse()) {
     const a = ((mem[k].sets || {})[n] || []).map((x) => x || {});
-    if (a.some((x) => x.w && x.r)) return { date: k.slice(2), sets: a };
+    if (a.some(logged)) return { date: k.slice(2), sets: a };
   }
   return null;
 }
@@ -324,13 +369,13 @@ function best(n, b) {
   let m = 0;
   logs()
     .filter((k) => k.slice(2) < b)
-    .forEach((k) => ((mem[k].sets || {})[n] || []).forEach((s) => (m = Math.max(m, e1(s)))));
+    .forEach((k) => ((mem[k].sets || {})[n] || []).forEach((s) => (m = Math.max(m, e1(s, n)))));
   return m;
 }
 const vol = (d) => all(d).reduce((t, s) => t + s.w * s.r, 0),
   volT = (d) => {
     const a = all(d);
-    const n = a.filter((x) => x.t !== 'R').length;
+    const n = a.filter((x) => !ADDON.includes(x.t)).length;
     return a.length ? `${Math.round(vol(d)).toLocaleString()} ${U()} · ${n} sets` : '';
   };
 // Per-exercise session note and pain flag, kept in the day log as xn / xp.
@@ -344,54 +389,114 @@ function exMeta(e, d, L) {
     lastPain = L ? exPain(n, L.date) : false;
   return `${lastPain ? `<div class=al>Pain was flagged on ${esc(n)} last session (${L.date.slice(5)}). Suggested weights are lower. Stop if it comes back.</div>` : ''}${lastNote ? `<p class=sm>Last note (${L.date.slice(5)}): ${esc(lastNote)}</p>` : ''}${xnN === n ? `<textarea rows=2 data-xn="${esc(n)}" placeholder="Cue, form note, substitution">${esc(note)}</textarea>` : note ? `<p class=sm>Note: ${esc(note)}</p>` : ''}<div class=chips style="margin:4px 0"><button data-a=xnt data-v="${esc(n)}">${xnN === n ? 'Done' : note ? 'Edit note' : 'Add note'}</button><button data-a=xp data-v="${esc(n)}" class="${pain ? 'on' : ''}" aria-pressed=${pain}>${pain ? 'Pain flagged' : 'Flag pain'}</button></div>`;
 }
+const mmss = (s: number) => (s < 60 ? s + 's' : Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'));
+// Technique for an exercise today: a mid-workout change (d.tq) wins over the program.
+const techFor = (e, d) => {
+  const o = (d.tq || {})[e.o || e.n];
+  return o != null ? (o === 'none' ? '' : o) : techOf(e);
+};
+const techRows = (e, d) => (TECH_ROWS[techFor(e, d)] || [0])[0];
+// The type a row is meant to have by position: technique rows follow the prescribed working sets.
+function rowType(e, d, a: any[], i: number) {
+  const s = a[i] || {};
+  if (s.t) return s.t;
+  const T = TECH_ROWS[techFor(e, d)];
+  if (!T) return '';
+  const n = i - a.slice(0, i).filter((x) => x && x.t === 'W').length;
+  return n >= e.s && n < e.s + T[0] ? T[1] : '';
+}
+// Warm-up ramp for today's working weight (first working set typed, else the suggestion, else last time).
+function wuPlan(e, d, L, g) {
+  const k = kindOf(e.n),
+    arr = ((d.sets || {})[e.n] || []).map((x) => x || {});
+  if (arr.some((x) => x.t === 'W')) return [];
+  const first = arr.find((x) => x.t !== 'W' && x.w > 0),
+    work = (first && first.w) || (g && g.w) || (L ? Math.max(0, ...L.sets.filter(working).map((x) => x.w || 0)) : 0);
+  if (!(work > 0) && k !== 'bw') return [];
+  const [lo] = range(e),
+    gr = e.g || LIB[e.n] || 'Other',
+    today = prog().days[dayIdx(date)] || { ex: [] },
+    pos = today.ex.findIndex((x) => x.n === (e.o || e.n)),
+    warm = pos > 0 && today.ex.slice(0, pos).some((x) => (x.g || LIB[x.n]) === gr);
+  return warmups({ work, lo, heavy: HEAVY(e.n), warm, bar: U() === 'kg' ? 20 : 45, st: U() === 'kg' ? 2.5 : 5, kind: k });
+}
+let tqN: string | null = null,
+  hwN: string | null = null;
 function exCard(e, d) {
   const L = lastFor(e.n, date),
+    k = kindOf(e.n),
+    tq = techFor(e, d),
     arr = ((d.sets || {})[e.n] || []).map((x) => x || {}),
-    rows = d.rows && d.rows[e.n] != null ? d.rows[e.n] : Math.max(e.s + (e.rp ? 1 : 0), arr.length),
+    rows = d.rows && d.rows[e.n] != null ? d.rows[e.n] : Math.max(e.s + techRows(e, d), arr.length),
     pb = best(e.n, date),
-    pl = plates(
-      Math.max(0, ...arr.map((s) => s.w || 0)) || (L ? Math.max(0, ...L.sets.map((s) => s.w || 0)) : 0),
-    ),
-    top = parseInt(String(e.r).split('-').pop()),
-    isPR = pb > 0 && arr.some((s) => e1(s) > pb);
-  const up = L && L.sets.length >= e.s && L.sets.slice(0, e.s).every((x) => x.w && x.r >= top);
-  let h = `<div class=swr><button class=sdel data-a=rd data-v="${esc(e.o || e.n)}">Delete</button><div class="card swb" data-sw><h3>${esc(e.n)}<span class=tg>${e.s} x ${esc(e.r)}${e.rp ? ' + RP' : ''}</span>${e.ss ? '<span class=pr style="background:var(--ac)">SUPERSET</span>' : ''}<button class=lnk data-a=sw data-v="${esc(e.o || e.n)}" style="margin-left:auto;padding:0">${e.o ? 'Swapped' : 'Swap'}</button>${isPR ? '<span class=pr>PR</span>' : ''}</h3>`;
+    pl =
+      k === 'w' && HEAVY(e.n)
+        ? plates(Math.max(0, ...arr.map((s) => s.w || 0)) || (L ? Math.max(0, ...L.sets.map((s) => s.w || 0)) : 0))
+        : '',
+    isPR = pb > 0 && arr.some((s) => e1(s, e.n) > pb),
+    g = sug(e, L),
+    lib = libFind(e.n),
+    tl = (TECH.find((x) => x[0] === tq) || ['', ''])[1],
+    who = esc(e.o || e.n);
+  let h = `<div class=swr><button class=sdel data-a=rd data-v="${who}">Delete</button><div class="card swb" data-sw><h3>${esc(e.n)}<span class=tg>${e.s} x ${esc(e.r)}${k === 'tm' ? ' s' : ''}${tq ? ' + ' + (tq === 'rp' ? 'RP' : tl) : ''}${e.u ? ' each side' : ''}${e.rs ? ' · ' + mmss(e.rs) + ' rest' : ''}</span>${e.ss ? '<span class=pr style="background:var(--ac)">SUPERSET</span>' : ''}<button class=lnk data-a=sw data-v="${who}" style="margin-left:auto;padding:0">${e.o ? 'Swapped' : 'Swap'}</button>${isPR ? '<span class=pr>PR</span>' : ''}</h3>`;
   if (e.wu) h += `<p class=sm><b>Warm-up:</b> ${esc(e.wu)}</p>`;
   if (e.t) h += `<p class=sm>${esc(e.t)}</p>`;
+  if (hwN === e.n)
+    h += `<div class=hint>${lib ? `${esc(lib.cue)}<br><span class=sm>${esc(lib.g)} · ${esc(lib.eq)}${lib.k === 'bw' ? ' · weight is added load' : lib.k === 'as' ? ' · weight is the assistance' : lib.k === 'tm' ? ' · reps are seconds' : ''}</span>` : 'No notes for this exercise yet. Add your own cue with Add note.'}</div>`;
   if (pl) h += `<p class=sm>Plates: ${pl}</p>`;
   h += exMeta(e, d, L);
   if (wun === e.n)
     h += `<div class=hint>Enter your first working weight and I will build the ramp-up sets.<div class=g3 style="grid-template-columns:1fr auto;margin-top:8px"><input type=number inputmode=decimal id=wuw placeholder="Working weight (${U()})"><button class=btn data-a=wu data-v="${esc(e.n)}">Build</button></div></div>`;
   if (xh === e.n) h += xhPanel(e.n);
-  if (swp === (e.o || e.n))
-    h += `<div class=g3 style="grid-template-columns:1fr auto"><input type=text id=swn placeholder="Alternative for today (blank to reset)" value="${esc(e.o ? e.n : '')}"><button class=btn data-a=sg data-v="${esc(e.o || e.n)}">Use</button></div>`;
+  if (swp === (e.o || e.n)) {
+    const alt = swaps(e.o || e.n, cfg().eq || EQUIP);
+    h += `<div class=hint>${alt.length ? `<div class=chips style="margin-bottom:8px">${alt.map((x) => `<button data-a=sgp data-v="${who}|${esc(x.n)}">${esc(x.n)}</button>`).join('')}</div>` : ''}<div class=g3 style="grid-template-columns:1fr auto"><input type=text id=swn placeholder="Or type an alternative (blank to reset)" value="${esc(e.o ? e.n : '')}"><button class=btn data-a=sg data-v="${who}">Use</button></div></div>`;
+  }
+  if (tqN === (e.o || e.n))
+    h += `<div class=hint><div class=chips>${TECH.map(([v, l]) => `<button data-a=tq data-v="${who}|${v}" class="${tq === v ? 'on' : ''}">${l}</button>`).join('')}</div>${tq ? `<p class=sm>${esc((TECH.find((x) => x[0] === tq) || ['', '', ''])[2])}</p>` : ''}<p class=sm>For today only. Set it for every session in Program.</p></div>`;
+  const lw = L ? L.sets.filter(working) : [],
+    le = lw.length ? Math.max(...lw.map((x) => e1(x, e.n))) : 0;
   h += `<p class=sm>${
     L
       ? 'Last (' +
         L.date.slice(5) +
         '): ' +
         L.sets
-          .filter((x) => x.w && x.r && x.t !== 'W')
-          .map((x) => (x.t === 'R' ? '+' + x.r : x.w + 'x' + x.r))
+          .filter((x) => logged(x) && x.t !== 'W')
+          .map((x) => (ADDON.includes(x.t) && x.t !== 'D' ? '+' + x.r : (k === 'tm' ? '' : (k === 'bw' && !x.w ? 'BW' : x.w) + 'x') + x.r + (k === 'tm' ? 's' : '') + (typeof x.q === 'number' && x.q ? '@' + x.q : '')))
           .join(' ')
-          .replace(/ \+/g, '+')
+          .replace(/ \+/g, '+') +
+        (le ? ` · est. 1RM ${Math.round(le)} ${U()}` : '')
       : 'No previous session logged'
   }</p>`;
-  {
-    const g = sug(e, L);
-    if (g)
-      h += `<div class=hint>${g.t} <button class=lnk data-a=ap data-v="${esc(e.o || e.n)}">Apply weights</button></div>`;
+  if (g) h += `<div class=hint>${g.t}${g.w != null ? ` <button class=lnk data-a=ap data-v="${who}">Apply weights</button>` : ''}</div>`;
+  if (cfg().wa !== 0) {
+    const W = wuPlan(e, d, L, g);
+    if (W.length)
+      h += `<div class=wup><span>Warm-up</span>${W.map((x) => `<i>${k === 'bw' ? 'BW' : x.w}×${x.r}</i>`).join('')}<button class=lnk data-a=wua data-v="${esc(e.n)}">Log warm-ups</button></div>`;
   }
-  const nIdx = (i: number) => i - arr.slice(0, i).filter((x) => x.t === 'W').length;
+  const nIdx = (i: number) => i - arr.slice(0, i).filter((x) => x.t === 'W').length,
+    wph = k === 'bw' ? '+' + U() : k === 'as' ? 'assist' : k === 'tm' ? U() + ' (opt.)' : U(),
+    rph = k === 'tm' ? 'sec' : e.u ? 'reps/side' : 'reps';
   for (let i = 0; i < rows; i++) {
-    const s = arr[i] || {},
+    let s = arr[i] || {},
       p = (L && L.sets[i]) || {},
-      key = esc(e.n) + '|' + i;
-    h += `<div class=sr><button class=ck data-a=ck data-v="${key}" aria-label="${s.w && s.r ? 'Set done' : 'Log set with suggested numbers'}"><b class="${s.w && s.r ? 'ok' : ''}">${s.t === 'W' ? 'W' : e.rp && nIdx(i) === e.s ? 'RP' : nIdx(i) + 1}</b></button><input type=number inputmode=decimal step=.5 data-s="${key}|w" placeholder="${(sug(e, L) || {}).w || p.w || U()}" value="${s.w ?? ''}"><input type=number inputmode=numeric data-s="${key}|r" placeholder="${p.r || 'reps'}" value="${s.r ?? ''}"><select class=rir data-s="${key}|q" aria-label="Reps in reserve"><option value="">RIR</option>${[0, 1, 2, 3, 4].map((n) => `<option value=${n} ${s.q === n ? 'selected' : ''}>${n}</option>`).join('')}</select><button class="fl ${s.t || s.f ? 'on' : ''}" data-a=f data-v="${key}" aria-label="Set type: failure, warm-up, or drop">${s.t || (s.f ? 'F' : '-')}</button><button class=x data-a=rm data-v="${key}" aria-label="Remove set">&times;</button></div>`;
+      key = esc(e.n) + '|' + i,
+      rt = rowType(e, d, arr, i),
+      lab = rt === 'W' ? 'W' : ADDON.includes(rt) && (rt !== 'D' || nIdx(i) >= e.s) ? ROWLAB[rt] : nIdx(i) + 1,
+      wp: any = g && g.w != null && nIdx(i) < e.s && rt !== 'W' ? g.w : p.w != null && p.w !== '' ? p.w : wph,
+      rp_: any = (g && g.r && nIdx(i) < e.s && !ADDON.includes(rt) ? g.r : p.r) || rph;
+    if (ADDON.includes(rt) && !logged(s)) {
+      // Technique rows: same weight (drops about 20% lighter), short reps.
+      const ww = g && g.w != null ? g.w : p.w;
+      if (ww != null && ww !== '') wp = rt === 'D' ? Math.round((ww * 0.8) / (U() === 'kg' ? 2.5 : 5)) * (U() === 'kg' ? 2.5 : 5) : ww;
+      rp_ = rt === 'M' ? '3-5' : rt === 'X' ? '1-3' : rph;
+    }
+    h += `<div class=sr><button class=ck data-a=ck data-v="${key}" aria-label="${logged(s) ? 'Set done' : 'Log set with suggested numbers'}"><b class="${logged(s) ? 'ok' : ''}">${lab}</b></button><input type=number inputmode=decimal step=.5 data-s="${key}|w" placeholder="${wp}" value="${s.w ?? ''}"><input type=number inputmode=numeric data-s="${key}|r" placeholder="${rp_}" value="${s.r ?? ''}"><select class=rir data-s="${key}|q" aria-label="Reps in reserve"><option value="">RIR</option>${[0, 1, 2, 3, 4, 5].map((n) => `<option value=${n} ${s.q === n ? 'selected' : ''}>${n}</option>`).join('')}</select><button class="fl ${s.t || s.f ? 'on' : ''}" data-a=f data-v="${key}" aria-label="Set type: failure, warm-up, drop, myo-rep or forced reps">${s.t ? ROWLAB[s.t] || s.t : s.f ? 'F' : '-'}</button><button class=x data-a=rm data-v="${key}" aria-label="Remove set">&times;</button></div>`;
   }
   return (
     h +
-    `<button class=lnk data-a=xh data-v="${esc(e.n)}">History</button> <button class=lnk data-a=wu data-v="${esc(e.n)}">${e.wu || prog().hit ? 'Feeder sets' : 'Add warm-ups'}</button> ${L ? '<button class=lnk data-a=fl data-v="' + esc(e.n) + '">Fill from last session</button> ' : ''}<button class=lnk data-a=as data-v="${esc(e.n)}">Add set</button> <button class=lnk data-a=rd data-v="${esc(e.o || e.n)}">Remove exercise</button></div></div>`
+    `<div class=exl><button class=lnk data-a=xh data-v="${esc(e.n)}">History</button><button class=lnk data-a=hw data-v="${esc(e.n)}">How to</button><button class=lnk data-a=tqo data-v="${who}">${tq ? tl : 'Technique'}</button><button class=lnk data-a=wu data-v="${esc(e.n)}">${e.wu || prog().hit ? 'Feeder sets' : 'Add warm-ups'}</button>${L ? '<button class=lnk data-a=fl data-v="' + esc(e.n) + '">Fill from last session</button>' : ''}<button class=lnk data-a=as data-v="${esc(e.n)}">Add set</button><button class=lnk data-a=rd data-v="${who}">Remove exercise</button></div></div></div>`
   );
 }
 const vx = (k, ph) =>
@@ -433,6 +538,23 @@ function todayV() {
     readyCard(d, isOff(k))
   );
 }
+// Per-exercise set style in the program: kind, technique, target RIR, one side at a time.
+const KINDS: [string, string][] = [
+  ['', 'Weight x reps'],
+  ['bw', 'Bodyweight (+ load)'],
+  ['as', 'Assisted'],
+  ['tm', 'Timed (seconds)'],
+];
+function styleRow(e, i, j) {
+  const k = e.k || '',
+    lk = libFind(e.n),
+    tq = techOf(e),
+    sel = (f, opts, cur) => `<select data-p="${i}|${j}|${f}">${opts.map(([v, l]) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${l}</option>`).join('')}</select>`,
+    sum = [k ? (KINDS.find((x) => x[0] === k) || ['', ''])[1] : lk && lk.k !== 'w' ? (KINDS.find((x) => x[0] === lk.k) || ['', ''])[1] : '', tq ? (TECH.find((x) => x[0] === tq) || ['', ''])[1] : '', typeof e.rir === 'number' ? 'RIR ' + e.rir : '', e.rs ? mmss(e.rs) + ' rest' : '', e.u ? 'each side' : '']
+      .filter(Boolean)
+      .join(' · ');
+  return `<details class=sty><summary>Set style${sum ? ': ' + esc(sum) : ''}</summary><div class=g3 style="grid-template-columns:1fr 1fr"><div><label class=f>Type</label>${sel('k', KINDS.map(([v, l]) => [v, v === '' && lk && lk.k !== 'w' ? 'Library default' : l]), k)}</div><div><label class=f>Technique</label>${sel('tq', TECH.map(([v, l]) => [v, l]), tq)}</div><div><label class=f>Target RIR</label>${sel('rir', [['', 'Program default'], ...[0, 1, 2, 3, 4].map((n) => [n, n + (n ? ' in reserve' : ' (failure)')])], e.rir ?? '')}</div><div><label class=f>Rest between sets</label>${sel('rs', [['', 'Default (' + mmss(cfg().rs || 90) + ')'], ...[30, 45, 60, 75, 90, 120, 150, 180, 210, 240, 300].map((n) => [n, mmss(n)])], e.rs ?? '')}</div><div><label class=f>Each side</label><label class=sw1><input type=checkbox data-p="${i}|${j}|u" ${e.u ? 'checked' : ''}> One side at a time</label></div></div></details>`;
+}
 function progV() {
   const P = prog();
   let h =
@@ -451,7 +573,7 @@ function progV() {
     }
     D.ex.forEach(
       (e, j) =>
-        (h += `<div class=swr><button class=sdel data-a=re data-v="${i}|${j}">Delete</button><div class=swb data-sw><div class=exh><span>${j + 1}</span><button class="mv ${e.ss ? 'on' : ''}" data-a=ss data-v="${i}|${j}" aria-label="Superset with next exercise">SS</button><i style="flex:1"></i><button class=lnk data-a=re data-v="${i}|${j}">Delete</button><button class=mv data-a=mu data-v="${i}|${j}" aria-label="Move up" ${j ? '' : 'disabled'}>&#9650;</button><button class=mv data-a=md data-v="${i}|${j}" aria-label="Move down" ${j < D.ex.length - 1 ? '' : 'disabled'}>&#9660;</button></div><div class=pe><input type=text list=exl data-p="${i}|${j}|n" value="${esc(e.n)}"><input type=number data-p="${i}|${j}|s" value="${e.s}"><input type=text data-p="${i}|${j}|r" value="${esc(e.r)}"></div><div class=g3 style="grid-template-columns:1fr 110px"><input type=text data-p="${i}|${j}|t" placeholder="Note (tempo, cues)" value="${esc(e.t || '')}" style="font-size:14px;padding:8px"><select data-p="${i}|${j}|g" style="padding:8px;font-size:14px">${GR.map((g) => `<option ${(e.g || 'Other') === g ? 'selected' : ''}>${g}</option>`).join('')}</select></div></div></div>`),
+        (h += `<div class=swr><button class=sdel data-a=re data-v="${i}|${j}">Delete</button><div class=swb data-sw><div class=exh><span>${j + 1}</span><button class="mv ${e.ss ? 'on' : ''}" data-a=ss data-v="${i}|${j}" aria-label="Superset with next exercise">SS</button><i style="flex:1"></i><button class=lnk data-a=re data-v="${i}|${j}">Delete</button><button class=mv data-a=mu data-v="${i}|${j}" aria-label="Move up" ${j ? '' : 'disabled'}>&#9650;</button><button class=mv data-a=md data-v="${i}|${j}" aria-label="Move down" ${j < D.ex.length - 1 ? '' : 'disabled'}>&#9660;</button></div><div class=pe><input type=text list=exl data-p="${i}|${j}|n" value="${esc(e.n)}"><input type=number data-p="${i}|${j}|s" value="${e.s}"><input type=text data-p="${i}|${j}|r" value="${esc(e.r)}"></div><div class=g3 style="grid-template-columns:1fr 110px"><input type=text data-p="${i}|${j}|t" placeholder="Note (tempo, cues)" value="${esc(e.t || '')}" style="font-size:14px;padding:8px"><select data-p="${i}|${j}|g" style="padding:8px;font-size:14px">${GR.map((g) => `<option ${(e.g || 'Other') === g ? 'selected' : ''}>${g}</option>`).join('')}</select></div>${styleRow(e, i, j)}</div></div>`),
     );
     h += `<button class=lnk data-a=ae data-v=${i}>Add exercise</button></div>`;
   });
@@ -470,19 +592,61 @@ function progV() {
       .map(([v, t]) => `<option value=${v} ${(cfg().rg || 1) === v ? 'selected' : ''}>${t}</option>`)
       .join(
         '',
-      )}</select><label class=f>Rest timer after each set</label><div class=g3 style="grid-template-columns:1fr 1fr"><select data-cf=auto><option value=1 ${cfg().auto !== 0 ? 'selected' : ''}>Auto-start on</option><option value=0 ${cfg().auto === 0 ? 'selected' : ''}>Auto-start off</option></select><select data-cf=rs>${[60, 90, 120, 180].map((s) => `<option value=${s} ${(cfg().rs || 90) === s ? 'selected' : ''}>${s} sec</option>`).join('')}</select></div><label class=f>Units (changing converts logged weights)</label><select data-cu=1><option value=lb ${U() === 'lb' ? 'selected' : ''}>lb</option><option value=kg ${U() === 'kg' ? 'selected' : ''}>kg</option></select><button class=btn data-a=csv style="margin-top:10px">Export sets (CSV)</button><p class=sm>${mode === 'local' ? 'Saved in the local database on this device. Use Backup to move it.' : 'Saved on this device only.'}</p></div>`
+      )}</select><label class=f>Target reps in reserve (unless an exercise sets its own)</label><select data-cf=rir>${[0, 1, 2, 3].map((n) => `<option value=${n} ${(cfg().rir || 0) === n ? 'selected' : ''}>${n ? n + ' in reserve' : '0, to failure'}</option>`).join('')}</select><label class=f>Log reps in reserve</label><select data-cf=rq><option value=1 ${cfg().rq !== 0 ? 'selected' : ''}>Show the RIR box on each set</option><option value=0 ${cfg().rq === 0 ? 'selected' : ''}>Hide it (sets count as to failure)</option></select><label class=f>Warm-up suggestions</label><select data-cf=wa><option value=1 ${cfg().wa !== 0 ? 'selected' : ''}>On: show a ramp from the working weight</option><option value=0 ${cfg().wa === 0 ? 'selected' : ''}>Off</option></select><label class=f>My equipment (for swap suggestions)</label><div class=chips>${EQUIP.map((x) => `<button data-a=eqt data-v=${x} class="${(cfg().eq || EQUIP).includes(x) ? 'on' : ''}">${x}</button>`).join('')}</div><label class=f>Rest timer: default rest (exercises can set their own in Set style)</label><div class=g3 style="grid-template-columns:1fr 1fr"><select data-cf=auto><option value=1 ${cfg().auto !== 0 ? 'selected' : ''}>Auto-start on</option><option value=0 ${cfg().auto === 0 ? 'selected' : ''}>Auto-start off</option></select><select data-cf=rs>${[60, 90, 120, 180].map((s) => `<option value=${s} ${(cfg().rs || 90) === s ? 'selected' : ''}>${s} sec</option>`).join('')}</select></div><label class=f>Units (changing converts logged weights)</label><select data-cu=1><option value=lb ${U() === 'lb' ? 'selected' : ''}>lb</option><option value=kg ${U() === 'kg' ? 'selected' : ''}>kg</option></select><button class=btn data-a=csv style="margin-top:10px">Export sets (CSV)</button><p class=sm>${mode === 'local' ? 'Saved in the local database on this device. Use Backup to move it.' : 'Saved on this device only.'}</p></div>`
   );
 }
-function sug(e, L) {
-  if (!L) return null;
-  const ws = L.sets.filter((x) => x && x.w && x.r && x.t !== 'W' && x.t !== 'R');
-  if (!ws.length) return null;
-  const [lo, hi] = String(e.r).split('-').map(Number),
-    top = hi || lo,
-    low = lo,
-    mw = Math.max(...ws.map((x) => x.w)),
-    weak = ws.filter((x) => x.r < low).length,
-    gr = e.g || LIB[e.n] || 'Other',
+// Target RIR: the exercise's own, else the program-wide setting (0 = to failure, the default).
+const tRir = (e) => (typeof e.rir === 'number' ? e.rir : typeof cfg().rir === 'number' ? cfg().rir : 0);
+const range = (e) => {
+  const [lo, hi] = String(e.r).split('-').map(Number);
+  return [lo || 8, hi || lo || 8];
+};
+// Best estimated 1RM for a lift over the last 12 weeks before a date (0 if none).
+function recentE1(n: string, b: string) {
+  let m = 0;
+  logs()
+    .filter((k) => k.slice(2) < b && days(k.slice(2), b) <= 84)
+    .forEach((k) => ((mem[k].sets || {})[n] || []).forEach((s) => (m = Math.max(m, e1(s, n)))));
+  return m;
+}
+// A starting weight when there is no usable last session: from this lift's 1RM estimate (a new rep range,
+// after switching programs) or from a related lift in the library (e.g. incline from bench).
+function startW(e) {
+  const [lo] = range(e),
+    k = kindOf(e.n),
+    st = U() === 'kg' ? 2.5 : 5,
+    bw = bwNow();
+  if (k === 'tm' || k === 'as') return null;
+  let base = recentE1(e.n, date),
+    from = '';
+  if (!base) {
+    const L = libFind(e.n);
+    if (L && L.an && L.ra) {
+      const a = recentE1(L.an, date);
+      if (a) {
+        base = a * L.ra;
+        from = L.an;
+      }
+    }
+  }
+  if (!base) return null;
+  const load = loadFor(base, lo + tRir(e)) * 0.95,
+    w = Math.max(0, Math.round((k === 'bw' ? load - bw : load) / st) * st);
+  if (k !== 'bw' && !w) return null;
+  return {
+    w,
+    est: 1,
+    t: `Starting estimate from ${from ? 'your ' + esc(from) : 'your'} estimated 1RM (${Math.round(base)} ${U()}): ${w} ${U()} for ${lo}+ reps. Treat the first set as a test and adjust.`,
+  };
+}
+function sug(e, L): any {
+  const [lo, hi] = range(e),
+    k = kindOf(e.n),
+    tr = tRir(e),
+    ws = L ? L.sets.filter(working) : [];
+  // No last session, or one done in a different rep range (a new program): estimate instead.
+  if (!ws.length || ws.every((x) => x.r < lo - 3 || x.r > hi + 3)) return k === 'tm' ? null : startW({ ...e, n: e.n });
+  const gr = e.g || LIB[e.n] || 'Other',
     lower = ['Quads', 'Hamstrings', 'Glutes', 'Calves'].includes(gr),
     st = U() === 'kg' ? 2.5 : 5,
     hitP = !!prog().hit,
@@ -491,33 +655,29 @@ function sug(e, L) {
       !/calf|adductor|fly|extension|curl|raise|lateral|crunch|straight-arm/i.test(e.n),
     inc = hitP ? (heavy ? st : U() === 'kg' ? 1.25 : 2.5) : lower ? st * 2 : st,
     rd = (x) => Math.round(x / st) * st,
-    hit = ws.slice(0, Math.max(e.s, 1)).every((x) => x.r >= top);
+    mw = Math.max(...ws.map((x) => x.w || 0));
   const pn = exPain(e.n, L.date);
   let w, t;
-  if (pn && !e.dl) {
-    w = rd(mw * 0.9);
-    t = `Pain was flagged last time. Try ${w} ${U()} (about 90%) with a slower tempo, and stop if it returns.`;
-  } else if (e.dl) {
-    w = rd(mw * 0.9);
-    t = `Deload: ${w} ${U()} for ${low}-${top} reps (about 90% of last load, stop short of failure).`;
-  } else if (hit) {
-    w = mw + inc;
-    t = hitP
-      ? `You hit ${top} reps on the first set last time. Add ${inc} ${U()}: next ${w} ${U()}, starting near ${low} reps.`
-      : `Hit ${top} reps on every set last time. Next: ${w} ${U()}, starting near ${low} reps.`;
-  } else if (weak >= Math.ceil(ws.length / 2)) {
-    w = rd(mw * 0.95);
-    t = `Fell below ${low} reps on most sets. Back off to ${w} ${U()}.`;
+  if (pn && !e.dl && k !== 'tm') {
+    w = k === 'as' ? mw + inc : rd(mw * 0.9);
+    t = `Pain was flagged last time. Try ${w} ${U()}${k === 'as' ? ' of assistance' : ' (about 90%)'} with a slower tempo, and stop if it returns.`;
+  } else if (e.dl && k !== 'tm') {
+    w = k === 'as' ? mw + inc : rd(mw * 0.9);
+    t = `Deload: ${w} ${U()} for ${lo}-${hi} reps, stopping 2 or 3 reps short of failure.`;
   } else {
-    w = mw;
-    t = `Stay at ${w} ${U()} and aim for ${Math.min(top, Math.max(...ws.map((x) => x.r)) + 1)} reps on your top set.`;
-  }
-  if (!e.dl) {
-    const m = rm();
-    if (m < 1) {
-      w = rd(w * m);
-      t += ' Adjusted down for low readiness.';
+    const g = progress({ sets: ws, lo, hi, n: e.s || 1, tr, inc, st, kind: k, bw: bwNow(), u: U() });
+    if (!g) return null;
+    w = g.w;
+    t = g.t + (tr ? ` Target: ${tr} rep${tr > 1 ? 's' : ''} in reserve.` : '');
+    if (g.w == null) return { w: null, r: g.r, t };
+    if (!e.dl && k === 'w') {
+      const m = rm();
+      if (m < 1) {
+        w = rd(w * m);
+        t += ' Adjusted down for low readiness.';
+      }
     }
+    return { w, r: g.r, t };
   }
   return { w, t };
 }
@@ -528,7 +688,7 @@ function applyW(d, v) {
     bl = c.bl || 5,
     dl = Math.floor(days(c.dl || c.start, date) / 7) % (bl + 1) === bl,
     g = sug({ ...t, n: v, dl, s: t.s || 3 }, L);
-  if (!g) return false;
+  if (!g || g.w == null) return false;
   if (d.k == null) d.k = dayIdx(date);
   d.sets = d.sets || {};
   const a2 = (d.sets[v] = (d.sets[v] || []).map((x) => x || {})),
@@ -615,8 +775,10 @@ let lacts = [],
 const MAXW = () => (U() === 'kg' ? 700 : 1500);
 function setMsg(n: string, f: string, v: number, typ?: string): string {
   if (!isFinite(v)) return '';
+  const k = kindOf(n);
   if (f === 'w') {
-    if (v <= 0) return 'A set needs a weight above 0 to count.';
+    if (v < 0 || (v === 0 && k === 'w')) return 'A set needs a weight above 0 to count.';
+    if (k !== 'w') return v > MAXW() ? `${v} ${U()} looks off.` : '';
     if (v > MAXW()) return `${v} ${U()} looks off (most lifts stay under ${MAXW()}).`;
     if (typ === 'W') return '';
     const L = lastFor(n, date),
@@ -624,6 +786,7 @@ function setMsg(n: string, f: string, v: number, typ?: string): string {
     if (mx > 0 && (v > mx * 1.6 || v < mx * 0.4))
       return `${n}: ${v} ${U()} is far from last time (${mx} ${U()}).`;
   } else if (f === 'r') {
+    if (k === 'tm') return v < 1 || v > 900 || v !== Math.round(v) ? `${v} seconds looks off (1 to 900).` : '';
     if (v < 1 || v > 50 || v !== Math.round(v)) return `${v} reps looks off (whole number, 1 to 50).`;
   }
   return '';
@@ -633,7 +796,7 @@ const lwarnHTML = () =>
   lwarn
     ? `<div class=al role=alert>${esc(lwarn.msg)} <button class=lnk data-a=lkeep>Keep ${lwarn.v}</button> <button class=lnk data-a=lfix>Re-enter</button></div>`
     : '';
-const sDone = (s) => s && s.w && s.r,
+const sDone = logged,
   NOSET = 'Did not catch that. Try: bench 185 for 8.';
 function parseSet(s) {
   s = (s || '').toLowerCase();
@@ -693,10 +856,10 @@ function xhPanel(n) {
   const ss = logs()
       .map((k) => ({
         d: k.slice(2),
-        a: ((mem[k].sets || {})[n] || []).filter((s) => s && s.w && s.r && s.t !== 'W' && s.t !== 'R'),
+        a: ((mem[k].sets || {})[n] || []).filter(working),
       }))
       .filter((x) => x.a.length),
-    pts = ss.map((x) => ({ x: x.d, y: Math.round(Math.max(...x.a.map(e1))) })),
+    pts = ss.map((x) => ({ x: x.d, y: Math.round(Math.max(...x.a.map((s) => e1(s, n)))) })),
     rp = {};
   ss.forEach((x) =>
     x.a.forEach((s) => {
@@ -716,7 +879,7 @@ function exSess() {
   const o = {};
   logs().forEach((k) =>
     Object.entries(mem[k].sets || {}).forEach(([n, a]) => {
-      const m = Math.max(0, ...a.map(e1));
+      const m = Math.max(0, ...a.map((s) => e1(s, n)));
       if (m > 0) (o[n] = o[n] || []).push({ d: k.slice(2), v: m });
     }),
   );
@@ -777,10 +940,10 @@ function mvCard() {
     const T = ago <= 6 ? cur : prv;
     Object.entries(mem[k].sets || {}).forEach(([n, a]: [string, any]) =>
       a.forEach((s) => {
-        if (s && s.w && s.r && s.t !== 'W') {
+        if (logged(s) && s.t !== 'W') {
           const G = grp[n] || LIB[n] || 'Other';
           T[G] = T[G] || { n: 0, t: 0 };
-          if (s.t !== 'R') T[G].n++;
+          if (!ADDON.includes(s.t)) T[G].n++;
           T[G].t += s.w * s.r;
         }
       }),
@@ -868,11 +1031,87 @@ function histV() {
         .map((k) => {
           const d = mem[k],
             x = d.k ?? 0;
-          return `<tr><td><button class=lnk data-a=go data-v="${k.slice(2)}">${k.slice(7)}${d.dn ? ' &#10003;' : ''}</button></td><td>${esc(title(x))}</td><td>${isOff(x) ? (d.st || 0) + ' steps' : volT(d) || '-'}</td></tr>`;
+          return `<tr><td><button class=lnk data-a=go data-v="${k.slice(2)}">${k.slice(7)}${d.dn ? ' &#10003;' : ''}</button></td><td>${esc(d.imp ? d.nt || 'Imported workout' : title(x))}</td><td>${d.imp || !isOff(x) ? volT(d) || '-' : (d.st || 0) + ' steps'}</td></tr>`;
         })
         .join('')}</table></div>`
     : '<div class=card>No sessions yet. Log a set on the Today tab to start your history.</div>';
-  return statH + plateauCard() + liftProgress() + mvCard() + h;
+  return statH + plateauCard() + liftProgress() + mvCard() + h + impCard();
+}
+// Import from Strong or Hevy: pick the CSV export, see what will come in, then confirm (with Undo).
+let impP: Imported | null = null,
+  impMsg = '',
+  impUndo: { k: string; v: any }[] | null = null,
+  impCfg: any = null;
+function impCard() {
+  if (impP) {
+    const ds = Object.keys(impP.days).sort(),
+      ren = Object.entries(impP.names).filter(([a, b]) => a !== b),
+      have = ds.filter((x) => mem['w-' + x] && all(mem['w-' + x]).length).length;
+    return `<div class=card id=impc><h3>Import from ${impP.src}</h3><p class=sm style="color:var(--tx)">${ds.length} workouts, ${impP.sets.toLocaleString()} sets, ${ds[0]} to ${ds[ds.length - 1]}.</p>${ren.length ? `<p class=sm>Matched to Daily's exercise names: ${ren.slice(0, 8).map(([a, b]) => esc(a) + ' → ' + esc(b)).join(', ')}${ren.length > 8 ? ', and ' + (ren.length - 8) + ' more' : ''}.</p>` : ''}${impP.assumed ? `<p class=sm>The file does not say its unit, so weights are read as ${impP.unit}. If your ${impP.src} app used ${impP.unit === 'lb' ? 'kg' : 'lb'}, change units in Program first.</p>` : ''}${have ? `<p class=sm>${have} of these days already have sets here. Exercises you already logged on those days are kept as they are.</p>` : ''}<button class=btn data-a=impgo>Import</button> <button class=lnk data-a=impx>Cancel</button></div>`;
+  }
+  return `<div class=card id=impc><h3>Bring your history</h3><p class=sm>Coming from Strong or Hevy? Export your workouts as CSV there (Settings, Export data) and pick the file here. Your sets, warm-ups, drop sets and RPE come across, and progression and 1RM estimates use them right away.</p><label class=btn for=imf role=button style="display:inline-block;cursor:pointer">Choose CSV file</label>${impMsg ? ` <p class=sm role=status>${esc(impMsg)}${impUndo ? ' <button class=lnk data-a=impu>Undo</button>' : ''}</p>` : ''}</div>`;
+}
+async function impPicked() {
+  const el = $('#imf') as HTMLInputElement,
+    f = el.files && el.files[0];
+  if (!f) return;
+  el.value = '';
+  const r = importCSV(await f.text(), U());
+  if (typeof r === 'string') {
+    impP = null;
+    impMsg = r;
+  } else {
+    impP = r;
+    impMsg = '';
+  }
+  tab = 'hist';
+  render();
+  setTimeout(() => {
+    const c = $('#impc');
+    c && c.scrollIntoView && c.scrollIntoView({ block: 'center' });
+  }, 50);
+}
+function impGo() {
+  if (!impP) return;
+  const undo: { k: string; v: any }[] = [];
+  let n = 0;
+  Object.entries(impP.days).forEach(([day, W]) => {
+    const key = 'w-' + day,
+      D = cl(mem[key] || {});
+    let ch = false;
+    D.sets = D.sets || {};
+    Object.entries(W.sets).forEach(([ex, a]) => {
+      if ((D.sets[ex] || []).some(logged)) return;
+      D.sets[ex] = a;
+      ch = true;
+    });
+    if (!ch) return;
+    undo.push({ k: key, v: mem[key] ? cl(mem[key]) : null });
+    D.imp = D.imp || impP!.src;
+    if (!D.nt && W.name) D.nt = W.name;
+    put(key, D);
+    n++;
+  });
+  impCfg = cl(cfg());
+  if (impP.timed.length) {
+    const c = cl(cfg());
+    c.xk = c.xk || {};
+    impP.timed.forEach((x) => (c.xk[x] = c.xk[x] || 'tm'));
+    put('wcfg', c);
+  }
+  impMsg = `Imported ${n} workout${n === 1 ? '' : 's'} from ${impP.src}.`;
+  impUndo = undo;
+  impP = null;
+}
+function impBack() {
+  (impUndo || []).forEach(({ k, v }) => {
+    if (v) put(k, v);
+    else L_.del(k);
+  });
+  if (impCfg) put('wcfg', impCfg);
+  impUndo = null;
+  impCfg = null;
+  impMsg = 'Import undone.';
 }
 // After a few finished workouts, offer Google Drive backup once (never before the app has proved itself).
 function bkAsk() {
@@ -896,7 +1135,7 @@ function render() {
     isT = date === iso(new Date()),
     body = tab === 'today' ? todayV() : tab === 'prog' ? progV() : histV();
   $('#app').innerHTML =
-    `<div class=w data-t="${tab}"><header><div class=dr><button data-a=p aria-label="Previous day">&#8249;</button><div class=dt><b>${esc(title(k))}</b><i>${fmt(date)}${isT ? ' · Today' : ''}${d.dn ? ' · Done' : ''}</i>${isT ? '' : '<button class=lk data-a=td>Jump to today</button>'}</div><button data-a=n aria-label="Next day">&#8250;</button></div>
+    `<div class="w ${cfg().rq === 0 ? 'norir' : ''}" data-t="${tab}"><header><div class=dr><button data-a=p aria-label="Previous day">&#8249;</button><div class=dt><b>${esc(title(k))}</b><i>${fmt(date)}${isT ? ' · Today' : ''}${d.dn ? ' · Done' : ''}</i>${isT ? '' : '<button class=lk data-a=td>Jump to today</button>'}</div><button data-a=n aria-label="Next day">&#8250;</button></div>
 <div class=sg style="grid-template-columns:repeat(${CY()},1fr)">${Array.from({ length: CY() }, (_, i) => i)
       .map((i) => `<button data-a=dk data-v=${i} class="${i === k ? 'on' : ''}">${nm(i)}</button>`)
       .join(
@@ -943,20 +1182,30 @@ function rest(s, label = '') {
   f();
   tm = setInterval(f, 500);
 }
-// HIT timing from the routine: feeders 45-60 s apart, 2.5 min before the working set,
-// 15 s rest-pause, 3.5 min before the next exercise.
+// Rest after a set. HIT timing from the routine: feeders 45-60 s apart, 2.5 min before the working set,
+// 3.5 min before the next exercise. Techniques get their own short rests (rest-pause, myo-reps, drops).
 function autoRest(n: string, i: number) {
   const ex = exOf(n),
-    a = (wd(date).sets || {})[n] || [],
-    x = a[i] || {};
-  if (!prog().hit || !ex) return rest(cfg().rs || 90);
+    d = wd(date),
+    a = (d.sets || {})[n] || [],
+    x = { ...(a[i] || {}), t: ex ? rowType(ex, d, a, i) : (a[i] || {}).t },
+    tq = ex ? techFor(ex, d) : '',
+    nW = a.slice(0, i + 1).filter((y) => y && y.t !== 'W').length,
+    lastWork = ex && nW === ex.s && x.t !== 'W' && !ADDON.includes(x.t),
+    nxt = a[i + 1],
+    moreAddon = ADDON.includes(x.t) && !!ex && !logged(nxt) && ADDON.includes(rowType(ex, d, a.slice(0, i + 1).concat([nxt || {}]), i + 1));
+  if (tq && lastWork) return tq === 'drop' ? rest(10, 'Drop') : tq === 'myo' ? rest(20, 'Myo: 5 breaths') : tq === 'fr' ? null : rest(15, 'Rest-pause');
+  if (moreAddon) return x.t === 'D' ? rest(10, 'Drop') : rest(20, 'Myo: 5 breaths');
+  // Rest between working sets: the exercise's own (from the program or set by you), else the default.
+  if (!prog().hit || !ex) {
+    if (x.t === 'W') return rest(Math.min(90, (ex && ex.rs) || 60), 'Warm-up');
+    return rest((ex && ex.rs) || cfg().rs || 90);
+  }
   if (x.t === 'W') {
     const more = a.slice(i + 1).some((y) => y && y.t === 'W');
     return more ? rest(60, 'Feeder') : rest(150, 'Working set');
   }
-  if (x.t === 'R') return rest(210, 'Next lift');
-  if (ex.rp && !a.some((y) => y && y.t === 'R' && y.r)) return rest(15, 'Rest-pause');
-  return rest(210, 'Next lift');
+  return rest(ex.rs || 210, 'Next lift');
 }
 function setS(n, i, f, v) {
   const d = cl(wd(date));
@@ -966,26 +1215,39 @@ function setS(n, i, f, v) {
   while (a.length <= i) a.push({});
   if (v === null || v === '') delete a[i][f];
   else a[i][f] = v;
-  tagRP(a, n);
+  tagTech(a, n, d);
   put('w-' + date, d);
 }
-// Rest-pause: the working row after the prescribed sets is stored as type 'R' so stats ignore it.
 const exOf = (n: string) => {
-  const ex = ((prog().days[dayIdx(date)] || {}).ex || []) as any[];
-  return ex.find((x) => x.n === n) || ex.find((x) => x.o === n);
+  const d = wd(date),
+    ex = ((prog().days[dayIdx(date)] || {}).ex || []) as any[],
+    hit = ex.find((x) => x.n === n) || ex.find((x) => (d.sw || {})[x.n] === n);
+  return hit ? { ...hit, o: hit.n, n } : undefined;
 };
-function tagRP(a: any[], n: string) {
+// Technique rows (rest-pause, myo-reps, drops, forced reps) follow the prescribed working sets. They are tagged
+// automatically (ta) so stats count them as add-ons; a type picked by hand is left alone.
+function tagTech(a: any[], n: string, d?: any) {
   const ex = exOf(n);
   a.forEach((x) => {
-    if (x && x.t === 'R') delete x.t;
+    if (x && (x.ta || x.t === 'R')) {
+      delete x.t;
+      delete x.ta;
+    }
   });
-  if (!ex || !ex.rp) return;
-  let c = 0;
+  if (!ex) return;
+  const tq = techFor(ex, d || wd(date)),
+    T = TECH_ROWS[tq];
+  if (!T) return;
+  let c = 0,
+    left = T[0];
   for (const x of a) {
     if (x.t === 'W') continue;
-    if (c === ex.s) {
-      if (!x.t) x.t = 'R';
-      break;
+    if (c >= ex.s && left > 0) {
+      if (!x.t) {
+        x.t = T[1];
+        x.ta = 1;
+      }
+      left--;
     }
     c++;
   }
@@ -1035,17 +1297,17 @@ app.addEventListener('click', async (e) => {
       ]),
       step = U() === 'kg' ? 1.25 : 2.5,
       rdf = (x) => Math.max(step, Math.round(x / step) * step),
+      ex0 = exOf(v) || { n: v, s: 3, r: '8' },
       W = parsed.length
         ? parsed.map(([q, r]) => ({ w: rdf(base * q), r, t: 'W' }))
-        : [
-            [0.4, 8],
-            [0.6, 5],
-            [0.8, 3],
-          ].map(([q, r]) => ({ w: rd(base * q), r, t: 'W' }));
+        : (() => {
+            const P = wuPlan(ex0, { ...d, sets: { ...(d.sets || {}), [v]: [{ w: base }] } }, null, null);
+            return (P.length ? P : [{ w: rd(base * 0.5), r: 8 }]).map((x) => ({ ...x, t: 'W' }));
+          })();
     if (d.k == null) d.k = dayIdx(date);
     d.sets = d.sets || {};
     d.rows = d.rows || {};
-    const r0 = d.rows[v] != null ? d.rows[v] : Math.max(t ? t.s + (t.rp ? 1 : 0) : 0, cur.length);
+    const r0 = d.rows[v] != null ? d.rows[v] : Math.max(t ? t.s + techRows(t, d) : 0, cur.length);
     d.sets[v] = W.concat(cur);
     d.rows[v] = r0 + W.length;
     wun = null;
@@ -1290,7 +1552,7 @@ app.addEventListener('click', async (e) => {
     const [n, i] = v.split('|'),
       s = ((d.sets || {})[n] || [])[+i] || {},
       cur = s.t || (s.f ? 'F' : ''),
-      nx = { '': 'F', F: 'W', W: 'D', D: '', R: '' }[cur];
+      nx = { '': 'F', F: 'W', W: 'D', D: 'M', M: 'X', X: '', R: '' }[cur];
     setS(n, +i, 'f', null);
     setS(n, +i, 't', nx || null);
   } else if (a === 'as') {
@@ -1333,19 +1595,28 @@ app.addEventListener('click', async (e) => {
     } catch (x) {}
     if (a === 'bkon') (window as any).GSync && (window as any).GSync.link();
   } else if (a === 'ck') {
-    // One tap logs the set: weight from the suggestion or last session, reps from last session or the top of the range.
+    // One tap logs the set: weight from the suggestion or last session, reps from last session or the range.
     const [n, si] = v.split('|'),
       i = +si,
       s = ((d.sets || {})[n] || [])[i] || {};
-    if (s.w && s.r) return;
+    if (logged(s)) return;
     const base = exOf(n) || { n, s: 1, r: '8' },
       ex = { ...base, n },
+      k = kindOf(n),
       L = lastFor(n, date),
-      p = (L && L.sets[i]) || (L && L.sets[L.sets.length - 1]) || {},
+      p = (L && L.sets[i]) || (L && L.sets.filter(working).slice(-1)[0]) || {},
       g = sug(ex, L),
-      w = s.w || (s.t !== 'W' && g && g.w) || p.w,
-      r = s.r || p.r || parseInt(String(ex.r).split('-').pop());
-    if (!w) {
+      rt = rowType(ex, d, ((d.sets || {})[n] || []).map((x) => x || {}), i),
+      addon = ADDON.includes(rt),
+      [lo, hi] = range(ex);
+    let w = s.w != null && s.w !== '' ? s.w : addon ? null : rt !== 'W' && g && g.w != null ? g.w : p.w;
+    if (addon && (w == null || w === '')) {
+      const prev = ((d.sets || {})[n] || []).slice(0, i).reverse().find(logged);
+      w = prev ? (rt === 'D' ? Math.round((prev.w * 0.8) / (U() === 'kg' ? 2.5 : 5)) * (U() === 'kg' ? 2.5 : 5) : prev.w) : p.w;
+    }
+    if (w == null || w === '') w = k === 'w' ? null : 0;
+    const r = s.r || (addon ? (rt === 'X' ? 2 : rt === 'M' ? 4 : p.r || 4) : (g && g.r ? g.r : p.r) || (k === 'tm' ? lo : hi));
+    if (w == null) {
       // Nothing to suggest yet (first session): put the cursor in the weight box instead.
       const el = (Array.from(SR.querySelectorAll('input[data-s]')) as HTMLInputElement[]).find((x) => x.dataset.s === v + '|w');
       el && el.focus();
@@ -1357,6 +1628,52 @@ app.addEventListener('click', async (e) => {
       navigator.vibrate && navigator.vibrate(15);
     } catch (x) {}
     if (cfg().auto !== 0) autoRest(n, i);
+  } else if (a === 'impgo' || a === 'impx' || a === 'impu') {
+    if (a === 'impgo') impGo();
+    else if (a === 'impx') impP = null;
+    else impBack();
+  } else if (a === 'wua') {
+    const ex = exOf(v) || { n: v, s: 3, r: '8' },
+      W = wuPlan(ex, d, lastFor(v, date), sug(ex, lastFor(v, date)));
+    if (!W.length) return;
+    if (d.k == null) d.k = dayIdx(date);
+    d.sets = d.sets || {};
+    d.rows = d.rows || {};
+    const cur = (d.sets[v] || []).map((x) => x || {}),
+      r0 = d.rows[v] != null ? d.rows[v] : Math.max(ex.s + techRows(ex, d), cur.length);
+    d.sets[v] = W.map((x) => ({ ...x, t: 'W' })).concat(cur);
+    d.rows[v] = r0 + W.length;
+    put('w-' + date, d);
+  } else if (a === 'hw') {
+    hwN = hwN === v ? null : v;
+  } else if (a === 'tqo') {
+    tqN = tqN === v ? null : v;
+  } else if (a === 'tq') {
+    const [o, tq] = v.split('|'),
+      P = (prog().days[dayIdx(date)] || { ex: [] }).ex.find((x) => x.n === o) || {},
+      n = (d.sw || {})[o] || o,
+      before = techRows({ ...P, n }, d);
+    if (d.k == null) d.k = dayIdx(date);
+    d.tq = d.tq || {};
+    if (tq === techOf(P)) delete d.tq[o];
+    else d.tq[o] = tq || 'none';
+    const after = techRows({ ...P, n }, d);
+    if (d.rows && d.rows[n] != null) d.rows[n] = Math.max(1, d.rows[n] + after - before);
+    if (d.sets && d.sets[n]) tagTech((d.sets[n] = d.sets[n].map((x) => x || {})), n, d);
+    put('w-' + date, d);
+  } else if (a === 'sgp') {
+    const [o, alt] = v.split('|');
+    if (d.k == null) d.k = dayIdx(date);
+    d.sw = d.sw || {};
+    d.sw[o] = alt;
+    put('w-' + date, d);
+    swp = null;
+  } else if (a === 'eqt') {
+    const c = cl(cfg()),
+      E = (c.eq || EQUIP.slice()).slice();
+    E.includes(v) ? E.splice(E.indexOf(v), 1) : E.push(v);
+    c.eq = EQUIP.filter((x) => E.includes(x));
+    put('wcfg', c);
   } else if (a === 'rest') {
     rest(+v);
     return;
@@ -1469,6 +1786,11 @@ app.addEventListener('change', (e) => {
     }
     lwarn = null;
     setS(n, +i, f, t.value === '' ? null : Number(t.value));
+    // Bodyweight, assisted and timed sets count with no weight typed: store 0.
+    if (f === 'r' && t.value !== '' && kindOf(n) !== 'w') {
+      const s0 = ((wd(date).sets || {})[n] || [])[+i] || {};
+      if (s0.w == null || s0.w === '') setS(n, +i, 'w', 0);
+    }
     const o = $('#vol');
     if (o) o.textContent = volT(wd(date));
     if (f === 'r' && t.value !== '' && cfg().auto !== 0) autoRest(n, +i);
@@ -1509,6 +1831,7 @@ app.addEventListener('change', (e) => {
     const c = cl(cfg());
     c[t.dataset.cf] = Number(t.value);
     put('wcfg', c);
+    if (t.dataset.cf === 'rq' || t.dataset.cf === 'wa' || t.dataset.cf === 'rir') render();
   } else if (t.dataset.p) {
     const p = t.dataset.p.split('|'),
       P = cl(prog());
@@ -1516,7 +1839,14 @@ app.addEventListener('change', (e) => {
     else {
       const ex = P.days[+p[0]].ex[+p[1]],
         old = ex.n;
-      ex[p[2]] = p[2] === 's' ? Math.max(1, Number(t.value) || 1) : t.value;
+      const f = p[2];
+      if (f === 's') ex.s = Math.max(1, Number(t.value) || 1);
+      else if (f === 'u') t.checked ? (ex.u = true) : delete ex.u;
+      else if (f === 'rir' || f === 'rs') t.value === '' ? delete ex[f] : (ex[f] = Number(t.value));
+      else if (f === 'k' || f === 'tq') {
+        t.value ? (ex[f] = t.value) : delete ex[f];
+        if (f === 'tq') delete ex.rp;
+      } else ex[f] = t.value;
       if (p[2] === 'n' && LIB[ex.n]) ex.g = LIB[ex.n];
       if (p[2] === 'n' && old !== ex.n)
         logs().forEach((k) => {
@@ -1719,7 +2049,7 @@ window.L_ = {
       pr: Record<string, { n: string; v: number; d: string }> = {};
     w.forEach((k) =>
       Object.entries(mem[k].sets || {}).forEach(([n, a]: [string, any]) => {
-        const m = Math.max(0, ...a.map(e1)),
+        const m = Math.max(0, ...a.map((s) => e1(s, n))),
           b = best(n, k.slice(2));
         if (b > 0 && m > b * 1.002 && (!pr[n] || m > pr[n].v)) pr[n] = { n, v: Math.round(m), d: k.slice(2) };
       }),

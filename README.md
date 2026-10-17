@@ -83,7 +83,22 @@ Build any routine in the app (Lift > Program): name days, add exercises with set
 
 A new install opens on a short setup: units, then a program picked from this list (or keep the sample to look around). No sign-in is asked for; Google Drive backup is offered once, after three finished workouts.
 
-**Logging a set:** tap the set number to log it with the suggested weight (or last session's) and last session's reps; the rest timer starts on its own. Type over any number to change it. They live in [`src/programs.json`](src/programs.json), in the same format as a program file, so adding a template is adding an entry there. Optional `level` (Beginner, Intermediate, Advanced) and `goal` tag a template in the picker.
+**Logging a set:** tap the set number to log it with the suggested weight (or last session's) and last session's reps; the rest timer starts on its own. Type over any number to change it.
+
+### Training engine
+
+- **Progression, session to session.** Hit the top of the rep range on every working set and the next weight is the one that should land you at the bottom of the range at your target reps in reserve (RIR), from that session's estimated 1RM, capped to sensible jumps. Reps left in reserve beyond the target mean a bigger jump; stopping early means "same weight, more reps"; falling short means a 5% back-off. Pain flags, deload weeks and low readiness still lower it.
+- **RIR.** Log it per set (or hide the box in Program if you always train to failure; sets then count as RIR 0). Set a program-wide target RIR and override it per exercise.
+- **Estimated 1RM** counts reps in reserve (5 reps at RIR 2 counts as 7 to failure) and, for bodyweight and assisted lifts, your logged body weight. It drives History, PRs and plateau watch.
+- **Starting weights after a program switch.** A new rep range, or a lift you have never logged, gets a starting weight from your recent 1RM estimate for that lift or a related one in the library (incline from bench, front squat from back squat).
+- **Warm-ups.** A ramp appears once the working weight is known: more steps for heavy low-rep barbell work, one or two for isolation, one feeder when the muscle is already warm from an earlier exercise. "Log warm-ups" adds them as warm-up sets.
+- **Techniques.** Rest-pause, myo-reps, drop sets and forced reps, set per exercise in the program (Set style) or changed for today on the workout card. Their extra rows are labeled (RP, M, D, FR), get short rests, and are kept out of hard-set counts and 1RM.
+- **Rest.** Every template exercise carries a recommended rest (heavy compounds 2:30 to 3:00, accessories 1:00 to 2:00). Change it per exercise in Set style; anything without one uses the default rest.
+- **Exercise types.** Weight x reps, bodyweight (weight is added load), assisted (weight is the assistance, less is progress), timed (reps are seconds), and one side at a time.
+- **Exercise library and swaps.** About 90 exercises with a one-line cue (How to), muscle group, equipment and movement pattern. Swap suggests alternatives with the same movement, filtered by the equipment you have.
+- **Import from Strong or Hevy.** History > Bring your history: pick the CSV export. Names are matched to Daily's, warm-ups and drop sets keep their type, RPE becomes RIR, Hevy kg/lb converts, timed sets stay timed. Days you already logged keep your sets. Undo is offered.
+
+Exercise fields in a program file also take `k` (`"bw"`, `"as"`, `"tm"`), `tq` (`"rp"`, `"myo"`, `"drop"`, `"fr"`), `rir` (0 to 5), `rs` (rest in seconds) and `u` (`true` for one side at a time). They live in [`src/programs.json`](src/programs.json), in the same format as a program file, so adding a template is adding an entry there. Optional `level` (Beginner, Intermediate, Advanced) and `goal` tag a template in the picker.
 
 ### Program files
 
