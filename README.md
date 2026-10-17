@@ -75,7 +75,15 @@ Build any routine in the app (Lift > Program): name days, add exercises with set
 - **Rotating cycle**: days run in order and the next day follows your last completed workout, so a missed day never shifts the plan (good for 2 on / 1 off style splits).
 - **Fixed weekdays**: 7 days, Monday first; today's workout is whatever is on today's weekday.
 
-**Start from a template** offers ready-made programs to use as they are or as a starting point: Dorian Yates HIT, Push pull legs, PHUL, PHAT, Upper lower, Full body 3 days and 5x5 strength. They live in [`src/programs.json`](src/programs.json), in the same format as a program file, so adding a template is adding an entry there.
+**Start from a template** offers 19 ready-made programs, tagged by experience level, goal and days a week, to use as they are or as a starting point:
+
+- **Beginner**: Novice linear A/B, 5x5 strength, GZCLP, Full body 3 days, Push pull legs 3 days, Minimalist 2 days, Dumbbells at home, Bodyweight basics
+- **Intermediate**: Push pull legs (6 days), PHUL, Upper lower, 5/3/1 Boring But Big, Texas Method, Bro split 5 days, Powerbuilding 4 days
+- **Advanced**: Dorian Yates HIT, Heavy Duty HIT, PHAT, Arnold split
+
+A new install opens on a short setup: units, then a program picked from this list (or keep the sample to look around). No sign-in is asked for; Google Drive backup is offered once, after three finished workouts.
+
+**Logging a set:** tap the set number to log it with the suggested weight (or last session's) and last session's reps; the rest timer starts on its own. Type over any number to change it. They live in [`src/programs.json`](src/programs.json), in the same format as a program file, so adding a template is adding an entry there. Optional `level` (Beginner, Intermediate, Advanced) and `goal` tag a template in the picker.
 
 ### Program files
 

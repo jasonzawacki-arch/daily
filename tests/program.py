@@ -96,13 +96,13 @@ with sync_playwright() as p:
     names = L("#tpl option").all_inner_texts()
     check("templates offered", all(n in names for n in ["Dorian Yates HIT", "Push pull legs", "PHUL", "PHAT", "Upper lower", "Full body 3 days", "5x5 strength"]), names)
     for i, n in enumerate(names):
-        L("#tpl").select_option(str(i)); pg.wait_for_timeout(250)
+        L("#tpl").select_option(label=n); pg.wait_for_timeout(250)  # grouped by level, so pick by name
         with pg.expect_download(timeout=5000) as dl:
             L("button[data-a=tps]").tap()
         f = json.loads(Path(dl.value.path()).read_text())
         L("#pgf").set_input_files(write(f"t{i}.json", f)); pg.wait_for_timeout(400)
         check(f"template file is valid: {n}", f["name"] == n and L("#ut button[data-pa]").count() == 1, L("#ut").inner_text())
-    L("#tpl").select_option(str(names.index("PHUL"))); pg.wait_for_timeout(250)
+    L("#tpl").select_option(label="PHUL"); pg.wait_for_timeout(250)
     L("button[data-a=tpu]").tap(); pg.wait_for_timeout(500)
     check("PHUL uses fixed weekdays", pg.evaluate("L_.mem().prog.sched") == "week" and pg.evaluate("L_.mem().prog.days.length") == 7)
     wd = pg.evaluate("(new Date().getDay() + 6) % 7")

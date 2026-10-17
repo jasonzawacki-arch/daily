@@ -184,7 +184,7 @@ header {
 }
 .sr {
   display: grid;
-  grid-template-columns: 24px 1fr 1fr 44px 36px;
+  grid-template-columns: 44px 1fr 1fr 44px 40px;
   gap: 8px;
   align-items: center;
   margin: 6px 0;
@@ -530,7 +530,7 @@ nav svg {
   filter: brightness(1.15);
 }
 .sr {
-  grid-template-columns: 24px 1fr 1fr 52px 40px 32px;
+  grid-template-columns: 44px 1fr 1fr 52px 44px 40px;
 }
 .rir {
   padding: 8px 2px;
@@ -1449,3 +1449,105 @@ input[type=number]{-moz-appearance:textfield}
 :host([data-theme="light"]) .lk,:host([data-theme="light"]) .lnk{color:#173fb0}
 .pe{grid-template-columns:1fr 1fr!important}
 .pe input:first-child{grid-column:1/-1}
+
+/* One-tap set button: the set number is the target; tapping an empty row logs the suggested set. */
+.sr .ck {
+  display: grid;
+  place-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  -webkit-tap-highlight-color: transparent;
+}
+.sr .ck b {
+  width: 32px;
+  height: 32px;
+  transition: transform 0.15s;
+}
+.sr .ck:active b {
+  transform: scale(0.88);
+}
+.sr .ck b:not(.ok) {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ac) 45%, transparent);
+}
+.x {
+  min-width: 40px;
+}
+
+/* Template tags: level, goal, days a week. */
+.tgs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 4px;
+}
+.tgs span {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ac) 14%, transparent);
+  color: var(--ac);
+}
+#tpl {
+  width: 100%;
+}
+
+/* First-run setup sheet. */
+#ob {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px calc(env(safe-area-inset-bottom, 0px) + 24px);
+}
+#ob[hidden] {
+  display: none;
+}
+.obw {
+  max-width: 520px;
+  margin: 0 auto;
+}
+.obw h2 {
+  margin: 0 0 4px;
+  font-size: 28px;
+  color: var(--tx);
+}
+.obw .chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.obt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 10px 0 0;
+  padding: 14px 16px;
+  font: inherit;
+  color: var(--tx);
+  cursor: pointer;
+}
+.obt b {
+  font-size: 18px;
+}
+.obt .sm {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+:host([data-fx='lite']) #ob {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: var(--bg);
+}

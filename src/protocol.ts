@@ -4061,7 +4061,9 @@ window.tour = () => {
   document.body.appendChild(o);
 };
 try {
-  if (!localStorage.getItem('tour')) setTimeout(() => window.tour(), 700);
+  // A brand-new install picks a program first, then sees the tour.
+  if (!localStorage.getItem('tour'))
+    setTimeout(() => (!localStorage.getItem('onb') && window.onboard ? window.onboard(() => window.tour()) : window.tour()), 700);
 } catch (e) {}
 boot().then(() => {
   resetOpen();
