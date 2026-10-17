@@ -3,7 +3,7 @@ import { checkProgram, programData, programFile } from './regcheck.js';
 import TEMPLATES from './programs.json';
 const SR = document.getElementById('hl').attachShadow({ mode: 'open' });
 SR.innerHTML =
-  '<style>' + liftCss + '</style><div id=app></div><div id=tm hidden></div><div id=ut hidden></div><input type=file id=pgf class=fi tabindex=-1 aria-hidden=true>';
+  '<style>' + liftCss + '</style><div id=app></div><div id=tm hidden></div><div id=ut hidden></div><div id=ob hidden role=dialog aria-label="Set up Daily"></div><input type=file id=pgf class=fi tabindex=-1 aria-hidden=true>';
 
 const $ = (s) => SR.querySelector(s),
   esc = (s) =>
@@ -44,6 +44,21 @@ const LIB = {
   Plank: 'Core',
   'Cable crunch': 'Core',
   'Hanging leg raise': 'Core',
+  'Close-grip bench press': 'Triceps',
+  'Overhead triceps extension': 'Triceps',
+  'Barbell curl': 'Biceps',
+  'Incline dumbbell curl': 'Biceps',
+  'Chin-up': 'Biceps',
+  'Dumbbell pullover': 'Back',
+  'Inverted row': 'Back',
+  Shrug: 'Back',
+  'Goblet squat': 'Quads',
+  'Bulgarian split squat': 'Quads',
+  'Split squat': 'Quads',
+  'Glute bridge': 'Glutes',
+  'Back extension': 'Hamstrings',
+  'Pike push-up': 'Shoulders',
+  'Dead bug': 'Core',
 };
 const GR = [
   'Chest',
@@ -100,6 +115,15 @@ const TPL: any[] = TEMPLATES as any,
   DY = programData(TPL[0]);
 let tplSel = 0,
   schMsg = '';
+const LV = ['Beginner', 'Intermediate', 'Advanced'];
+// Training days per week: a weekly program counts its training days, a cycle scales to 7 days.
+const perWeek = (t) => {
+  const on = t.days.filter((d) => !d.off).length,
+    len = t.days.length + (t.sched !== 'week' && !t.days.some((d) => d.off) ? 1 : 0);
+  return t.sched === 'week' ? on : Math.round((on * 7) / len);
+};
+const tplTags = (t) =>
+  [t.level || 'Intermediate', t.goal || '', perWeek(t) + ' days a week'].filter(Boolean).map((x) => `<span>${esc(x)}</span>`).join('');
 const U = () => cfg().u || 'lb';
 const plates = (w) => {
   const kg = U() === 'kg',
@@ -363,7 +387,7 @@ function exCard(e, d) {
     const s = arr[i] || {},
       p = (L && L.sets[i]) || {},
       key = esc(e.n) + '|' + i;
-    h += `<div class=sr><b class="${s.w && s.r ? 'ok' : ''}">${s.t === 'W' ? 'W' : e.rp && nIdx(i) === e.s ? 'RP' : nIdx(i) + 1}</b><input type=number inputmode=decimal step=.5 data-s="${key}|w" placeholder="${(sug(e, L) || {}).w || p.w || U()}" value="${s.w ?? ''}"><input type=number inputmode=numeric data-s="${key}|r" placeholder="${p.r || 'reps'}" value="${s.r ?? ''}"><select class=rir data-s="${key}|q" aria-label="Reps in reserve"><option value="">RIR</option>${[0, 1, 2, 3, 4].map((n) => `<option value=${n} ${s.q === n ? 'selected' : ''}>${n}</option>`).join('')}</select><button class="fl ${s.t || s.f ? 'on' : ''}" data-a=f data-v="${key}" aria-label="Set type: failure, warm-up, or drop">${s.t || (s.f ? 'F' : '-')}</button><button class=x data-a=rm data-v="${key}" aria-label="Remove set">&times;</button></div>`;
+    h += `<div class=sr><button class=ck data-a=ck data-v="${key}" aria-label="${s.w && s.r ? 'Set done' : 'Log set with suggested numbers'}"><b class="${s.w && s.r ? 'ok' : ''}">${s.t === 'W' ? 'W' : e.rp && nIdx(i) === e.s ? 'RP' : nIdx(i) + 1}</b></button><input type=number inputmode=decimal step=.5 data-s="${key}|w" placeholder="${(sug(e, L) || {}).w || p.w || U()}" value="${s.w ?? ''}"><input type=number inputmode=numeric data-s="${key}|r" placeholder="${p.r || 'reps'}" value="${s.r ?? ''}"><select class=rir data-s="${key}|q" aria-label="Reps in reserve"><option value="">RIR</option>${[0, 1, 2, 3, 4].map((n) => `<option value=${n} ${s.q === n ? 'selected' : ''}>${n}</option>`).join('')}</select><button class="fl ${s.t || s.f ? 'on' : ''}" data-a=f data-v="${key}" aria-label="Set type: failure, warm-up, or drop">${s.t || (s.f ? 'F' : '-')}</button><button class=x data-a=rm data-v="${key}" aria-label="Remove set">&times;</button></div>`;
   }
   return (
     h +
@@ -417,7 +441,7 @@ function progV() {
       .map((n) => '<option>' + esc(n) + '</option>')
       .join('') +
     '</datalist><div class=hint>Your program: edit days and exercises here. Rep ranges drive the "add weight" hints. Swipe a row left to delete it. RP marks a rest-pause set after the working set; log it as weight and the extra reps.</div>' +
-    `<div class=card><h3>Start from a template</h3><select id=tpl aria-label="Template">${TPL.map((t, i) => `<option value=${i} ${i === tplSel ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select><p class=sm>${esc(TPL[tplSel].about || '')} ${TPL[tplSel].sched === 'week' ? 'Fixed weekdays.' : 'Rotating cycle.'}</p><button class=btn data-a=tpu>Use this template</button> <button class=btn data-a=tps>Save as file</button><p class=sm>Using a template replaces the current program, with Undo; then change anything below. Save as file to edit it on a computer and load it back, or to put it in a regimen file.</p></div>`;
+    `<div class=card><h3>Start from a template</h3><select id=tpl aria-label="Template">${LV.map((lv) => `<optgroup label="${lv}">${TPL.map((t, i) => (t.level || 'Intermediate') === lv ? `<option value=${i} ${i === tplSel ? 'selected' : ''}>${esc(t.name)}</option>` : '').join('')}</optgroup>`).join('')}</select><div class=tgs>${tplTags(TPL[tplSel])}</div><p class=sm>${esc(TPL[tplSel].about || '')} ${TPL[tplSel].sched === 'week' ? 'Fixed weekdays.' : 'Rotating cycle.'}</p><button class=btn data-a=tpu>Use this template</button> <button class=btn data-a=tps>Save as file</button><p class=sm>Using a template replaces the current program, with Undo; then change anything below. Save as file to edit it on a computer and load it back, or to put it in a regimen file.</p></div>`;
   P.days.forEach((D, i) => {
     const mv = `<button class=mv data-a=dmu data-v=${i} aria-label="Move day up" ${i ? '' : 'disabled'}>&#9650;</button><button class=mv data-a=dmd data-v=${i} aria-label="Move day down" ${i < P.days.length - 1 ? '' : 'disabled'}>&#9660;</button>`;
     h += `<div class=card><input type=text data-p="${i}|n" value="${esc(D.n)}" aria-label="Day name"><div class=exh><span class=sm>${WEEK() ? WDS[i] : nm(i)}${D.off ? ' · rest day' : ''}</span><i style="flex:1"></i><button class=lnk data-a=doff data-v=${i}>${D.off ? 'Make it a training day' : 'Make it a rest day'}</button>${mv}</div>`;
@@ -850,10 +874,21 @@ function histV() {
     : '<div class=card>No sessions yet. Log a set on the Today tab to start your history.</div>';
   return statH + plateauCard() + liftProgress() + mvCard() + h;
 }
+// After a few finished workouts, offer Google Drive backup once (never before the app has proved itself).
+function bkAsk() {
+  const G = (window as any).GSync;
+  let no = '';
+  try {
+    no = localStorage.getItem('bkask') || '';
+  } catch (x) {}
+  if (!G || (G.state && G.state.on) || no) return '';
+  if (logs().filter((k) => mem[k].dn && all(mem[k]).length).length < 3) return '';
+  return `<div class=card><h3>Back up your workouts</h3><p class=sm>Your log lives on this phone. Turn on Google Drive backup to keep it safe if you lose or change phones. Optional: Daily works fully without it.</p><button class=btn data-a=bkon>Turn on backup</button> <button class=lnk data-a=bkno>Not now</button></div>`;
+}
 function fin(d, k) {
-  return d.dn
+  return bkAsk() + (d.dn
     ? `<div class="card"><h3>Day complete</h3><p class=sm>${isOff(k) ? 'Recovery logged.' : volT(d) || 'No sets logged.'}</p><button class=btn data-a=nx>Go to next day</button> <button class=lnk data-a=ro>Reopen</button></div>`
-    : `<div class="card"><button class=btn data-a=fin style="width:100%;padding:14px">Complete day and go to next</button><p class=sm>Everything saves as you go. Completing marks the day done in History and moves to ${nm((k + 1) % CY())}.</p></div>`;
+    : `<div class="card"><button class=btn data-a=fin style="width:100%;padding:14px">Complete day and go to next</button><p class=sm>Everything saves as you go. Completing marks the day done in History and moves to ${nm((k + 1) % CY())}.</p></div>`);
 }
 function render() {
   const k = dayIdx(date),
@@ -1292,6 +1327,36 @@ app.addEventListener('click', async (e) => {
     d.rows = d.rows || {};
     d.rows[v] = L.sets.length;
     put('w-' + date, d);
+  } else if (a === 'bkon' || a === 'bkno') {
+    try {
+      localStorage.setItem('bkask', a);
+    } catch (x) {}
+    if (a === 'bkon') (window as any).GSync && (window as any).GSync.link();
+  } else if (a === 'ck') {
+    // One tap logs the set: weight from the suggestion or last session, reps from last session or the top of the range.
+    const [n, si] = v.split('|'),
+      i = +si,
+      s = ((d.sets || {})[n] || [])[i] || {};
+    if (s.w && s.r) return;
+    const base = exOf(n) || { n, s: 1, r: '8' },
+      ex = { ...base, n },
+      L = lastFor(n, date),
+      p = (L && L.sets[i]) || (L && L.sets[L.sets.length - 1]) || {},
+      g = sug(ex, L),
+      w = s.w || (s.t !== 'W' && g && g.w) || p.w,
+      r = s.r || p.r || parseInt(String(ex.r).split('-').pop());
+    if (!w) {
+      // Nothing to suggest yet (first session): put the cursor in the weight box instead.
+      const el = (Array.from(SR.querySelectorAll('input[data-s]')) as HTMLInputElement[]).find((x) => x.dataset.s === v + '|w');
+      el && el.focus();
+      return;
+    }
+    setS(n, i, 'w', w);
+    setS(n, i, 'r', r);
+    try {
+      navigator.vibrate && navigator.vibrate(15);
+    } catch (x) {}
+    if (cfg().auto !== 0) autoRest(n, i);
   } else if (a === 'rest') {
     rest(+v);
     return;
@@ -1553,6 +1618,85 @@ $('#tm').addEventListener('click', () => {
   clearInterval(tm);
   $('#tm').hidden = true;
 });
+// First run: pick units and a program before the tour, or keep the sample to look around. No sign-in here:
+// Google backup is offered later, once there is something worth backing up.
+let obLv = '',
+  obDone: (() => void) | null = null;
+function obV() {
+  const c = cfg(),
+    list = TPL.map((t, i) => [t, i] as [any, number]).filter(([t]) => !obLv || (t.level || 'Intermediate') === obLv);
+  return `<div class=obw><h2>Welcome to Daily</h2><p class=sm>Pick a program to start logging today. You can change anything later in Program.</p>
+<label class=f>Units</label><div class=en>${['lb', 'kg'].map((u) => `<button data-ob=u data-v=${u} class="${U() === u ? 'on' : ''}">${u}</button>`).join('')}</div>
+<label class=f>Experience</label><div class=chips>${[['', 'All'], ...LV.map((x) => [x, x])].map(([v, l]) => `<button data-ob=lv data-v="${v}" class="${obLv === v ? 'on' : ''}">${l}</button>`).join('')}</div>
+${list.map(([t, i]) => `<button class="card obt" data-ob=pick data-v=${i}><b>${esc(t.name)}</b><div class=tgs>${tplTags(t)}</div><span class=sm>${esc(t.about || '')}</span></button>`).join('')}
+<button class=lnk data-ob=skip style="display:block;margin:14px auto 0;padding:12px">Just look around with sample data</button></div>`;
+}
+function obClose() {
+  const o = $('#ob');
+  o.hidden = true;
+  o.innerHTML = '';
+  try {
+    localStorage.setItem('onb', '1');
+  } catch (x) {}
+  const f = obDone;
+  obDone = null;
+  render();
+  f && f();
+}
+window.onboard = (done?: () => void) => {
+  obDone = done || null;
+  window.gomod && window.gomod('l');
+  const o = $('#ob');
+  o.innerHTML = obV();
+  o.hidden = false;
+  o.scrollTop = 0;
+};
+$('#ob').addEventListener('click', (e) => {
+  const b = (e.target as HTMLElement).closest('[data-ob]') as HTMLElement | null;
+  if (!b) return;
+  const a = b.dataset.ob,
+    v = b.dataset.v || '';
+  if (a === 'u') put('wcfg', { ...cfg(), u: v });
+  else if (a === 'lv') obLv = v;
+  else if (a === 'skip') return obClose();
+  else if (a === 'pick') {
+    put('prog', programData(TPL[+v]));
+    tplSel = +v;
+    put('wcfg', { ...cfg(), start: iso(new Date()) });
+    date = iso(new Date());
+    tab = 'today';
+    try {
+      navigator.vibrate && navigator.vibrate(12);
+    } catch (x) {}
+    return obClose();
+  }
+  $('#ob').innerHTML = obV();
+});
+// Android back gesture in the installed app: close the setup sheet or go back to Today before leaving the app.
+// Everything saves as you go, so leaving from Today loses nothing.
+{
+  const inApp = () => (window as any).DAILY_STANDALONE || matchMedia('(display-mode: standalone)').matches;
+  const arm = () => {
+    try {
+      history.state && history.state.dl ? 0 : history.pushState({ dl: 1 }, '');
+    } catch (x) {}
+  };
+  if (inApp()) {
+    arm();
+    window.addEventListener('popstate', () => {
+      const lift = (document.getElementById('hl') as HTMLElement).style.display !== 'none';
+      if (!$('#ob').hidden) return arm(); // setup is a one-time choice; back does not skip it by accident
+      if (lift && (tab !== 'today' || date !== iso(new Date()))) {
+        tab = 'today';
+        date = iso(new Date());
+        render();
+        scrollTo(0, 0);
+        return arm();
+      }
+      history.back();
+    });
+  }
+}
 window.L_ = {
   g: () => date,
   s: (v) => {

@@ -102,6 +102,9 @@ export interface ProgramFile {
   name?: string;
   /** One line about the program, shown with templates. */
   about?: string;
+  /** Template tags shown in the template picker: who it suits and what it builds. */
+  level?: 'Beginner' | 'Intermediate' | 'Advanced';
+  goal?: string;
   /** 'cycle' (default): days rotate, the next day follows the last completed one. 'week': 7 days, Monday first. */
   sched?: 'cycle' | 'week';
   /** HIT style: one working set to failure, feeder sets and short rest options. */

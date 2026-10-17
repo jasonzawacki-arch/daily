@@ -257,7 +257,9 @@
     "off": true,
     "ex": []
    }
-  ]
+  ],
+  "level": "Advanced",
+  "goal": "Size"
  },
  {
   "format": "daily-program",
@@ -505,7 +507,9 @@
     "off": true,
     "ex": []
    }
-  ]
+  ],
+  "level": "Intermediate",
+  "goal": "Size"
  },
  {
   "format": "daily-program",
@@ -699,7 +703,9 @@
     "off": true,
     "ex": []
    }
-  ]
+  ],
+  "level": "Intermediate",
+  "goal": "Strength and size"
  },
  {
   "format": "daily-program",
@@ -998,7 +1004,9 @@
     "off": true,
     "ex": []
    }
-  ]
+  ],
+  "level": "Advanced",
+  "goal": "Strength and size"
  },
  {
   "format": "daily-program",
@@ -1174,7 +1182,9 @@
     "off": true,
     "ex": []
    }
-  ]
+  ],
+  "level": "Intermediate",
+  "goal": "Size"
  },
  {
   "format": "daily-program",
@@ -1309,7 +1319,9 @@
     "off": true,
     "ex": []
    }
-  ]
+  ],
+  "level": "Beginner",
+  "goal": "General fitness"
  },
  {
   "format": "daily-program",
@@ -1368,6 +1380,1752 @@
       "g": "Back"
      }
     ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ],
+  "level": "Beginner",
+  "goal": "Strength"
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Novice linear A/B",
+  "sched": "week",
+  "level": "Beginner",
+  "goal": "Strength",
+  "about": "3 days a week (Mon, Wed, Fri), alternating workouts A and B. Few lifts, small jumps every session: the fastest way for a new lifter to get strong.",
+  "days": [
+   {
+    "n": "Workout A",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 3,
+      "r": "5",
+      "g": "Quads",
+      "t": "Add 5 lb (2.5 kg) each session while you can."
+     },
+     {
+      "n": "Bench press",
+      "s": 3,
+      "r": "5",
+      "g": "Chest",
+      "t": "Alternates with overhead press."
+     },
+     {
+      "n": "Deadlift",
+      "s": 1,
+      "r": "5",
+      "g": "Back",
+      "t": "One heavy set after warm-ups."
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Workout B",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 3,
+      "r": "5",
+      "g": "Quads"
+     },
+     {
+      "n": "Overhead press",
+      "s": 3,
+      "r": "5",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Barbell row",
+      "s": 3,
+      "r": "5",
+      "g": "Back",
+      "t": "Or power clean 5 x 3 if you know the lift."
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Workout A (or B next week)",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 3,
+      "r": "5",
+      "g": "Quads",
+      "t": "Add 5 lb (2.5 kg) each session while you can."
+     },
+     {
+      "n": "Bench press",
+      "s": 3,
+      "r": "5",
+      "g": "Chest",
+      "t": "Alternates with overhead press."
+     },
+     {
+      "n": "Deadlift",
+      "s": 1,
+      "r": "5",
+      "g": "Back",
+      "t": "One heavy set after warm-ups."
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "GZCLP",
+  "sched": "cycle",
+  "level": "Beginner",
+  "goal": "Strength and size",
+  "about": "4 workouts in rotation, about 4 a week. Three tiers: T1 heavy (5 x 3), T2 moderate (3 x 10), T3 light pump work (3 x 15, last set as many reps as possible). When a T1 stalls, move to 6 x 2, then 10 x 1.",
+  "days": [
+   {
+    "n": "Day 1: squat T1",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 5,
+      "r": "3",
+      "g": "Quads",
+      "t": "T1. Last set: as many reps as possible."
+     },
+     {
+      "n": "Bench press",
+      "s": 3,
+      "r": "10",
+      "g": "Chest",
+      "t": "T2"
+     },
+     {
+      "n": "Lat pulldown",
+      "s": 3,
+      "r": "15",
+      "g": "Back",
+      "t": "T3. Last set: as many reps as possible."
+     }
+    ]
+   },
+   {
+    "n": "Day 2: OHP T1",
+    "ex": [
+     {
+      "n": "Overhead press",
+      "s": 5,
+      "r": "3",
+      "g": "Shoulders",
+      "t": "T1. Last set: as many reps as possible."
+     },
+     {
+      "n": "Deadlift",
+      "s": 3,
+      "r": "10",
+      "g": "Back",
+      "t": "T2"
+     },
+     {
+      "n": "Dumbbell row",
+      "s": 3,
+      "r": "15",
+      "g": "Back",
+      "t": "T3"
+     }
+    ]
+   },
+   {
+    "n": "Day 3: bench T1",
+    "ex": [
+     {
+      "n": "Bench press",
+      "s": 5,
+      "r": "3",
+      "g": "Chest",
+      "t": "T1. Last set: as many reps as possible."
+     },
+     {
+      "n": "Back squat",
+      "s": 3,
+      "r": "10",
+      "g": "Quads",
+      "t": "T2"
+     },
+     {
+      "n": "Lat pulldown",
+      "s": 3,
+      "r": "15",
+      "g": "Back",
+      "t": "T3"
+     }
+    ]
+   },
+   {
+    "n": "Day 4: deadlift T1",
+    "ex": [
+     {
+      "n": "Deadlift",
+      "s": 5,
+      "r": "3",
+      "g": "Back",
+      "t": "T1. Last set: as many reps as possible."
+     },
+     {
+      "n": "Overhead press",
+      "s": 3,
+      "r": "10",
+      "g": "Shoulders",
+      "t": "T2"
+     },
+     {
+      "n": "Dumbbell row",
+      "s": 3,
+      "r": "15",
+      "g": "Back",
+      "t": "T3"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "5/3/1 Boring But Big",
+  "sched": "week",
+  "level": "Intermediate",
+  "goal": "Strength and size",
+  "about": "4 days a week (Mon, Tue, Thu, Fri), one main lift a day. Week 1: 3 x 5, week 2: 3 x 3, week 3: 5/3/1, week 4: deload, using percentages of a training max (90% of your 1RM). Then 5 x 10 of the same lift at 50 to 60%.",
+  "days": [
+   {
+    "n": "Overhead press",
+    "ex": [
+     {
+      "n": "Overhead press",
+      "s": 3,
+      "r": "1-5",
+      "g": "Shoulders",
+      "t": "Main sets: 65/75/85% wk1, 70/80/90% wk2, 75/85/95% wk3. Last set: as many reps as possible."
+     },
+     {
+      "n": "Overhead press",
+      "s": 5,
+      "r": "10",
+      "g": "Shoulders",
+      "t": "Boring But Big: 50 to 60% of training max."
+     },
+     {
+      "n": "Pull-up",
+      "s": 5,
+      "r": "10",
+      "g": "Back",
+      "t": "Assistance"
+     }
+    ]
+   },
+   {
+    "n": "Deadlift",
+    "ex": [
+     {
+      "n": "Deadlift",
+      "s": 3,
+      "r": "1-5",
+      "g": "Back",
+      "t": "Main sets, as for press. Last set: as many reps as possible."
+     },
+     {
+      "n": "Deadlift",
+      "s": 5,
+      "r": "10",
+      "g": "Back",
+      "t": "Boring But Big: 50 to 60%."
+     },
+     {
+      "n": "Hanging leg raise",
+      "s": 5,
+      "r": "10-15",
+      "g": "Core",
+      "t": "Assistance"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Bench press",
+    "ex": [
+     {
+      "n": "Bench press",
+      "s": 3,
+      "r": "1-5",
+      "g": "Chest",
+      "t": "Main sets. Last set: as many reps as possible."
+     },
+     {
+      "n": "Bench press",
+      "s": 5,
+      "r": "10",
+      "g": "Chest",
+      "t": "Boring But Big: 50 to 60%."
+     },
+     {
+      "n": "Dumbbell row",
+      "s": 5,
+      "r": "10",
+      "g": "Back",
+      "t": "Assistance"
+     }
+    ]
+   },
+   {
+    "n": "Squat",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 3,
+      "r": "1-5",
+      "g": "Quads",
+      "t": "Main sets. Last set: as many reps as possible."
+     },
+     {
+      "n": "Back squat",
+      "s": 5,
+      "r": "10",
+      "g": "Quads",
+      "t": "Boring But Big: 50 to 60%."
+     },
+     {
+      "n": "Leg curl",
+      "s": 5,
+      "r": "10",
+      "g": "Hamstrings",
+      "t": "Assistance"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Texas Method",
+  "sched": "week",
+  "level": "Intermediate",
+  "goal": "Strength",
+  "about": "3 days a week: volume on Monday (5 x 5 at about 90% of Friday's weight), a light recovery day Wednesday, and a new 5-rep best on Friday. For lifters who have run out of session-to-session progress.",
+  "days": [
+   {
+    "n": "Volume day",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 5,
+      "r": "5",
+      "g": "Quads",
+      "t": "About 90% of Friday's top set."
+     },
+     {
+      "n": "Bench press",
+      "s": 5,
+      "r": "5",
+      "g": "Chest",
+      "t": "Alternates weekly with overhead press."
+     },
+     {
+      "n": "Deadlift",
+      "s": 1,
+      "r": "5",
+      "g": "Back"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Recovery day",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 2,
+      "r": "5",
+      "g": "Quads",
+      "t": "About 80% of Monday's weight."
+     },
+     {
+      "n": "Overhead press",
+      "s": 3,
+      "r": "5",
+      "g": "Shoulders",
+      "t": "Light"
+     },
+     {
+      "n": "Pull-up",
+      "s": 3,
+      "r": "5-10",
+      "g": "Back"
+     },
+     {
+      "n": "Back extension",
+      "s": 3,
+      "r": "10",
+      "g": "Hamstrings"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Intensity day",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 1,
+      "r": "5",
+      "g": "Quads",
+      "t": "Work up to a new 5-rep best."
+     },
+     {
+      "n": "Bench press",
+      "s": 1,
+      "r": "5",
+      "g": "Chest",
+      "t": "New 5-rep best."
+     },
+     {
+      "n": "Power clean",
+      "s": 5,
+      "r": "3",
+      "g": "Other",
+      "t": "Or barbell row 3 x 5."
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Arnold split",
+  "sched": "cycle",
+  "level": "Advanced",
+  "goal": "Size",
+  "about": "Chest and back, shoulders and arms, legs: each twice in 6 days, then a rest day. High volume, classic golden-era bodybuilding.",
+  "days": [
+   {
+    "n": "Chest and back",
+    "ex": [
+     {
+      "n": "Bench press",
+      "s": 4,
+      "r": "6-10",
+      "g": "Chest"
+     },
+     {
+      "n": "Incline dumbbell press",
+      "s": 4,
+      "r": "8-10",
+      "g": "Chest"
+     },
+     {
+      "n": "Dumbbell fly",
+      "s": 3,
+      "r": "10-12",
+      "g": "Chest"
+     },
+     {
+      "n": "Pull-up",
+      "s": 4,
+      "r": "6-10",
+      "g": "Back",
+      "t": "Wide grip"
+     },
+     {
+      "n": "Barbell row",
+      "s": 4,
+      "r": "8-10",
+      "g": "Back"
+     },
+     {
+      "n": "Dumbbell pullover",
+      "s": 3,
+      "r": "10-12",
+      "g": "Back"
+     }
+    ]
+   },
+   {
+    "n": "Shoulders and arms",
+    "ex": [
+     {
+      "n": "Seated shoulder press",
+      "s": 4,
+      "r": "6-10",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Lateral raise",
+      "s": 4,
+      "r": "10-12",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Rear delt fly",
+      "s": 3,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Barbell curl",
+      "s": 4,
+      "r": "8-10",
+      "g": "Biceps"
+     },
+     {
+      "n": "Incline dumbbell curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Biceps"
+     },
+     {
+      "n": "Close-grip bench press",
+      "s": 4,
+      "r": "8-10",
+      "g": "Triceps"
+     },
+     {
+      "n": "Overhead triceps extension",
+      "s": 3,
+      "r": "10-12",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Legs",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 4,
+      "r": "6-10",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg press",
+      "s": 3,
+      "r": "10-12",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg extension",
+      "s": 3,
+      "r": "12-15",
+      "g": "Quads"
+     },
+     {
+      "n": "Romanian deadlift",
+      "s": 4,
+      "r": "8-10",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Leg curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Standing calf raise",
+      "s": 5,
+      "r": "12-15",
+      "g": "Calves"
+     },
+     {
+      "n": "Hanging leg raise",
+      "s": 3,
+      "r": "10-15",
+      "g": "Core"
+     }
+    ]
+   },
+   {
+    "n": "Chest and back",
+    "ex": [
+     {
+      "n": "Bench press",
+      "s": 4,
+      "r": "6-10",
+      "g": "Chest"
+     },
+     {
+      "n": "Incline dumbbell press",
+      "s": 4,
+      "r": "8-10",
+      "g": "Chest"
+     },
+     {
+      "n": "Dumbbell fly",
+      "s": 3,
+      "r": "10-12",
+      "g": "Chest"
+     },
+     {
+      "n": "Pull-up",
+      "s": 4,
+      "r": "6-10",
+      "g": "Back",
+      "t": "Wide grip"
+     },
+     {
+      "n": "Barbell row",
+      "s": 4,
+      "r": "8-10",
+      "g": "Back"
+     },
+     {
+      "n": "Dumbbell pullover",
+      "s": 3,
+      "r": "10-12",
+      "g": "Back"
+     }
+    ]
+   },
+   {
+    "n": "Shoulders and arms",
+    "ex": [
+     {
+      "n": "Seated shoulder press",
+      "s": 4,
+      "r": "6-10",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Lateral raise",
+      "s": 4,
+      "r": "10-12",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Rear delt fly",
+      "s": 3,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Barbell curl",
+      "s": 4,
+      "r": "8-10",
+      "g": "Biceps"
+     },
+     {
+      "n": "Incline dumbbell curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Biceps"
+     },
+     {
+      "n": "Close-grip bench press",
+      "s": 4,
+      "r": "8-10",
+      "g": "Triceps"
+     },
+     {
+      "n": "Overhead triceps extension",
+      "s": 3,
+      "r": "10-12",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Legs",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 4,
+      "r": "6-10",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg press",
+      "s": 3,
+      "r": "10-12",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg extension",
+      "s": 3,
+      "r": "12-15",
+      "g": "Quads"
+     },
+     {
+      "n": "Romanian deadlift",
+      "s": 4,
+      "r": "8-10",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Leg curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Standing calf raise",
+      "s": 5,
+      "r": "12-15",
+      "g": "Calves"
+     },
+     {
+      "n": "Hanging leg raise",
+      "s": 3,
+      "r": "10-15",
+      "g": "Core"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Bro split 5 days",
+  "sched": "week",
+  "level": "Intermediate",
+  "goal": "Size",
+  "about": "One muscle group a day, Monday to Friday, weekends off. Lots of volume per session; each muscle trained once a week.",
+  "days": [
+   {
+    "n": "Chest",
+    "ex": [
+     {
+      "n": "Bench press",
+      "s": 4,
+      "r": "6-10",
+      "g": "Chest"
+     },
+     {
+      "n": "Incline dumbbell press",
+      "s": 3,
+      "r": "8-10",
+      "g": "Chest"
+     },
+     {
+      "n": "Cable fly",
+      "s": 3,
+      "r": "12-15",
+      "g": "Chest"
+     },
+     {
+      "n": "Dip",
+      "s": 3,
+      "r": "8-12",
+      "g": "Chest"
+     }
+    ]
+   },
+   {
+    "n": "Back",
+    "ex": [
+     {
+      "n": "Deadlift",
+      "s": 3,
+      "r": "5",
+      "g": "Back"
+     },
+     {
+      "n": "Pull-up",
+      "s": 3,
+      "r": "6-10",
+      "g": "Back"
+     },
+     {
+      "n": "Barbell row",
+      "s": 3,
+      "r": "8-10",
+      "g": "Back"
+     },
+     {
+      "n": "Seated cable row",
+      "s": 3,
+      "r": "10-12",
+      "g": "Back"
+     }
+    ]
+   },
+   {
+    "n": "Shoulders",
+    "ex": [
+     {
+      "n": "Overhead press",
+      "s": 4,
+      "r": "6-10",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Lateral raise",
+      "s": 4,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Rear delt fly",
+      "s": 3,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Shrug",
+      "s": 3,
+      "r": "10-12",
+      "g": "Back"
+     }
+    ]
+   },
+   {
+    "n": "Legs",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 4,
+      "r": "6-10",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg press",
+      "s": 3,
+      "r": "10-12",
+      "g": "Quads"
+     },
+     {
+      "n": "Romanian deadlift",
+      "s": 3,
+      "r": "8-10",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Leg curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Standing calf raise",
+      "s": 4,
+      "r": "12-15",
+      "g": "Calves"
+     }
+    ]
+   },
+   {
+    "n": "Arms",
+    "ex": [
+     {
+      "n": "Barbell curl",
+      "s": 4,
+      "r": "8-10",
+      "g": "Biceps"
+     },
+     {
+      "n": "Hammer curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Biceps"
+     },
+     {
+      "n": "Skull crusher",
+      "s": 4,
+      "r": "8-10",
+      "g": "Triceps"
+     },
+     {
+      "n": "Triceps pushdown",
+      "s": 3,
+      "r": "10-12",
+      "g": "Triceps"
+     },
+     {
+      "n": "Cable crunch",
+      "s": 3,
+      "r": "12-15",
+      "g": "Core"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Heavy Duty HIT",
+  "sched": "cycle",
+  "level": "Advanced",
+  "goal": "Size",
+  "hit": true,
+  "about": "Mike Mentzer style: very brief, very hard. One all-out set per exercise, pre-exhaust pairs done back to back, then 3 or more rest days. Add rest days when you stop getting stronger.",
+  "days": [
+   {
+    "n": "Chest and back",
+    "ex": [
+     {
+      "n": "Dumbbell fly",
+      "s": 1,
+      "r": "6-10",
+      "g": "Chest",
+      "t": "Pre-exhaust: go straight to the next exercise.",
+      "ss": true
+     },
+     {
+      "n": "Incline dumbbell press",
+      "s": 1,
+      "r": "1-3",
+      "g": "Chest",
+      "t": "To failure."
+     },
+     {
+      "n": "Dumbbell pullover",
+      "s": 1,
+      "r": "6-10",
+      "g": "Back",
+      "t": "Pre-exhaust.",
+      "ss": true
+     },
+     {
+      "n": "Lat pulldown",
+      "s": 1,
+      "r": "6-10",
+      "g": "Back",
+      "t": "Close grip, to failure."
+     },
+     {
+      "n": "Deadlift",
+      "s": 1,
+      "r": "5-8",
+      "g": "Back"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Legs",
+    "ex": [
+     {
+      "n": "Leg extension",
+      "s": 1,
+      "r": "8-12",
+      "g": "Quads",
+      "t": "Pre-exhaust.",
+      "ss": true
+     },
+     {
+      "n": "Leg press",
+      "s": 1,
+      "r": "8-12",
+      "g": "Quads",
+      "t": "To failure."
+     },
+     {
+      "n": "Leg curl",
+      "s": 1,
+      "r": "6-10",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Standing calf raise",
+      "s": 1,
+      "r": "12-20",
+      "g": "Calves"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Shoulders and arms",
+    "ex": [
+     {
+      "n": "Lateral raise",
+      "s": 1,
+      "r": "6-10",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Rear delt fly",
+      "s": 1,
+      "r": "6-10",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Biceps curl",
+      "s": 1,
+      "r": "6-10",
+      "g": "Biceps"
+     },
+     {
+      "n": "Triceps pushdown",
+      "s": 1,
+      "r": "6-10",
+      "g": "Triceps",
+      "t": "Pre-exhaust.",
+      "ss": true
+     },
+     {
+      "n": "Dip",
+      "s": 1,
+      "r": "3-5",
+      "g": "Triceps",
+      "t": "To failure."
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Push pull legs 3 days",
+  "sched": "week",
+  "level": "Beginner",
+  "goal": "Size",
+  "about": "Push Monday, pull Wednesday, legs Friday: the classic split on 3 days a week. Each muscle once a week with enough volume to grow.",
+  "days": [
+   {
+    "n": "Push",
+    "ex": [
+     {
+      "n": "Bench press",
+      "s": 4,
+      "r": "6-8",
+      "g": "Chest"
+     },
+     {
+      "n": "Overhead press",
+      "s": 3,
+      "r": "8-10",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Incline dumbbell press",
+      "s": 3,
+      "r": "10-12",
+      "g": "Chest"
+     },
+     {
+      "n": "Lateral raise",
+      "s": 3,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Triceps pushdown",
+      "s": 3,
+      "r": "10-12",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Pull",
+    "ex": [
+     {
+      "n": "Barbell row",
+      "s": 4,
+      "r": "6-8",
+      "g": "Back"
+     },
+     {
+      "n": "Lat pulldown",
+      "s": 3,
+      "r": "8-10",
+      "g": "Back"
+     },
+     {
+      "n": "Face pull",
+      "s": 3,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Biceps curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Biceps"
+     },
+     {
+      "n": "Hammer curl",
+      "s": 2,
+      "r": "10-12",
+      "g": "Biceps"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Legs",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 4,
+      "r": "6-8",
+      "g": "Quads"
+     },
+     {
+      "n": "Romanian deadlift",
+      "s": 3,
+      "r": "8-10",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Leg press",
+      "s": 3,
+      "r": "10-12",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Standing calf raise",
+      "s": 4,
+      "r": "12-15",
+      "g": "Calves"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Powerbuilding 4 days",
+  "sched": "week",
+  "level": "Intermediate",
+  "goal": "Strength and size",
+  "about": "Each day starts with a heavy compound for strength (3 to 5 reps), then hypertrophy work (8 to 15 reps). Get stronger and bigger together.",
+  "days": [
+   {
+    "n": "Squat and quads",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 4,
+      "r": "3-5",
+      "g": "Quads",
+      "t": "Heavy. 3 to 4 min rest."
+     },
+     {
+      "n": "Leg press",
+      "s": 3,
+      "r": "10-12",
+      "g": "Quads"
+     },
+     {
+      "n": "Leg extension",
+      "s": 3,
+      "r": "12-15",
+      "g": "Quads"
+     },
+     {
+      "n": "Standing calf raise",
+      "s": 4,
+      "r": "10-15",
+      "g": "Calves"
+     }
+    ]
+   },
+   {
+    "n": "Bench and chest",
+    "ex": [
+     {
+      "n": "Bench press",
+      "s": 4,
+      "r": "3-5",
+      "g": "Chest",
+      "t": "Heavy. 3 to 4 min rest."
+     },
+     {
+      "n": "Incline dumbbell press",
+      "s": 3,
+      "r": "8-12",
+      "g": "Chest"
+     },
+     {
+      "n": "Lateral raise",
+      "s": 3,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Triceps pushdown",
+      "s": 3,
+      "r": "10-12",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Deadlift and back",
+    "ex": [
+     {
+      "n": "Deadlift",
+      "s": 3,
+      "r": "3-5",
+      "g": "Back",
+      "t": "Heavy. 3 to 4 min rest."
+     },
+     {
+      "n": "Pull-up",
+      "s": 3,
+      "r": "6-10",
+      "g": "Back"
+     },
+     {
+      "n": "Seated cable row",
+      "s": 3,
+      "r": "10-12",
+      "g": "Back"
+     },
+     {
+      "n": "Leg curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Hamstrings"
+     }
+    ]
+   },
+   {
+    "n": "Press and arms",
+    "ex": [
+     {
+      "n": "Overhead press",
+      "s": 4,
+      "r": "3-5",
+      "g": "Shoulders",
+      "t": "Heavy. 3 min rest."
+     },
+     {
+      "n": "Close-grip bench press",
+      "s": 3,
+      "r": "8-10",
+      "g": "Triceps"
+     },
+     {
+      "n": "Biceps curl",
+      "s": 3,
+      "r": "10-12",
+      "g": "Biceps"
+     },
+     {
+      "n": "Face pull",
+      "s": 3,
+      "r": "12-15",
+      "g": "Shoulders"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Minimalist 2 days",
+  "sched": "week",
+  "level": "Beginner",
+  "goal": "General fitness",
+  "about": "Two full-body sessions a week (Mon and Thu), about 45 minutes each. Enough to build and keep strength when time is short.",
+  "days": [
+   {
+    "n": "Full body A",
+    "ex": [
+     {
+      "n": "Back squat",
+      "s": 3,
+      "r": "6-8",
+      "g": "Quads"
+     },
+     {
+      "n": "Bench press",
+      "s": 3,
+      "r": "6-8",
+      "g": "Chest"
+     },
+     {
+      "n": "Barbell row",
+      "s": 3,
+      "r": "8-10",
+      "g": "Back"
+     },
+     {
+      "n": "Plank",
+      "s": 2,
+      "r": "30-60",
+      "g": "Core",
+      "t": "Seconds, not reps."
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Full body B",
+    "ex": [
+     {
+      "n": "Romanian deadlift",
+      "s": 3,
+      "r": "6-8",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Overhead press",
+      "s": 3,
+      "r": "6-8",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Lat pulldown",
+      "s": 3,
+      "r": "8-10",
+      "g": "Back"
+     },
+     {
+      "n": "Lunge",
+      "s": 2,
+      "r": "10-12",
+      "g": "Quads",
+      "t": "Per leg."
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Dumbbells at home",
+  "sched": "week",
+  "level": "Beginner",
+  "goal": "General fitness",
+  "about": "3 full-body days a week (Mon, Wed, Fri) with just a pair of dumbbells and a bench or floor. Use a weight you can lift for the top of the range with 1 to 2 reps left.",
+  "days": [
+   {
+    "n": "Home A",
+    "ex": [
+     {
+      "n": "Goblet squat",
+      "s": 3,
+      "r": "10-15",
+      "g": "Quads"
+     },
+     {
+      "n": "Dumbbell bench press",
+      "s": 3,
+      "r": "8-12",
+      "g": "Chest",
+      "t": "Or floor press."
+     },
+     {
+      "n": "Dumbbell row",
+      "s": 3,
+      "r": "10-12",
+      "g": "Back",
+      "t": "Per arm."
+     },
+     {
+      "n": "Dumbbell shoulder press",
+      "s": 2,
+      "r": "10-12",
+      "g": "Shoulders"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Home B",
+    "ex": [
+     {
+      "n": "Dumbbell Romanian deadlift",
+      "s": 3,
+      "r": "10-12",
+      "g": "Hamstrings"
+     },
+     {
+      "n": "Push-up",
+      "s": 3,
+      "r": "8-20",
+      "g": "Chest"
+     },
+     {
+      "n": "Dumbbell pullover",
+      "s": 3,
+      "r": "10-12",
+      "g": "Back"
+     },
+     {
+      "n": "Hammer curl",
+      "s": 2,
+      "r": "10-12",
+      "g": "Biceps"
+     },
+     {
+      "n": "Overhead triceps extension",
+      "s": 2,
+      "r": "10-12",
+      "g": "Triceps"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Home C",
+    "ex": [
+     {
+      "n": "Split squat",
+      "s": 3,
+      "r": "8-12",
+      "g": "Quads",
+      "t": "Per leg. Back foot on a bench if you have one."
+     },
+     {
+      "n": "Incline dumbbell press",
+      "s": 3,
+      "r": "8-12",
+      "g": "Chest"
+     },
+     {
+      "n": "Dumbbell row",
+      "s": 3,
+      "r": "10-12",
+      "g": "Back"
+     },
+     {
+      "n": "Lateral raise",
+      "s": 3,
+      "r": "12-15",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Dead bug",
+      "s": 2,
+      "r": "10-12",
+      "g": "Core"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   }
+  ]
+ },
+ {
+  "format": "daily-program",
+  "version": 1,
+  "name": "Bodyweight basics",
+  "sched": "week",
+  "level": "Beginner",
+  "goal": "General fitness",
+  "about": "No equipment except a pull-up bar. 3 days a week (Mon, Wed, Fri). When you hit the top of a range on every set, move to a harder version (decline push-up, archer push-up, pistol progressions).",
+  "days": [
+   {
+    "n": "Bodyweight A",
+    "ex": [
+     {
+      "n": "Push-up",
+      "s": 3,
+      "r": "8-20",
+      "g": "Chest"
+     },
+     {
+      "n": "Pull-up",
+      "s": 3,
+      "r": "3-10",
+      "g": "Back",
+      "t": "Use a band or negatives if needed."
+     },
+     {
+      "n": "Bodyweight squat",
+      "s": 3,
+      "r": "15-25",
+      "g": "Quads"
+     },
+     {
+      "n": "Plank",
+      "s": 3,
+      "r": "30-60",
+      "g": "Core",
+      "t": "Seconds."
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Bodyweight B",
+    "ex": [
+     {
+      "n": "Pike push-up",
+      "s": 3,
+      "r": "6-12",
+      "g": "Shoulders"
+     },
+     {
+      "n": "Inverted row",
+      "s": 3,
+      "r": "8-15",
+      "g": "Back"
+     },
+     {
+      "n": "Lunge",
+      "s": 3,
+      "r": "10-15",
+      "g": "Quads",
+      "t": "Per leg."
+     },
+     {
+      "n": "Glute bridge",
+      "s": 3,
+      "r": "12-20",
+      "g": "Glutes"
+     },
+     {
+      "n": "Hanging leg raise",
+      "s": 3,
+      "r": "6-12",
+      "g": "Core"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
+   },
+   {
+    "n": "Bodyweight C",
+    "ex": [
+     {
+      "n": "Dip",
+      "s": 3,
+      "r": "5-12",
+      "g": "Triceps",
+      "t": "Between chairs or bars."
+     },
+     {
+      "n": "Chin-up",
+      "s": 3,
+      "r": "3-10",
+      "g": "Biceps"
+     },
+     {
+      "n": "Bulgarian split squat",
+      "s": 3,
+      "r": "8-12",
+      "g": "Quads",
+      "t": "Per leg."
+     },
+     {
+      "n": "Single-leg calf raise",
+      "s": 3,
+      "r": "12-20",
+      "g": "Calves"
+     }
+    ]
+   },
+   {
+    "n": "Rest",
+    "off": true,
+    "ex": []
    },
    {
     "n": "Rest",
